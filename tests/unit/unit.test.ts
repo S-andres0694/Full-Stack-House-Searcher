@@ -37,9 +37,9 @@ describe("Database Unit Tests", () => {
     schemaLoader(db);
     expect(db.prepare("SELECT * FROM properties").get()).toBeUndefined();
     expect(db.prepare("SELECT * FROM viewed_properties").get()).toBeUndefined();
-    expect(db.prepare("SELECT * FROM roles").get()).toBeUndefined();
+    expect(db.prepare("SELECT * FROM roles").get()).toBeDefined();
     expect(db.prepare("SELECT * FROM favorites").get()).toBeUndefined();
-    expect(db.prepare("SELECT * FROM users").get()).toBeUndefined();
+    expect(db.prepare("SELECT * FROM users").get()).toBeDefined();
   });
 
   //Test 4:
