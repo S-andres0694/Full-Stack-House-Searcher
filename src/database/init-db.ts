@@ -18,7 +18,7 @@ const adminUsername: string = process.env.ADMIN_USERNAME || "";
 const adminEmail: string = process.env.ADMIN_EMAIL || "";
 
 //Runs the code.
-const db : boolean = databaseCreator();
+const db : boolean = databaseCreator(databasePath);
   if (db) {
     console.log("Database initialized successfully.");
   } else {
@@ -30,14 +30,15 @@ const db : boolean = databaseCreator();
  * Also initializes the database schema if it doesn't exist.
  */
 
-function databaseCreator(): boolean {
+export function databaseCreator(databasePath: string): boolean {
   const db: Database = new Database(databasePath,
     sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err: Error | null) => {
       if (err && "code" in err && err.code === "SQLITE_CANTOPEN") {
         schemaLoader(db);
         //Populate with starting values.
-        initialValues(db);
-        db.close();
+        initialValues(db, () => {
+          db.close();
+        });
         return true;
       } else if (err) {
         console.error(`Getting error ${err}. Unable to open database`);
@@ -77,9 +78,15 @@ export default function connectionGenerator(): Database {
 function schemaLoader(db: Database): void {
   try{
     const schema : string = readFileSync(schemaPath, "utf-8");
-    db.serialize(() => {
-      db.exec("PRAGMA foreign_keys = ON;");
-      db.exec(schema);
+    
+    //Enables foreign key constraints.
+    db.exec("PRAGMA foreign_keys = ON;", (err : Error | null) => {
+      if (err) throw err;
+    });
+
+    //Loads the schema into the database.
+    db.run(schema, (err : Error | null) => {
+      if (err) throw err;
     });
   } catch (error) {
     console.error(`Error starting the schema of the database: ${error}`);
@@ -94,28 +101,49 @@ function schemaLoader(db: Database): void {
  * @returns {void}
  */
  
-function initialValues(db: Database): void {
-  //Starts the initial values for the roles.
-  try {
-    const sql: string = `
-      INSERT INTO roles (role_name, description) VALUES (?, ?);
-      INSERT INTO roles (role_name, description) VALUES (?, ?);`;
-    db.run(sql, [
-      "admin", "Administrator with full access",
-      "user", "Regular user with basic access"
-    ]);
-  } catch (error) {
-    console.error(`Error populating the database with initial values. Error is: ${error}`);
-  } finally {
-    db.close();
-  }
+function initialValues(db: Database, callback: () => void): void {
+  db.serialize(() => {
+    try {
+      // Begin transaction
+      db.run('BEGIN TRANSACTION');
 
-  //Starts the initial values for the admin user (Me).
-  try {
-    const sql: string = "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)";
-    db.run(sql, [adminUsername, adminPassword, adminEmail, "admin"]);
-  } catch (error) {
-    console.error(`Error populating the database with initial values. Error is: ${error}`);
-  }
+      //Starts the initial values for the roles.
+      const rolesSql: string = `
+        INSERT INTO roles (role_name, description) VALUES (?, ?);
+        INSERT INTO roles (role_name, description) VALUES (?, ?);`;
+      
+      db.run(rolesSql, [
+        "admin", "Administrator with full access",
+        "user", "Regular user with basic access"
+      ], (err) => {
+        if (err) throw err;
+      });
+
+      console.log("Roles inserted successfully.");
+
+      //Starts the initial values for the admin user
+      const userSql: string = "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)";
+      db.run(userSql, [adminUsername, adminPassword, adminEmail, "admin"], (err) => {
+        if (err) throw err;
+      });
+
+      console.log("Admin user inserted successfully.");
+
+      // Commit transaction
+      db.run('COMMIT', (err) => {
+        if (err) throw err;
+        callback();
+      });
+
+      console.log("Transaction committed successfully.");
+
+    } catch (error) {
+      // Rollback on error
+      db.run('ROLLBACK', () => {
+        console.error('Database initialization failed:', error);
+        callback();
+      });
+    }
+  });
 }
 
