@@ -45,10 +45,7 @@ describe("Database Unit Tests", () => {
   //Test 4:
   it("should be able to insert a user", () => {
     schemaLoader(db);
-
-    db.prepare(
-      "INSERT INTO roles (role_name, description) VALUES (?, ?)"
-    ).run("admin", "Admin role with full access");
+    initialValues(db);
 
     db.prepare(
       "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)"
@@ -95,10 +92,7 @@ describe("Database Unit Tests", () => {
   //Test 7:
   it("should be able to insert a viewed property", () => {
     schemaLoader(db);
-    
-    // First insert roles
-    db.prepare("INSERT INTO roles (role_name, description) VALUES (?, ?)")
-      .run("user", "Standard user role");
+    initialValues(db);
     
     // Then insert user
     db.prepare(
@@ -134,10 +128,7 @@ describe("Database Unit Tests", () => {
   //Test 8:
   it("should be able to insert a favorite property", () => {
     schemaLoader(db);
-    
-    // First insert roles
-    db.prepare("INSERT INTO roles (role_name, description) VALUES (?, ?)")
-      .run("user", "Standard user role");
+    initialValues(db);
     
     // Then insert user
     db.prepare(
