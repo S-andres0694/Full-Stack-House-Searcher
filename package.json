@@ -7,7 +7,7 @@
     "build": "tsc",
     "watch": "tsc --watch",
     "parcel-build": "parcel build src/public/index.html --dist-dir dist/public",
-    "tailwind-build": "npx tailwindcss -i ./src/public/styles.css -o ./src/public/≠output.css --watch --minify"
+    "tailwind-build": "npx tailwindcss -i ./src/public/styles.css -o ./src/public/output.css --watch --minify"
   },
   "keywords": [],
   "author": "Sebastian",
@@ -26,6 +26,7 @@
     "@types/jest": "^29.5.14",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.10.2",
+    "@types/sqlite3": "^3.1.11",
     "morgan": "^1.10.0",
     "parcel": "^2.13.3",
     "ts-node": "^10.9.2",
