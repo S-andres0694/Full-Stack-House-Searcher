@@ -35,13 +35,15 @@ if (db) {
 }
 
 /**
- * Creates the database connection and forms an object that can be used to interact with the database.
- * Also initializes the database schema if it doesn't exist.
+ * Creates the database file to be used by the server.
+ * It also loads the schema and populates the database with the initial values.
  */
 
 export function databaseCreator(databasePath: string): boolean {
   try {
     const db: Database = new sqlite3(databasePath, dbOptions);
+    schemaLoader(db);
+    initialValues(db);
     return true;
   } catch (error) {
     console.error(`Error creating database: ${error}`);
@@ -50,7 +52,7 @@ export function databaseCreator(databasePath: string): boolean {
 }
 
 /**
- * Function to return a connection object to the database.
+ * Function to return a connection object for the database.
  *
  * @returns {Database} - The database connection object.
  */
