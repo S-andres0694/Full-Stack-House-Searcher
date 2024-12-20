@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL,
     email TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    role TEXT NOT NULL
+    role TEXT NOT NULL,
+    FOREIGN KEY (role) REFERENCES roles(role_name)
 );
 CREATE TABLE IF NOT EXISTS properties (
     identifier INTEGER PRIMARY KEY,
