@@ -3,7 +3,7 @@ import sqlite3, { Database } from "better-sqlite3";
 import dotenv from "dotenv";
 import { readFileSync } from "fs";
 
-const databasePath: string = __dirname + "/database.sqlite";
+export const databasePath: string = __dirname + "/database.sqlite";
 const schemaPath: string = __dirname + "/schema.sql";
 
 //Loads the environment variables.
@@ -18,12 +18,14 @@ const adminEmail: string = process.env.ADMIN_EMAIL || "";
 const dbOptions = {
   fileMustExist: false,
   verbose: console.log,
+  readonly: false,
 };
 
 //Options for the Database Connection
 const dbConnectionOptions = {
   fileMustExist: true,
   verbose: console.log,
+  readonly: false,
 };
 
 //Runs the code.
@@ -82,12 +84,12 @@ export function schemaLoader(db: Database): void {
 }
 
 /**
-   * Function to populate the database with some initial values.
-   * It adds the admin user and all of the roles into the database.
-   *
-   * @returns {void}
-   */
- 
+ * Function to populate the database with some initial values.
+ * It adds the admin user and all of the roles into the database.
+ *
+ * @returns {void}
+ */
+
 export function initialValues(db: Database): void {
   try {
     db.transaction(() => {
@@ -95,15 +97,15 @@ export function initialValues(db: Database): void {
       db.prepare(
         "INSERT OR IGNORE INTO roles (role_name, description) VALUES (?, ?)"
       ).run("admin", "Admin role with full access");
-      
+
       db.prepare(
         "INSERT OR IGNORE INTO roles (role_name, description) VALUES (?, ?)"
       ).run("user", "Standard user role with limited access");
-      
+
       // Then insert admin user
       db.prepare(
-        "INSERT OR IGNORE INTO users (username, email, password, role) VALUES (?, ?, ?, ?)"
-      ).run(adminUsername, adminEmail, adminPassword, "admin");
+        "INSERT OR IGNORE INTO users (username, email, password, role, name) VALUES (?, ?, ?, ?, ?)"
+      ).run(adminUsername, adminEmail, adminPassword, "admin", "Sebastian El Khoury");
     })();
   } catch (error) {
     console.error(`Error populating the database: ${error}`);

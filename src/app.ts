@@ -2,7 +2,7 @@ import express, { Application } from "express";
 import morgan from "morgan";
 import path from "path";
 import { databaseCreator } from "./database/init-db";
-
+import supertest, { Response } from "supertest";
 
 //Express application
 const app: Application = express();

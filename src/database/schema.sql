@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     role TEXT NOT NULL,
+    name TEXT NOT NULL,
     FOREIGN KEY (role) REFERENCES roles(role_name)
 );
 CREATE TABLE IF NOT EXISTS properties (

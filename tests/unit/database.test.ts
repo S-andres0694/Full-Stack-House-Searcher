@@ -3,9 +3,13 @@ import connectionGenerator, { initialValues } from "../../src/database/init-db";
 import { databaseCreator, schemaLoader } from "../../src/database/init-db";
 import sqlite3, { Database } from "better-sqlite3";
 import { existsSync, unlinkSync } from "fs";
+import supertest from "supertest";
+import usersModelFactory, { UsersModel } from "../../src/models/users";
+import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
+import { NewUser } from "../../src/models/table-types";
 
 let db: Database;
-
+ 
 const testDbPath: string = __dirname + "/test-database.sqlite";
 
 //Creates a test database and provides a connection to it.
@@ -16,6 +20,13 @@ beforeEach(() => {
   }
   databaseCreator(testDbPath);
   db = connectionGenerator(testDbPath);
+});
+
+afterEach(() => {
+  // Close database connection after each test
+  if (db) {
+    db.close();
+  }
 });
 
 describe("Database Unit Tests", () => {
@@ -48,8 +59,8 @@ describe("Database Unit Tests", () => {
     initialValues(db);
 
     db.prepare(
-      "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)"
-    ).run("testuser", "testpassword", "test@test.com", "admin");
+      "INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)"
+    ).run("testuser", "testpassword", "test@test.com", "admin", "Anon User");
     expect(
       db.prepare("SELECT * FROM users WHERE username = 'testuser'").get()
     ).toBeDefined();
@@ -93,11 +104,11 @@ describe("Database Unit Tests", () => {
   it("should be able to insert a viewed property", () => {
     schemaLoader(db);
     initialValues(db);
-    
+
     // Then insert user
     db.prepare(
-      "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)"
-    ).run("testuser", "testpassword", "test@test.com", "user");
+      "INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)"
+    ).run("testuser", "testpassword", "test@test.com", "user", "Anon User");
 
     // Then insert property
     db.prepare(
@@ -115,7 +126,7 @@ describe("Database Unit Tests", () => {
     db.prepare(
       "INSERT INTO viewed_properties (user_id, property_id) VALUES (?, ?)"
     ).run(1, 1);
-    
+
     expect(
       db
         .prepare(
@@ -129,12 +140,12 @@ describe("Database Unit Tests", () => {
   it("should be able to insert a favorite property", () => {
     schemaLoader(db);
     initialValues(db);
-    
+
     // Then insert user
     db.prepare(
-      "INSERT INTO users (username, password, email, role) VALUES (?, ?, ?, ?)"
-    ).run("testuser", "testpassword", "test@test.com", "user");
-    
+      "INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)"
+      ).run("testuser", "testpassword", "test@test.com", "user", "Anon User");
+
     // Then insert property
     db.prepare(
       "INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url) VALUES (?, ?, ?, ?, ?, ?)"
@@ -146,12 +157,12 @@ describe("Database Unit Tests", () => {
       "A test property for viewing",
       "https://example.com"
     );
-    
+
     // Finally insert favorite
     db.prepare(
       "INSERT INTO favorites (user_id, property_id) VALUES (?, ?)"
     ).run(1, 1);
-    
+
     expect(
       db
         .prepare(
@@ -171,7 +182,7 @@ describe("Database Unit Tests", () => {
       .prepare("SELECT * FROM roles WHERE role_name = ?")
       .get("admin");
     expect(adminRole).toBeDefined();
-    
+
     const userRole = db
       .prepare("SELECT * FROM roles WHERE role_name = ?")
       .get("user");
@@ -186,12 +197,7 @@ describe("Database Unit Tests", () => {
 });
 
 afterAll(() => {
-  // Close database connection after each test
-  if (db) {
-    db.close();
-  }
-
-  //Remove the test database
+  // Remove the test database
   if (existsSync(testDbPath)) {
     unlinkSync(testDbPath);
   }
