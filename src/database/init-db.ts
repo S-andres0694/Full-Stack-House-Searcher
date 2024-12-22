@@ -47,8 +47,8 @@ export function databaseCreator(databasePath: string): boolean {
     schemaLoader(db);
     initialValues(db);
     return true;
-  } catch (error) {
-    console.error(`Error creating database: ${error}`);
+  } catch (error: any) {
+    console.error(`Error creating database: ${error.stack}`);
     return false;
   }
 }
@@ -78,8 +78,8 @@ export function schemaLoader(db: Database): void {
 
     //Loads the schema into the database.
     db.exec(schema);
-  } catch (error) {
-    console.error(`Error starting the schema of the database: ${error}`);
+  } catch (error: any) {
+    console.error(`Error starting the schema of the database: ${error.stack}`);
   }
 }
 
@@ -105,9 +105,15 @@ export function initialValues(db: Database): void {
       // Then insert admin user
       db.prepare(
         "INSERT OR IGNORE INTO users (username, email, password, role, name) VALUES (?, ?, ?, ?, ?)"
-      ).run(adminUsername, adminEmail, adminPassword, "admin", "Sebastian El Khoury");
+      ).run(
+        adminUsername,
+        adminEmail,
+        adminPassword,
+        "admin",
+        "Sebastian El Khoury"
+      );
     })();
-  } catch (error) {
-    console.error(`Error populating the database: ${error}`);
+  } catch (error: any) {
+    console.error(`Error populating the database: ${error.stack}`);
   }
 }
