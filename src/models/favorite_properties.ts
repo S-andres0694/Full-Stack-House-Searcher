@@ -24,9 +24,14 @@ class FavoritePropertiesModel {
      * @param {NewFavorite} favorite - The favorite property object to add
      * @returns {Promise<number>} The ID of the newly created favorite property
      */
-    async addFavoriteProperty(favorite: NewFavorite): Promise<number> {
-        const [favoriteRecord] = await this.db.insert(favorites).values(favorite).returning({ id: favorites.id });
-        return favoriteRecord.id;
+    async addFavoriteProperty(favorite: NewFavorite): Promise<void> {
+        try {
+            this.db.transaction(async (tx) => {
+                await tx.insert(favorites).values(favorite);
+            });
+        } catch (error) {
+            throw new Error("Failed to add favorite property");
+        }
     }
 
     /**
@@ -35,7 +40,13 @@ class FavoritePropertiesModel {
      * @returns {Promise<void>} A promise that resolves when the deletion is complete
      */
     async deleteFavoriteProperty(id: number): Promise<void> {
-        await this.db.delete(favorites).where(eq(favorites.id, id));
+        try {
+            this.db.transaction(async (tx) => {
+                await tx.delete(favorites).where(eq(favorites.id, id));
+            });
+        } catch (error) {
+            throw new Error("Failed to delete favorite property");
+        }
     }
 
     /**
@@ -44,7 +55,13 @@ class FavoritePropertiesModel {
      * @returns {Promise<void>} A promise that resolves when the deletion is complete
      */
     async clearFavoriteProperties(userId: number): Promise<void> {
-        await this.db.delete(favorites).where(eq(favorites.userId, userId));
+        try {
+            this.db.transaction(async (tx) => {
+                await tx.delete(favorites).where(eq(favorites.userId, userId));
+            });
+        } catch (error) {
+            throw new Error("Failed to clear favorite properties");
+        }
     }
 
     /**

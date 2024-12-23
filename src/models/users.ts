@@ -24,19 +24,22 @@ export class UsersModel {
    * @param {NewUser} user - The user object containing user details
    * @returns {Promise<number>} The ID of the newly created user
    */
-  async createUser(user: NewUser): Promise<number> {
+  async createUser(user: NewUser): Promise<void> {
     const validationResult: boolean | string = await this.validateUniqueUsernameAndEmail(user);
     if (validationResult === true) {
       //Hash the password.
       user.password = await hash(user.password, 10);
       //Insert the user into the database and return the id of the user.
-      const [userRecord] = await this.db
-        .insert(users)
-        .values(user)
-        .returning({ id: users.id });
-      return userRecord.id;
+      try {
+        this.db.transaction(async (tx) => {
+          await tx.insert(users).values(user);
+        });
+      } catch (error) {
+        throw new Error("Failed to create user");
+      }
+    } else {
+      throw new Error(validationResult as string);
     }
-    throw new Error(validationResult as string);
   }
 
   /**
@@ -116,8 +119,15 @@ export class UsersModel {
    * @returns {Promise<void>}
    */
   async updateUserUsername(id: number, username: string): Promise<void> {
-    //Update the user's username in the database.
-    await this.db.update(users).set({ username }).where(eq(users.id, id));
+    //Check if the username already exists
+    const usernameExists = await this.usernameExists(username);
+    if (usernameExists) {
+      throw new Error("Username already exists");
+    }
+    
+    this.db.transaction(async (tx) => {
+      await tx.update(users).set({ username }).where(eq(users.id, id));
+    });
   }
 
   /**
@@ -127,11 +137,15 @@ export class UsersModel {
    * @returns {Promise<void>}
    */
   async updateUserEmail(username: string, email: string): Promise<void> {
-    //Update the user's email in the database.
-    await this.db
-      .update(users)
-      .set({ email })
-      .where(eq(users.username, username));
+    //Check if the email already exists
+    const emailExists = await this.emailExists(email);
+    if (emailExists) {
+      throw new Error("Email already exists");
+    }
+    
+    this.db.transaction(async (tx) => {
+      await tx.update(users).set({ email }).where(eq(users.username, username));
+    });
   }
 
   /**
@@ -144,10 +158,9 @@ export class UsersModel {
     //Hash the password.
     password = await hash(password, 10);
     //Update the user's password in the database.
-    await this.db
-      .update(users)
-      .set({ password })
-      .where(eq(users.username, username));
+    this.db.transaction(async (tx) => {
+      await tx.update(users).set({ password }).where(eq(users.username, username));
+    });
   }
 
   /**
@@ -156,7 +169,9 @@ export class UsersModel {
    * @returns {Promise<void>}
    */
   async deleteUser(username: string): Promise<void> {
-    await this.db.delete(users).where(eq(users.username, username));
+    this.db.transaction(async (tx) => {
+      await tx.delete(users).where(eq(users.username, username));
+    });
   }
 
   /**
@@ -208,6 +223,20 @@ export class UsersModel {
   async getEmail(username: string): Promise<string | undefined> {
     const user = await this.getUserByUsername(username);
     return user?.email;
+  }
+
+  /**
+   * Retrieves the ID of a user by their username.
+   * @param {string} username - The username of the user to retrieve
+   * @returns {Promise<number>} The ID of the user
+   */
+  async getUserId(username: string): Promise<number> {
+    const userExists = await this.usernameExists(username);
+    if (!userExists) {
+      throw new Error("User does not exist");
+    }
+    const user = await this.getUserByUsername(username);
+    return user!.id;
   }
 }
 

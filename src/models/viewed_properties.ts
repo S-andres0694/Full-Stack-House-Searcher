@@ -13,7 +13,7 @@ class ViewedPropertiesModel {
      * @param {number} userId - The ID of the user whose viewed properties to retrieve
      * @returns {Promise<ViewedProperty[]>} A promise that resolves to an array of viewed properties
      */
-    async getAllViewedProperties(userId: number): Promise<ViewedProperty[]> {
+    async getAllViewedPropertiesFromUser(userId: number): Promise<ViewedProperty[]> {
         return await this.db
             .select()
             .from(viewedProperties)
@@ -25,9 +25,14 @@ class ViewedPropertiesModel {
      * @param {NewViewedProperty} viewedProperty - The viewed property object to create
      * @returns {Promise<number>} The ID of the newly created viewed property
      */
-    async addPropertyAsViewed(viewedProperty: NewViewedProperty): Promise<number> {
-        const [viewedPropertyRecord] = await this.db.insert(viewedProperties).values(viewedProperty).returning({ id: viewedProperties.id });
-        return viewedPropertyRecord.id;
+    async addPropertyAsViewed(viewedProperty: NewViewedProperty): Promise<void> {
+        try {
+            this.db.transaction(async (tx) => {
+                await tx.insert(viewedProperties).values(viewedProperty);
+            });
+        } catch (error) {
+            throw new Error("Failed to add property as viewed");
+        }
     }
 
     /**
@@ -36,7 +41,13 @@ class ViewedPropertiesModel {
      * @returns {Promise<void>} A promise that resolves when the deletion is complete
      */
     async deleteViewedProperty(id: number): Promise<void> {
-        await this.db.delete(viewedProperties).where(eq(viewedProperties.id, id));
+        try {
+            this.db.transaction(async (tx) => {
+                await tx.delete(viewedProperties).where(eq(viewedProperties.id, id));
+            });
+        } catch (error) {
+            throw new Error("Failed to delete viewed property");
+        }
     }
 
     /**
@@ -45,7 +56,13 @@ class ViewedPropertiesModel {
      * @returns {Promise<void>} A promise that resolves when the deletion is complete
      */
     async clearViewedProperties(userId: number): Promise<void> {
-        await this.db.delete(viewedProperties).where(eq(viewedProperties.userId, userId));
+        try {
+            this.db.transaction(async (tx) => {
+                await tx.delete(viewedProperties).where(eq(viewedProperties.userId, userId));
+            });
+        } catch (error) {
+            throw new Error("Failed to clear viewed properties");
+        }
     }
 
     /**
@@ -74,17 +91,19 @@ class ViewedPropertiesModel {
      * @param {Property[]} properties - Array of properties to mark as viewed
      * @returns {Promise<number>} How many properties were added as viewed.
      */
-    async addMultiplePropertiesAsViewed(userId: number, properties: Property[]): Promise<number> {
-        const viewedPropertyRecords = await this.db.insert(viewedProperties)
-            .values(
-                properties.map(property => ({
-                    userId: userId,
-                    propertyId: property.id,
-                    viewedAt: new Date().toISOString()
-                }))
-            ).returning({ id: viewedProperties.id });
-
-        return viewedPropertyRecords.length;
+    async addMultiplePropertiesAsViewed(userId: number, properties: Property[]): Promise<void> {
+        try {
+            this.db.transaction(async (tx) => {
+                properties.forEach(async (property) => {
+                    await tx.insert(viewedProperties).values({
+                        userId: userId,
+                        propertyId: property.id
+                    });
+                });
+            });
+        } catch (error) {
+            throw new Error("Failed to add multiple properties as viewed");
+        }
     }
 }
 

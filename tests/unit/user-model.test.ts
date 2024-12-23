@@ -43,7 +43,8 @@ beforeEach(async () => {
   db = connectionGenerator(testDbPath, dbTestOptions);
   await resetDatabase(db, dbTestOptions);
   await initialValues(db);
-  userId = await usersModel.createUser(user);
+  await usersModel.createUser(user);
+  userId = await usersModel.getUserId(user.username)!;
 });
 
 afterAll(() => {
