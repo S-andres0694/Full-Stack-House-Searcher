@@ -166,4 +166,24 @@ describe("Database Unit Tests", () => {
         .run(userId.id, propertyId.id)
     ).toBeDefined();
   });
+
+  //Test 9:
+  it("the table actually gets wiped when calling the resetDatabase function", async () => {
+    expect(db.prepare("SELECT * FROM roles").get()).toBeDefined();
+    expect(db.prepare("SELECT * FROM users").get()).toBeDefined();
+    await resetDatabase(db, dbTestOptions);
+    expect(db.prepare("SELECT * FROM roles").get()).toBeUndefined();
+    expect(db.prepare("SELECT * FROM users").get()).toBeUndefined();
+  });
+
+  //Test 10:
+  it("tests that the initial values are inserted correctly", async () => {
+    await resetDatabase(db, dbTestOptions);
+    await initialValues(db);
+    expect(db.prepare("SELECT * FROM roles").get()).toBeDefined();
+    expect(db.prepare("SELECT * FROM users").get()).toBeDefined();
+    expect(db.prepare("SELECT * FROM roles WHERE role_name = 'admin'").get()).toBeDefined();
+    expect(db.prepare("SELECT * FROM roles WHERE role_name = 'user'").get()).toBeDefined();
+  });
 });
+

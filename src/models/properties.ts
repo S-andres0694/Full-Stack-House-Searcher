@@ -173,6 +173,26 @@ export class PropertiesModel {
       .where(eq(properties.id, id));
     return propertyRecord?.identifier;
   }
+
+  /**
+   * Retrieves the property by its address.
+   * @param {string} address - The address of the property
+   * @returns {Promise<Property | undefined>} A promise that resolves to the property if found, undefined otherwise
+   */
+  async getPropertyByAddress(address: string): Promise<Property | undefined> {
+    const [propertyRecord]: Property[] = await this.db.select().from(properties).where(eq(properties.address, address));
+    return propertyRecord;
+  }
+
+  /**
+   * Retrieves the property by its identifier.
+   * @param {number} identifier - The identifier of the property
+   * @returns {Promise<Property | undefined>} A promise that resolves to the property if found, undefined otherwise
+   */
+  async getPropertyByIdentifier(identifier: number): Promise<Property | undefined> {
+    const [propertyRecord]: Property[] = await this.db.select().from(properties).where(eq(properties.identifier, identifier));
+    return propertyRecord;
+  }
 }
 
 /**
