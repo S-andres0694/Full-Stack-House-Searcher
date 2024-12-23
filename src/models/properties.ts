@@ -128,8 +128,20 @@ export class PropertiesModel {
    * @returns {Promise<number>} The ID of the newly created property
    */
   async createProperty(property: NewProperty): Promise<number> {
-    const [propertyRecord] = await this.db.insert(properties).values(property).returning({ id: properties.id });
-    return propertyRecord.id;
+    try {
+      // Use DrizzleORM's transaction functionality
+      const result = await this.db.transaction(async (tx) => {
+        const [propertyRecord] = await tx
+          .insert(properties)
+          .values(property)
+          .returning({ id: properties.id });
+        return propertyRecord;
+      });
+      return result.id;
+    } catch (error: any) {
+      console.error(`Error creating property: ${error.stack}`);
+      return -1;
+    }
   }
 
   /**
@@ -138,7 +150,13 @@ export class PropertiesModel {
    * @returns {Promise<void>} A promise that resolves when the property is deleted
    */
   async deleteProperty(identifier: number): Promise<void> {
-    await this.db.delete(properties).where(eq(properties.id, identifier));
+    try {
+      this.db.transaction(async (tx) => {
+        await tx.delete(properties).where(eq(properties.id, identifier));
+      });
+    } catch (error: any) {
+      console.error(`Error deleting property: ${error.stack}`);
+    }
   }
 
   /**
@@ -148,7 +166,13 @@ export class PropertiesModel {
    * @returns {Promise<void>} A promise that resolves when the property is updated
    */
   async updateProperty(identifier: number, property: NewProperty): Promise<void> {
-    await this.db.update(properties).set(property).where(eq(properties.id, identifier));
+    try {
+      this.db.transaction(async (tx) => {
+        await tx.update(properties).set(property).where(eq(properties.id, identifier));
+      });
+    } catch (error: any) {
+      console.error(`Error updating property: ${error.stack}`);
+    }
   }
 
   /**
@@ -157,8 +181,20 @@ export class PropertiesModel {
    * @returns {Promise<void>} A promise that resolves when the properties are inserted
    */
   
-  async insertProperties(propertiesArray: NewProperty[]): Promise<void> {
-    await this.db.insert(properties).values(propertiesArray);
+  async insertProperties(propertiesArray: NewProperty[]): Promise<number[]> {
+    const addedIDs: number[] = [];
+    try {
+      this.db.transaction(async (tx) => {
+        propertiesArray.forEach(async (property) => {
+          const [propertyRecord] = await tx.insert(properties).values(property).returning({ id: properties.id });
+          addedIDs.push(propertyRecord.id);
+        });
+      });
+      return addedIDs;
+    } catch (error: any) {
+      console.error(`Error inserting properties: ${error.stack}`);
+      return [];
+    }
   }
 
   /**
