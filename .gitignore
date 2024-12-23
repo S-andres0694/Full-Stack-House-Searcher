@@ -12,3 +12,4 @@ dist
 .env.development
 .env.test
 coverage
+.idea
