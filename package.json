@@ -11,9 +11,10 @@
     "watch": "tsc --watch",
     "parcel-build": "parcel build src/public/index.html --dist-dir dist/public",
     "tailwind-build": "npx tailwindcss -i ./src/public/styles.css -o ./src/public/output.css --watch --minify",
-    "test": "jest tests/unit --coverage --verbose ",
+    "test": "jest tests/unit --coverage --verbose --runInBand",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "migrate": "drizzle-kit migrate"
   },
   "keywords": [],
   "author": "Sebastian",

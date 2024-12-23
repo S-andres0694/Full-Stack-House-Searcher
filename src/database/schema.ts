@@ -34,16 +34,21 @@ export const properties = sqliteTable(
     contactPhone: t.text("contact_phone").notNull(),
     summary: t.text("summary").notNull(),
     url: t.text("url").notNull(),
+    identifier: t.integer("identifier").notNull(),
   },
-  (table) => [unique().on(table.address, table.url)] //Creates a unique constraint on the address and url columns.
+  (table) => [unique().on(table.address, table.url, table.identifier)] //Creates a unique constraint on the address, url and identifier columns.
 );
 
 //Defines the roles table.
-export const roles = sqliteTable("roles", {
-  id: t.integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-  roleName: t.text("role_name").notNull(),
-  description: t.text("description"),
-}, (table) => [unique().on(table.roleName)]);
+export const roles = sqliteTable(
+  "roles",
+  {
+    id: t.integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+    roleName: t.text("role_name").notNull(),
+    description: t.text("description"),
+  },
+  (table) => [unique().on(table.roleName)]
+);
 
 //Defines the favorites table.
 export const favorites = sqliteTable(

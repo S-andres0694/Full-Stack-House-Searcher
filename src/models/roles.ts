@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 /**
  * Class representing a model for role operations in the database.
  */
-class RolesModel {
+export class RolesModel {
     constructor(private db: BetterSQLite3Database) { }
 
     /**
@@ -33,6 +33,25 @@ class RolesModel {
             .where(eq(roles.id, roleId))
             .returning();
         return deletedRole;
+    }
+
+    /**
+     * Retrieves all roles from the database.
+     * @returns {Promise<Role[]>} A promise that resolves to an array of roles
+     */
+    async getAllRoles(): Promise<Role[]> {
+        const rolesArray: Role[] = await this.db.select().from(roles);
+        return rolesArray;
+    }
+
+    /**
+     * Check if a role exists in the database.
+     * @param {string} roleName - The name of the role to check
+     * @returns {Promise<boolean>} A promise that resolves to true if the role exists, false otherwise
+     */
+    async checkRoleExists(roleName: string): Promise<boolean> {
+        const role = await this.db.select().from(roles).where(eq(roles.roleName, roleName));
+        return role.length > 0;
     }
 }
 

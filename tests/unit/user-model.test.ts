@@ -1,6 +1,6 @@
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import { NewUser } from "../../src/models/table-types";
-import { UsersModel } from "../../src/models/users";
+import usersModelFactory, { UsersModel } from "../../src/models/users";
 import connectionGenerator, {
   dbTestOptions,
   initialValues,
@@ -36,7 +36,7 @@ let userId: number;
 beforeAll(() => {
   db = connectionGenerator(testDbPath, dbTestOptions);
   drizzleORM = drizzle(db);
-  usersModel = new UsersModel(drizzleORM);
+  usersModel = usersModelFactory(drizzleORM);
 });
 
 beforeEach(async () => {

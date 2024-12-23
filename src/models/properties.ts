@@ -7,7 +7,7 @@ import { NewProperty, Property } from "./table-types";
 /**
  * Class representing a model for property operations in the database.
  */
-class PropertiesModel {
+export class PropertiesModel {
   constructor(private db: BetterSQLite3Database) {}
 
   /**
@@ -130,6 +130,48 @@ class PropertiesModel {
   async createProperty(property: NewProperty): Promise<number> {
     const [propertyRecord] = await this.db.insert(properties).values(property).returning({ id: properties.id });
     return propertyRecord.id;
+  }
+
+  /**
+   * Deletes a property from the database.
+   * @param {number} identifier - The identifier of the property to delete
+   * @returns {Promise<void>} A promise that resolves when the property is deleted
+   */
+  async deleteProperty(identifier: number): Promise<void> {
+    await this.db.delete(properties).where(eq(properties.id, identifier));
+  }
+
+  /**
+   * Updates a property in the database.
+   * @param {number} identifier - The identifier of the property to update
+   * @param {NewProperty} property - The property object to update
+   * @returns {Promise<void>} A promise that resolves when the property is updated
+   */
+  async updateProperty(identifier: number, property: NewProperty): Promise<void> {
+    await this.db.update(properties).set(property).where(eq(properties.id, identifier));
+  }
+
+  /**
+   * Allows for a insertion of multiple properties into the database.
+   * @param {NewProperty[]} properties - The array of properties to insert
+   * @returns {Promise<void>} A promise that resolves when the properties are inserted
+   */
+  
+  async insertProperties(propertiesArray: NewProperty[]): Promise<void> {
+    await this.db.insert(properties).values(propertiesArray);
+  }
+
+  /**
+   * Obtains the identifier of a property by its ID.
+   * @param {number} id - The ID of the property
+   * @returns {Promise<number | undefined>} A promise that resolves to the identifier if found, undefined otherwise
+   */
+  async getIdentifierById(id: number): Promise<number | undefined> {
+    const [propertyRecord]: { identifier: number }[] = await this.db
+      .select({ identifier: properties.identifier })
+      .from(properties)
+      .where(eq(properties.id, id));
+    return propertyRecord?.identifier;
   }
 }
 

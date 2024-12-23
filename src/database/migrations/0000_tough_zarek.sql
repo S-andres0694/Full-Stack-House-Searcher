@@ -14,10 +14,11 @@ CREATE TABLE `properties` (
 	`monthly_rent` text NOT NULL,
 	`contact_phone` text NOT NULL,
 	`summary` text NOT NULL,
-	`url` text NOT NULL
+	`url` text NOT NULL,
+	`identifier` integer NOT NULL
 );
 --> statement-breakpoint
-CREATE UNIQUE INDEX `properties_address_url_unique` ON `properties` (`address`,`url`);--> statement-breakpoint
+CREATE UNIQUE INDEX `properties_address_url_identifier_unique` ON `properties` (`address`,`url`,`identifier`);--> statement-breakpoint
 CREATE TABLE `roles` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`role_name` text NOT NULL,

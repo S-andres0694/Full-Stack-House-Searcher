@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "feef808f-5343-4f7b-8ade-eb9690fa7452",
+  "id": "1846ddb6-10d8-4d9e-a497-bea6abcc577e",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "favorites": {
@@ -122,14 +122,22 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "identifier": {
+          "name": "identifier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
         }
       },
       "indexes": {
-        "properties_address_url_unique": {
-          "name": "properties_address_url_unique",
+        "properties_address_url_identifier_unique": {
+          "name": "properties_address_url_identifier_unique",
           "columns": [
             "address",
-            "url"
+            "url",
+            "identifier"
           ],
           "isUnique": true
         }

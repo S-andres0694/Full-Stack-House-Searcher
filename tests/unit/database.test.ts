@@ -12,7 +12,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 let db: Database;
 
 //Creates a test database and provides a connection to it.
-beforeEach(() => {
+beforeAll(() => {
   db = connectionGenerator(testDbPath, dbTestOptions);
 });
 
@@ -57,14 +57,15 @@ describe("Database Unit Tests", () => {
   //Test 5:
   it("should be able to insert a property", () => {
     db.prepare(
-      "INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url) VALUES (?, ?, ?, ?, ?, ?)"
+      "INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url, identifier) VALUES (?, ?, ?, ?, ?, ?, ?)"
     ).run(
       2,
       "123 Main St, Anytown, USA",
       "$1000",
       "123-456-7890",
       "This is a test property",
-      "https://test.com"
+      "https://test.com",
+      1234567890
     );
     expect(
       db
@@ -95,14 +96,15 @@ describe("Database Unit Tests", () => {
 
     // Then insert property
     db.prepare(
-      "INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url) VALUES (?, ?, ?, ?, ?, ?)"
+      "INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url, identifier) VALUES (?,?, ?, ?, ?, ?, ?)"
     ).run(
       3,
       "456 Oak Ave, Somewhere, USA",
       "$1500",
       "555-123-4567",
       "A test property for viewing",
-      "https://example.com"
+      "https://example.com",
+      1234567890
     );
 
     //Retrieve user id
@@ -134,14 +136,15 @@ describe("Database Unit Tests", () => {
 
     // Then insert property
     db.prepare(
-      "INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url) VALUES (?, ?, ?, ?, ?, ?)"
+      "INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url, identifier) VALUES (?, ?, ?, ?, ?, ?, ?)"
     ).run(
       3,
       "456 Oak Ave, Somewhere, USA",
       "$1500",
       "555-123-4567",
       "A test property for viewing",
-      "https://example.com"
+      "https://example.com",
+      1234567890
     );
 
     //Retrieve user id

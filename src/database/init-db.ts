@@ -11,7 +11,8 @@ import { SQLiteColumn } from "drizzle-orm/sqlite-core";
 import { eq } from "drizzle-orm";
 import rolesModelFactory from "../models/roles";
 import usersModelFactory from "../models/users";
-
+import { RolesModel } from "../models/roles";
+import { User } from "../models/table-types";
 export const databasePath: string = __dirname + "/database.sqlite";
 
 // Load environment variables
@@ -107,22 +108,38 @@ export default function connectionGenerator(
 export async function initialValues(db: BetterSQLite3Database): Promise<void> {
   try {
     //Roles Model
-    const roleModel = rolesModelFactory(drizzle(db));
-    await roleModel.createRole(
-      "user",
-      "Standard user role with limited access"
-    );
-    await roleModel.createRole("admin", "Admin role with full access");
+    const roleModel: RolesModel = rolesModelFactory(drizzle(db));
+
+    //Check if the roles exist
+    const userRoleChecker: boolean = await roleModel.checkRoleExists("user");
+    const adminRoleChecker: boolean = await roleModel.checkRoleExists("admin");
+
+    //Create the roles if they don't exist
+    if (!userRoleChecker) {
+      await roleModel.createRole(
+        "user",
+        "Standard user role with limited access"
+      );
+    }
+    if (!adminRoleChecker) {
+      await roleModel.createRole("admin", "Admin role with full access");
+    }
 
     //Users Model
     const userModel = usersModelFactory(drizzle(db));
-    await userModel.createUser({
-      username: adminUsername,
-      email: adminEmail,
-      password: adminPassword,
-      role: "admin",
-      name: "Sebastian El Khoury",
-    });
+    const userChecker: User | undefined = await userModel.getUserByUsername(adminUsername);
+
+    //Create the user if they don't exist
+    if (!userChecker) {
+      await userModel.createUser({
+        username: adminUsername,
+        email: adminEmail,
+        password: adminPassword,
+        role: "admin",
+        name: "Sebastian El Khoury",
+      });
+    }
+
   } catch (error: any) {
     console.error(`Error populating the database: ${error.stack}`);
   }

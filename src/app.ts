@@ -24,7 +24,7 @@ app.use(express.json());
 (async () => {
   const initializationStatus = await databaseCreator(dbPath, dbProductionOptions);
   runMigrations(drizzle(db), __dirname + "/database/migrations");
-  initialValues(db);
+  await initialValues(db);
   if (initializationStatus) {
     console.log("Database initialized successfully.");
   } else {
