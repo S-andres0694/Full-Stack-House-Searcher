@@ -5,7 +5,7 @@ import { eq, sql, desc } from "drizzle-orm";
 /**
  * Class representing a model for viewed properties operations in the database.
  */
-class ViewedPropertiesModel {
+export class ViewedPropertiesModel {
     constructor(private db: BetterSQLite3Database) { }
 
     /**
