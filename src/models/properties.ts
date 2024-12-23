@@ -229,6 +229,8 @@ export class PropertiesModel {
     const [propertyRecord]: Property[] = await this.db.select().from(properties).where(eq(properties.identifier, identifier));
     return propertyRecord;
   }
+
+  
 }
 
 /**

@@ -9,24 +9,7 @@ import connectionGenerator, {
 import { Database } from "better-sqlite3";
 import { compare } from "bcrypt";
 import { testDbPath } from "../jest.setup";
-
-//Test user
-const user: NewUser = {
-  username: "testuser",
-  password: "testpassword",
-  email: "test@test.com",
-  role: "user",
-  name: "testuser",
-};
-
-//Test user with the same username as the first user
-const user2: NewUser = {
-  username: "testuser",
-  password: "testpassword2",
-  email: "test2@test.com",
-  role: "user",
-  name: "testuser2",
-};
+import { user, user2 } from "./constants";
 
 let usersModel: UsersModel;
 let drizzleORM: BetterSQLite3Database;
@@ -235,5 +218,16 @@ describe("Users Model Unit Tests", () => {
       userWithUniqueEmail
     );
     expect(validationResult).toBe(true);
+  });
+
+  //Test 24
+  it("tests that it can retrieve the id of a user by their username", async () => {
+    const userId = await usersModel.getUserId(user.username);
+    expect(userId).toBe(userId);
+  });
+
+  //Test 25
+  it("tests that it returns an error when trying to retrieve the id of a user that does not exist", async () => {
+    await expect(usersModel.getUserId("nonexistentuser")).rejects.toThrow();
   });
 });

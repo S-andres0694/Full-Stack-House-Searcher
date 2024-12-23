@@ -5,6 +5,7 @@ import propertiesModelFactory, { PropertiesModel } from "../../src/models/proper
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import { Database } from "better-sqlite3";
 import { NewProperty, Property } from "../../src/models/table-types";
+import { property, property2 } from "./constants";
 
 let db: Database;
 let propertiesModel: PropertiesModel;
@@ -27,26 +28,6 @@ afterAll(() => {
     db.close();
   }
 });
-
-const property: NewProperty = {
-  url: "https://www.example.com",
-  address: "123 Main St, Anytown, USA",
-  summary: "This is an example property",
-  monthlyRent: "1000",
-  contactPhone: "1234567890",
-  bedrooms: 3,
-  identifier: 2783423,
-};
-
-const property2: NewProperty = {
-  url: "https://www.example2.com",
-  address: "456 Main St, Anytown, USA",
-  summary: "This is another example property",
-  monthlyRent: "1500",
-  contactPhone: "1234567890",
-  bedrooms: 4,
-  identifier: 2783424,
-};
 
 describe("Properties Model Unit Tests", () => {
   //Test 1:

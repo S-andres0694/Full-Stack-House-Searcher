@@ -231,11 +231,11 @@ export class UsersModel {
    * @returns {Promise<number>} The ID of the user
    */
   async getUserId(username: string): Promise<number> {
-    const userExists = await this.usernameExists(username);
+    const userExists: boolean = await this.usernameExists(username);
     if (!userExists) {
       throw new Error("User does not exist");
     }
-    const user = await this.getUserByUsername(username);
+    const user: User | undefined = await this.getUserByUsername(username);
     return user!.id;
   }
 }

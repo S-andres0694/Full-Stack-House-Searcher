@@ -3,11 +3,10 @@ import { favorites } from "../database/schema";
 import { Favorite, NewFavorite } from "./table-types";
 import { eq, sql } from "drizzle-orm";
 
-
 /**
  * Class representing a model for favorite properties operations in the database.
  */
-class FavoritePropertiesModel {
+export class FavoritePropertiesModel {
     constructor(private db: BetterSQLite3Database) { }
 
     /**
@@ -39,10 +38,10 @@ class FavoritePropertiesModel {
      * @param {number} id - The ID of the favorite property to delete
      * @returns {Promise<void>} A promise that resolves when the deletion is complete
      */
-    async deleteFavoriteProperty(id: number): Promise<void> {
+    async deleteFavoriteProperty(propertyID: number, userID: number): Promise<void> {
         try {
             this.db.transaction(async (tx) => {
-                await tx.delete(favorites).where(eq(favorites.id, id));
+                await tx.delete(favorites).where((eq(favorites.propertyId, propertyID), eq(favorites.userId, userID)));
             });
         } catch (error) {
             throw new Error("Failed to delete favorite property");
