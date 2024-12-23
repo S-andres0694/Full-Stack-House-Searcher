@@ -9,9 +9,6 @@ import connectionGenerator, {
 import { Database } from "better-sqlite3";
 import { compare } from "bcrypt";
 import { testDbPath } from "../jest.setup";
-let usersModel: UsersModel;
-let drizzleORM: BetterSQLite3Database;
-let db: Database;
 
 //Test user
 const user: NewUser = {
@@ -31,6 +28,9 @@ const user2: NewUser = {
   name: "testuser2",
 };
 
+let usersModel: UsersModel;
+let drizzleORM: BetterSQLite3Database;
+let db: Database;
 let userId: number;
 
 beforeAll(() => {
@@ -40,6 +40,7 @@ beforeAll(() => {
 });
 
 beforeEach(async () => {
+  db = connectionGenerator(testDbPath, dbTestOptions);
   await resetDatabase(db, dbTestOptions);
   await initialValues(db);
   userId = await usersModel.createUser(user);
