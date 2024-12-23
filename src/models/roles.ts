@@ -14,12 +14,15 @@ export class RolesModel {
      * @param {string} name - The name of the role to create
      * @returns {Promise<Role>} The newly created role
      */
-    async createRole(name: string, description: string): Promise<Role> {
-        const [role] = await this.db
-            .insert(roles)
-            .values({ roleName: name, description: description })
-            .returning();
-        return role;
+    async createRole(name: string, description: string): Promise<void> {
+        try {
+            this.db.transaction(async (tx) => {
+                await tx.insert(roles).values({ roleName: name, description: description });
+            });
+        } catch (error: any) {
+            console.error(`Error creating role: ${error.stack}`);
+            throw error;
+        }
     }
 
     /**
@@ -27,12 +30,15 @@ export class RolesModel {
      * @param {number} roleId - The ID of the role to remove
      * @returns {Promise<Role | undefined>} The deleted role if found, undefined otherwise
      */
-    async deleteRole(roleId: number): Promise<Role | undefined> {
-        const [deletedRole] = await this.db
-            .delete(roles)
-            .where(eq(roles.id, roleId))
-            .returning();
-        return deletedRole;
+    async deleteRole(roleId: number): Promise<void> {
+        try {
+            this.db.transaction(async (tx) => {
+                await tx.delete(roles).where(eq(roles.id, roleId));
+            });
+        } catch (error: any) {
+            console.error(`Error deleting role: ${error.stack}`);
+            throw error;
+        }
     }
 
     /**
@@ -52,6 +58,26 @@ export class RolesModel {
     async checkRoleExists(roleName: string): Promise<boolean> {
         const role = await this.db.select().from(roles).where(eq(roles.roleName, roleName));
         return role.length > 0;
+    }
+
+    /**
+     * Retrieves the ID of a role by its name.
+     * @param {string} roleName - The name of the role to retrieve the ID for
+     * @returns {Promise<number | undefined>} The ID of the role if found, undefined otherwise
+     */
+    async getRoleId(roleName: string): Promise<number | undefined> {
+        const role = await this.db.select().from(roles).where(eq(roles.roleName, roleName));
+        return role[0]?.id;
+    }
+
+    /**
+     * Retrieves the name of a role by its ID.
+     * @param {number} roleId - The ID of the role to retrieve the name for
+     * @returns {Promise<string | undefined>} The name of the role if found, undefined otherwise
+     */
+    async getRoleName(roleId: number): Promise<string | undefined> {
+        const role = await this.db.select().from(roles).where(eq(roles.id, roleId));
+        return role[0]?.roleName;
     }
 }
 
