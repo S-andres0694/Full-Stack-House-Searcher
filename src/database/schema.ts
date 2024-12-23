@@ -3,6 +3,7 @@
 import { sql } from "drizzle-orm";
 import { sqliteTable, unique } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
+import { User } from "../models/table-types";
 
 //Defines the users table.
 export const users = sqliteTable(
@@ -40,9 +41,9 @@ export const properties = sqliteTable(
 //Defines the roles table.
 export const roles = sqliteTable("roles", {
   id: t.integer("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-  roleName: t.text("role_name").notNull().unique(),
+  roleName: t.text("role_name").notNull(),
   description: t.text("description"),
-});
+}, (table) => [unique().on(table.roleName)]);
 
 //Defines the favorites table.
 export const favorites = sqliteTable(

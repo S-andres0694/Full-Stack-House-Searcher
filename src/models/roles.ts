@@ -1,11 +1,7 @@
-import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { roles } from "../database/schema";
 import { Role } from "./table-types";
-import connectionGenerator, { databasePath } from "../database/init-db";
 import { eq } from "drizzle-orm";
-
-const databaseConnection = connectionGenerator(databasePath);
-const db: BetterSQLite3Database = drizzle({ client: databaseConnection });
 
 /**
  * Class representing a model for role operations in the database.
@@ -18,10 +14,10 @@ class RolesModel {
      * @param {string} name - The name of the role to create
      * @returns {Promise<Role>} The newly created role
      */
-    async createRole(name: string): Promise<Role> {
+    async createRole(name: string, description: string): Promise<Role> {
         const [role] = await this.db
             .insert(roles)
-            .values({ roleName: name })
+            .values({ roleName: name, description: description })
             .returning();
         return role;
     }

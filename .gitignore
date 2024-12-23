@@ -8,3 +8,7 @@ dist
 .env.test.local
 .env.production.local  
 .vscode
+.env.production
+.env.development
+.env.test
+coverage

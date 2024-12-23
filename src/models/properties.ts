@@ -1,13 +1,8 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { eq } from "drizzle-orm";
-import connectionGenerator, { databasePath } from "../database/init-db";
 import { properties } from "../database/schema";
 import { NewProperty, Property } from "./table-types";
 
-//Database connection elements
-const databaseConnection = connectionGenerator(databasePath);
-const db: BetterSQLite3Database = drizzle({ client: databaseConnection });
 
 /**
  * Class representing a model for property operations in the database.

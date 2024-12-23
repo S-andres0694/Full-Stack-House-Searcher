@@ -1,51 +1,62 @@
-import { readFile } from "fs/promises";
-import sqlite3, { Database } from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import Database, { Options } from "better-sqlite3";
+import { Database as BetterSQLite3Database } from "better-sqlite3";
+import DrizzleORM from "drizzle-orm";
+import type { BetterSQLite3Database as DrizzleDB } from "drizzle-orm/better-sqlite3";
 import dotenv from "dotenv";
-import { readFileSync } from "fs";
+import * as schema from "./schema"; // Import your existing schema
+import { existsSync } from "fs";
+import { SQLiteColumn } from "drizzle-orm/sqlite-core";
+import { eq } from "drizzle-orm";
+import rolesModelFactory from "../models/roles";
+import usersModelFactory from "../models/users";
 
 export const databasePath: string = __dirname + "/database.sqlite";
-const schemaPath: string = __dirname + "/schema.sql";
 
-//Loads the environment variables.
+// Load environment variables
 dotenv.config();
 
-//Initializes the admin values.
+// Initialize admin values
 const adminPassword: string = process.env.ADMIN_PASSWORD || "";
 const adminUsername: string = process.env.ADMIN_USERNAME || "";
 const adminEmail: string = process.env.ADMIN_EMAIL || "";
 
-//Options for the Database Creator
-const dbOptions = {
+// Database options
+export const dbProductionOptions: Options = {
   fileMustExist: false,
   verbose: console.log,
   readonly: false,
 };
 
-//Options for the Database Connection
-const dbConnectionOptions = {
-  fileMustExist: true,
-  verbose: console.log,
+export const dbTestOptions: Options = {
+  fileMustExist: false,
   readonly: false,
 };
 
-//Runs the code.
-const db: boolean = databaseCreator(databasePath);
-if (db) {
-  console.log("Database initialized successfully.");
-} else {
-  console.error("Database initialization failed.");
-}
+//Migrations folder
+const migrationsFolder = __dirname + "/migrations";
 
 /**
- * Creates the database file to be used by the server.
- * It also loads the schema and populates the database with the initial values.
+ * Creates the database and populates it with the initial values.
+ * @param databasePath - The path to the database file.
+ * @returns A boolean indicating the success of the operation.
  */
 
-export function databaseCreator(databasePath: string): boolean {
+export async function databaseCreator(
+  databasePath: string,
+  dbOptions: Options
+): Promise<boolean> {
   try {
-    const db: Database = new sqlite3(databasePath, dbOptions);
-    schemaLoader(db);
-    initialValues(db);
+    // Create SQLite connection
+    const sqlite = new Database(databasePath, dbOptions);
+
+    // Create Drizzle instance
+    const db = drizzle(sqlite, { schema });
+
+    // Enable foreign keys
+    sqlite.pragma("foreign_keys = ON");
+
     return true;
   } catch (error: any) {
     console.error(`Error creating database: ${error.stack}`);
@@ -54,66 +65,85 @@ export function databaseCreator(databasePath: string): boolean {
 }
 
 /**
- * Function to return a connection object for the database.
- *
- * @returns {Database} - The database connection object.
+ * Runs the migrations on the database.
+ * @param db - The database instance.
+ * @param migrationsFolder - The path to the migrations folder.
  */
-
-export default function connectionGenerator(databasePath: string): Database {
-  return new sqlite3(databasePath, dbConnectionOptions);
-}
-
-/**
- * Function to load the schema into the database.
- *
- * @returns {void}
- */
-
-export function schemaLoader(db: Database): void {
+export function runMigrations(db: DrizzleDB, migrationsFolder: string): void {
   try {
-    const schema: string = readFileSync(schemaPath, "utf-8");
-
-    //Enables foreign key constraints.
-    db.pragma("foreign_keys = ON");
-
-    //Loads the schema into the database.
-    db.exec(schema);
-  } catch (error: any) {
-    console.error(`Error starting the schema of the database: ${error.stack}`);
+    migrate(db, { migrationsFolder });
+    // Verify tables were created
+    const tables = db.all("SELECT name FROM sqlite_master WHERE type='table'");
+  } catch (error) {
+    console.error("Migration failed:", error);
+    throw error;
   }
 }
 
 /**
- * Function to populate the database with some initial values.
- * It adds the admin user and all of the roles into the database.
- *
- * @returns {void}
+ * Generates a connection to the database.
+ * @param databasePath - The path to the database file.
+ * @returns A Database object.
  */
 
-export function initialValues(db: Database): void {
+export default function connectionGenerator(
+  databasePath: string,
+  dbOptions: Options
+): BetterSQLite3Database {
   try {
-    db.transaction(() => {
-      // First insert roles
-      db.prepare(
-        "INSERT OR IGNORE INTO roles (role_name, description) VALUES (?, ?)"
-      ).run("admin", "Admin role with full access");
+    const sqlite: BetterSQLite3Database = new Database(databasePath, dbOptions);
+    return sqlite;
+  } catch (error) {
+    console.error(`Failed to connect to database at ${databasePath}:`, error);
+    throw error;
+  }
+}
 
-      db.prepare(
-        "INSERT OR IGNORE INTO roles (role_name, description) VALUES (?, ?)"
-      ).run("user", "Standard user role with limited access");
+/**
+ * Populates the database with the initial values.
+ * @param db - The database instance.
+ */
 
-      // Then insert admin user
-      db.prepare(
-        "INSERT OR IGNORE INTO users (username, email, password, role, name) VALUES (?, ?, ?, ?, ?)"
-      ).run(
-        adminUsername,
-        adminEmail,
-        adminPassword,
-        "admin",
-        "Sebastian El Khoury"
-      );
-    })();
+export async function initialValues(db: BetterSQLite3Database): Promise<void> {
+  try {
+    //Roles Model
+    const roleModel = rolesModelFactory(drizzle(db));
+    await roleModel.createRole(
+      "user",
+      "Standard user role with limited access"
+    );
+    await roleModel.createRole("admin", "Admin role with full access");
+
+    //Users Model
+    const userModel = usersModelFactory(drizzle(db));
+    await userModel.createUser({
+      username: adminUsername,
+      email: adminEmail,
+      password: adminPassword,
+      role: "admin",
+      name: "Sebastian El Khoury",
+    });
   } catch (error: any) {
     console.error(`Error populating the database: ${error.stack}`);
+  }
+}
+
+export async function resetDatabase(
+  db: BetterSQLite3Database,
+  dbOptions: Options
+): Promise<void> {
+  try {
+    const drizzleDb = drizzle(db, { schema });
+    db.pragma("foreign_keys = OFF");
+    // Clear all tables in the correct order to avoid foreign key constraints
+    await drizzleDb.delete(schema.users).execute();
+    await drizzleDb.delete(schema.viewedProperties).execute();
+    await drizzleDb.delete(schema.favorites).execute();
+    await drizzleDb.delete(schema.properties).execute();
+    await drizzleDb.delete(schema.roles).execute();
+    db.pragma("foreign_keys = ON");
+  } catch (error: any) {
+    console.error(`Error resetting the database: ${error.stack}`);
+    throw error;
   }
 }

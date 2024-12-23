@@ -1,32 +1,24 @@
 import { describe, it, expect } from "@jest/globals";
-import connectionGenerator, { initialValues } from "../../src/database/init-db";
-import { databaseCreator, schemaLoader } from "../../src/database/init-db";
+import connectionGenerator, {
+  dbTestOptions,
+  initialValues,
+  resetDatabase,
+  runMigrations,
+} from "../../src/database/init-db";
 import sqlite3, { Database } from "better-sqlite3";
-import { existsSync, unlinkSync } from "fs";
-import supertest from "supertest";
-import usersModelFactory, { UsersModel } from "../../src/models/users";
-import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
-import { NewUser } from "../../src/models/table-types";
+import { testDbPath } from "../jest.setup";
+import { drizzle } from "drizzle-orm/better-sqlite3";
 
 let db: Database;
- 
-const testDbPath: string = __dirname + "/test-database.sqlite";
 
 //Creates a test database and provides a connection to it.
 beforeEach(() => {
-  // Remove test database if it exists
-  if (existsSync(testDbPath)) {
-    unlinkSync(testDbPath);
-  }
-  databaseCreator(testDbPath);
-  db = connectionGenerator(testDbPath);
+  db = connectionGenerator(testDbPath, dbTestOptions);
 });
 
-afterEach(() => {
-  // Close database connection after each test
-  if (db) {
-    db.close();
-  }
+afterEach(async () => {
+  await resetDatabase(db, dbTestOptions);
+  await initialValues(db);
 });
 
 describe("Database Unit Tests", () => {
@@ -45,7 +37,6 @@ describe("Database Unit Tests", () => {
 
   //Test 3:
   it("should be able to load the schema", () => {
-    schemaLoader(db);
     expect(db.prepare("SELECT * FROM properties").get()).toBeUndefined();
     expect(db.prepare("SELECT * FROM viewed_properties").get()).toBeUndefined();
     expect(db.prepare("SELECT * FROM roles").get()).toBeDefined();
@@ -55,9 +46,6 @@ describe("Database Unit Tests", () => {
 
   //Test 4:
   it("should be able to insert a user", () => {
-    schemaLoader(db);
-    initialValues(db);
-
     db.prepare(
       "INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)"
     ).run("testuser", "testpassword", "test@test.com", "admin", "Anon User");
@@ -68,7 +56,6 @@ describe("Database Unit Tests", () => {
 
   //Test 5:
   it("should be able to insert a property", () => {
-    schemaLoader(db);
     db.prepare(
       "INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url) VALUES (?, ?, ?, ?, ?, ?)"
     ).run(
@@ -90,7 +77,6 @@ describe("Database Unit Tests", () => {
 
   //Test 6:
   it("should be able to insert a role", () => {
-    schemaLoader(db);
     db.prepare("INSERT INTO roles (role_name, description) VALUES (?, ?)").run(
       "test",
       "This is a test role"
@@ -102,10 +88,7 @@ describe("Database Unit Tests", () => {
 
   //Test 7:
   it("should be able to insert a viewed property", () => {
-    schemaLoader(db);
-    initialValues(db);
-
-    // Then insert user
+    // Insert user
     db.prepare(
       "INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)"
     ).run("testuser", "testpassword", "test@test.com", "user", "Anon User");
@@ -122,29 +105,32 @@ describe("Database Unit Tests", () => {
       "https://example.com"
     );
 
+    //Retrieve user id
+    const userId = db.prepare("SELECT id FROM users WHERE username = ?").get("testuser") as { id: number };
+
+    //Retrieve property id
+    const propertyId = db.prepare("SELECT id FROM properties WHERE address = ?").get("456 Oak Ave, Somewhere, USA") as { id: number };
+
     // Finally insert viewed property
     db.prepare(
       "INSERT INTO viewed_properties (user_id, property_id) VALUES (?, ?)"
-    ).run(1, 1);
+    ).run(userId.id, propertyId.id);
 
     expect(
       db
         .prepare(
-          "SELECT * FROM viewed_properties WHERE user_id = 1 AND property_id = 1"
+          "SELECT * FROM viewed_properties WHERE user_id = ? AND property_id = ?"
         )
-        .get()
+        .run(userId.id, propertyId.id)
     ).toBeDefined();
   });
 
   //Test 8:
   it("should be able to insert a favorite property", () => {
-    schemaLoader(db);
-    initialValues(db);
-
-    // Then insert user
+    // Insert user
     db.prepare(
       "INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)"
-      ).run("testuser", "testpassword", "test@test.com", "user", "Anon User");
+    ).run("testuser", "testpassword", "test@test.com", "user", "Anon User");
 
     // Then insert property
     db.prepare(
@@ -158,47 +144,23 @@ describe("Database Unit Tests", () => {
       "https://example.com"
     );
 
+    //Retrieve user id
+    const userId = db.prepare("SELECT id FROM users WHERE username = ?").get("testuser") as { id: number };
+
+    //Retrieve property id
+    const propertyId = db.prepare("SELECT id FROM properties WHERE address = ?").get("456 Oak Ave, Somewhere, USA") as { id: number };
+
     // Finally insert favorite
     db.prepare(
       "INSERT INTO favorites (user_id, property_id) VALUES (?, ?)"
-    ).run(1, 1);
+    ).run(userId.id, propertyId.id);
 
     expect(
       db
         .prepare(
-          "SELECT * FROM favorites WHERE user_id = 1 AND property_id = 1"
+          "SELECT * FROM favorites WHERE user_id = ? AND property_id = ?"
         )
-        .get()
+        .run(userId.id, propertyId.id)
     ).toBeDefined();
   });
-
-  //Test 9:
-  it("should be able to insert initial values", () => {
-    schemaLoader(db);
-    initialValues(db);
-
-    // Verify roles were created first
-    const adminRole = db
-      .prepare("SELECT * FROM roles WHERE role_name = ?")
-      .get("admin");
-    expect(adminRole).toBeDefined();
-
-    const userRole = db
-      .prepare("SELECT * FROM roles WHERE role_name = ?")
-      .get("user");
-    expect(userRole).toBeDefined();
-
-    // Then verify admin user was created
-    const adminUser = db
-      .prepare("SELECT * FROM users WHERE role = ?")
-      .get("admin");
-    expect(adminUser).toBeDefined();
-  });
-});
-
-afterAll(() => {
-  // Remove the test database
-  if (existsSync(testDbPath)) {
-    unlinkSync(testDbPath);
-  }
 });

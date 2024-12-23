@@ -1,12 +1,7 @@
-import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { viewedProperties } from "../database/schema";
 import { NewViewedProperty, Property, ViewedProperty } from "./table-types";
-import connectionGenerator, { databasePath } from "../database/init-db";
 import { eq, sql, desc } from "drizzle-orm";
-
-const databaseConnection = connectionGenerator(databasePath);
-const db: BetterSQLite3Database = drizzle({ client: databaseConnection });
-
 /**
  * Class representing a model for viewed properties operations in the database.
  */
