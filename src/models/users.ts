@@ -17,7 +17,7 @@ export class UsersModel {
    * Creates an instance of UsersModel.
    * @param {BetterSQLite3Database} db - The database connection instance
    */
-  constructor(private db: BetterSQLite3Database) {}
+  constructor(private db: BetterSQLite3Database) { }
 
   /**
    * Creates a new user in the database.
@@ -25,7 +25,8 @@ export class UsersModel {
    * @returns {Promise<number>} The ID of the newly created user
    */
   async createUser(user: NewUser): Promise<void> {
-    const validationResult: boolean | string = await this.validateUniqueUsernameAndEmail(user);
+    const validationResult: boolean | string =
+      await this.validateUniqueUsernameAndEmail(user);
     if (validationResult === true) {
       //Hash the password.
       user.password = await hash(user.password, 10);
@@ -48,7 +49,9 @@ export class UsersModel {
    * @returns {Promise<boolean>} True if the username and email are unique, false otherwise
    */
 
-  async validateUniqueUsernameAndEmail(user: NewUser): Promise<boolean | string> {
+  async validateUniqueUsernameAndEmail(
+    user: NewUser
+  ): Promise<boolean | string> {
     const usernameExists = await this.usernameExists(user.username);
     const emailExists = await this.emailExists(user.email);
     if (usernameExists) {
@@ -118,16 +121,18 @@ export class UsersModel {
    * @param {string} username - The new username
    * @returns {Promise<void>}
    */
-  async updateUserUsername(id: number, username: string): Promise<void> {
-    //Check if the username already exists
-    const usernameExists = await this.usernameExists(username);
-    if (usernameExists) {
-      throw new Error("Username already exists");
+  async updateUserUsername(id: number, newUsername: string): Promise<boolean | string> {
+    try {
+      if ((await this.getUserByUsername(newUsername))) {
+        return false;
+      }
+      this.db.transaction(async (tx) => {
+        await tx.update(users).set({ username: newUsername }).where(eq(users.id, id));
+      });
+      return true;
+    } catch (error) {
+      return "Internal Database Failure";
     }
-    
-    this.db.transaction(async (tx) => {
-      await tx.update(users).set({ username }).where(eq(users.id, id));
-    });
   }
 
   /**
@@ -136,16 +141,18 @@ export class UsersModel {
    * @param {string} email - The new email address
    * @returns {Promise<void>}
    */
-  async updateUserEmail(username: string, email: string): Promise<void> {
-    //Check if the email already exists
-    const emailExists = await this.emailExists(email);
-    if (emailExists) {
-      throw new Error("Email already exists");
+  async updateUserEmail(id: number, newEmail: string): Promise<boolean | string> {
+    try {
+      if ((await this.getUserByEmail(newEmail))) {
+        return false;
+      }
+      this.db.transaction(async (tx) => {
+        await tx.update(users).set({ email: newEmail }).where(eq(users.id, id));
+      });
+      return true;
+    } catch (error) {
+      return "Internal Database Failure";
     }
-    
-    this.db.transaction(async (tx) => {
-      await tx.update(users).set({ email }).where(eq(users.username, username));
-    });
   }
 
   /**
@@ -154,28 +161,49 @@ export class UsersModel {
    * @param {string} password - The new password (will be hashed)
    * @returns {Promise<void>}
    */
-  async updateUserPassword(username: string, password: string): Promise<void> {
-    //Hash the password.
-    password = await hash(password, 10);
-    //Update the user's password in the database.
-    this.db.transaction(async (tx) => {
-      await tx.update(users).set({ password }).where(eq(users.username, username));
-    });
+  async updateUserPassword(id: number, newPassword: string): Promise<boolean | string> {
+    try {
+      if (!(await this.getUserById(id))) {
+        return false;
+      }
+
+      //Hash the password.
+      newPassword = await hash(newPassword, 10);
+      //Update the user's password in the database.
+      this.db.transaction(async (tx) => {
+        await tx
+          .update(users)
+          .set({ password: newPassword })
+          .where(eq(users.id, id));
+      });
+      return true;
+    } catch (error) {
+      return "Internal Database Failure";
+    }
   }
 
   /**
-   * Deletes a user from the database.
-   * @param {string} username - The username of the user to delete
+   * Deletes a user from the database by their ID.
+   * @param {number} id - The ID of the user to delete
    * @returns {Promise<void>}
    */
-  async deleteUser(username: string): Promise<void> {
-    this.db.transaction(async (tx) => {
-      await tx.delete(users).where(eq(users.username, username));
-    });
+  async deleteUser(id: number): Promise<boolean | string> {
+    try {
+      if (!(await this.getUserById(id))) {
+        return false;
+      }
+      this.db.transaction(async (tx) => {
+        await tx.delete(users).where(eq(users.id, id));
+      });
+
+      return true;
+    } catch (error) {
+      return "Internal Database Failure";
+    }
   }
 
   /**
-   * Checks if a user exists in the database.
+   * Checks if a username exists in the database.
    * @param {string} username - The username of the user to check
    * @returns {Promise<boolean>} True if the user exists, false otherwise
    */

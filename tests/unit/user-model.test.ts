@@ -77,7 +77,7 @@ describe("Users Model Unit Tests", () => {
 
   //Test 6:
   it("should be able to delete a user", async () => {
-    await usersModel.deleteUser(user.username);
+    await usersModel.deleteUser(userId);
     const retrievedUser = await usersModel.getUserById(userId);
     expect(retrievedUser).toBeUndefined();
   });
@@ -92,7 +92,7 @@ describe("Users Model Unit Tests", () => {
 
   //Test 8:
   it("should be able to update a user's email", async () => {
-    await usersModel.updateUserEmail(user.username, "updatedemail@test.com");
+    await usersModel.updateUserEmail(userId, "updatedemail@test.com");
     const retrievedUser = await usersModel.getUserById(userId);
     expect(retrievedUser).toBeDefined();
     expect(retrievedUser?.email).toBe("updatedemail@test.com");
@@ -100,7 +100,7 @@ describe("Users Model Unit Tests", () => {
 
   //Test 9:
   it("should be able to update a user's password", async () => {
-    await usersModel.updateUserPassword(user.username, "updatedpassword");
+    await usersModel.updateUserPassword(userId, "updatedpassword");
     const retrievedUser = await usersModel.getUserById(userId);
     expect(retrievedUser).toBeDefined();
     expect(
@@ -185,21 +185,25 @@ describe("Users Model Unit Tests", () => {
   //Test 21
   it("tests that it returns the correct error message when trying to add a user with the same username", async () => {
     //Try to create a user with the same username
-    const validationResult = await usersModel.validateUniqueUsernameAndEmail(user);
+    const validationResult = await usersModel.validateUniqueUsernameAndEmail(
+      user
+    );
     expect(validationResult).toBe("Username already exists");
   });
 
   //Test 22
   it("tests that it returns the correct error message when trying to add a user with the same email", async () => {
     //Try to create a user with the same email
-    const userWithSameEmail: NewUser = { 
-    username: "testuser3",
-    password: "testpassword3",
-    email: user.email, // Same email as original user
-    role: "user",
-    name: "testuser3"
+    const userWithSameEmail: NewUser = {
+      username: "testuser3",
+      password: "testpassword3",
+      email: user.email, // Same email as original user
+      role: "user",
+      name: "testuser3",
     };
-    const validationResult = await usersModel.validateUniqueUsernameAndEmail(userWithSameEmail);
+    const validationResult = await usersModel.validateUniqueUsernameAndEmail(
+      userWithSameEmail
+    );
     expect(validationResult).toBe("Email already exists");
   });
 
@@ -230,4 +234,29 @@ describe("Users Model Unit Tests", () => {
   it("tests that it returns an error when trying to retrieve the id of a user that does not exist", async () => {
     await expect(usersModel.getUserId("nonexistentuser")).rejects.toThrow();
   });
+
+  //Test 26
+  it("tests that it returns false when trying to update the password of a user that does not exist", async () => {
+    const result = await usersModel.updateUserPassword(-1020, "updatedpassword");
+    expect(result).toBe(false);
+  });
+
+  //Test 27
+  it("tests that it returns an error when trying to delete a user by id that does not exist", async () => {
+    const result = await usersModel.deleteUser(-20);
+    expect(result).toBe(false);
+  });
+
+  //Test 28
+  it("tests that it returns false when trying to update a user's username to a username that already exists", async () => {
+    const result = await usersModel.updateUserUsername(userId, user.username);
+    expect(result).toBe(false);
+  });
+
+  //Test 29
+  it("tests that it returns true when trying to update a user's username", async () => {
+    const result = await usersModel.updateUserUsername(userId, "updatedusername");
+    expect(result).toBe(true);
+  });
+  
 });

@@ -13,6 +13,8 @@ import rolesModelFactory from "../models/roles";
 import usersModelFactory from "../models/users";
 import { RolesModel } from "../models/roles";
 import { User } from "../models/table-types";
+import Backup from "better-sqlite3";
+
 export const databasePath: string = __dirname + "/database.sqlite";
 
 // Load environment variables
@@ -163,4 +165,15 @@ export async function resetDatabase(
     console.error(`Error resetting the database: ${error.stack}`);
     throw error;
   }
+}
+
+export function createBackup(backupPath: string, db: BetterSQLite3Database) {
+  const backup = db.backup(backupPath);
+  backup
+    .then(() => {
+      console.log("Backup completed successfully!");
+    })
+    .catch((err: any) => {
+      console.error("Backup failed:", err);
+    });
 }

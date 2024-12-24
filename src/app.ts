@@ -1,9 +1,11 @@
 import express, { Application } from "express";
 import morgan from "morgan";
 import path from "path";
-import { databaseCreator, dbProductionOptions, initialValues, runMigrations } from './database/init-db';
+import { createBackup, databaseCreator, dbProductionOptions, initialValues, runMigrations } from './database/init-db';
 import connectionGenerator from './database/init-db';
 import { drizzle } from "drizzle-orm/better-sqlite3";
+import userRoutes from "./routes/user_routes";
+import { UsersModel } from "./models/users";
 
 //Express application
 const app: Application = express();
@@ -19,6 +21,17 @@ app.use(express.static(path.join(__dirname, "dist/public")));
 
 //Extra middleware
 app.use(express.json());
+
+//Routes
+app.use("/users", userRoutes);
+
+// Initialize models
+const models = {
+  usersModel: new UsersModel(drizzle(db))
+};
+
+// Add models to app.locals
+app.locals.models = models;
 
 //Start the database in the server.
 (async () => {

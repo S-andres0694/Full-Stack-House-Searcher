@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon src/server.ts --clear",
     "generate": "drizzle-kit generate",
     "push": "drizzle-kit push",
     "drop": "drizzle-kit drop",
