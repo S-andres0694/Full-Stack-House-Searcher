@@ -238,7 +238,7 @@ export class UsersModel {
    * Checks if a user has a specific role.
    * @param {string} username - The username of the user to check
    * @param {string} role - The role to check for
-   * @returns {Promise<boolean>} True if the user has the role, false otherwise
+   * @returns {Promise<boolean | string>} True if the user has the role, false otherwise
    */
   async hasRole(id: number, role: string): Promise<boolean | string> {
     const user = await this.getUserById(id);

@@ -230,7 +230,7 @@ describe("User API Testing", () => {
   it("tests that the hasRole endpoint fails when the user does not exist", async () => {
     const response = await request(app).get("/users/-1020/hasRole/user");
     expect(response.status).toBe(404);
-    expect(response.body.error).toBe("User not found");
+    expect(response.body.error).toBe("User does not exist");
   });
 
   it("tests that the hasRole endpoint fails when the role does not exist", async () => {
@@ -278,6 +278,5 @@ describe("User API Testing", () => {
 });
 
 afterAll(() => {
-  //Close the server
   server.close();
 });

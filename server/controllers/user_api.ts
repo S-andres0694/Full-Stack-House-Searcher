@@ -149,7 +149,9 @@ export class UserApi {
     }
 
     if (newUsername === user.username) {
-      response.status(400).json({ error: "Cannot update username to the same username" });
+      response
+        .status(400)
+        .json({ error: "Cannot update username to the same username" });
       return;
     }
 
@@ -198,7 +200,9 @@ export class UserApi {
     }
 
     if (newEmail === user.email) {
-      response.status(400).json({ error: "Cannot update email to the same email" });
+      response
+        .status(400)
+        .json({ error: "Cannot update email to the same email" });
       return;
     }
 
@@ -231,22 +235,21 @@ export class UserApi {
   hasRole = async (request: Request, response: Response): Promise<void> => {
     const id: number = parseInt(request.params.id);
     const role: string = request.params.role;
+    const roleId: number | undefined = await this.rolesModel.getRoleId(role);
 
-    const result: boolean | string = await this.usersModel.hasRole(id, role);
-
-    if (await this.rolesModel.checkRoleExists(role) === false) {
+    if (!roleId) {
       response.status(404).json({ error: "Role does not exist" });
       return;
     }
 
-    if (result === "User does not exist") {
-      response.status(404).json({ error: "User not found" });
+    const result: boolean | string = await this.usersModel.hasRole(id, role);
+
+    if (typeof result === "string") {
+      response.status(404).json({ error: result });
       return;
     }
 
-    if (result === true) {
-      response.status(200).json({ hasRole: result });
-    }
+    response.status(200).json({ hasRole: result });
   };
 
   /**

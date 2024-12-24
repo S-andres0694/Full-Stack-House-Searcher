@@ -12,7 +12,7 @@
     "parcel-build": "parcel build src/public/index.html --dist-dir dist/public",
     "tailwind-build": "npx tailwindcss -i ./src/public/styles.css -o ./src/public/output.css --watch --minify",
     "unit-tests": "jest tests/unit --coverage --verbose --runInBand",
-    "integration-tests": "jest tests/integration --coverage --verbose",
+    "integration-tests": "jest tests/integration --coverage --verbose --runInBand",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "migrate": "drizzle-kit migrate"

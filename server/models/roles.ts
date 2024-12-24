@@ -28,7 +28,6 @@ export class RolesModel {
     /**
      * Removes a role from the database.
      * @param {number} roleId - The ID of the role to remove
-     * @returns {Promise<Role | undefined>} The deleted role if found, undefined otherwise
      */
     async deleteRole(roleId: number): Promise<void> {
         try {
