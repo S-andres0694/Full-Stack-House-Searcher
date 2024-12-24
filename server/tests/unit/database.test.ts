@@ -4,7 +4,7 @@ import connectionGenerator, {
   initialValues,
   resetDatabase,
   runMigrations,
-} from "../../src/database/init-db";
+} from "../../database/init-db";
 import sqlite3, { Database } from "better-sqlite3";
 import { testDbPath } from "../jest.setup";
 import { drizzle } from "drizzle-orm/better-sqlite3";
@@ -108,10 +108,14 @@ describe("Database Unit Tests", () => {
     );
 
     //Retrieve user id
-    const userId = db.prepare("SELECT id FROM users WHERE username = ?").get("testuser") as { id: number };
+    const userId = db
+      .prepare("SELECT id FROM users WHERE username = ?")
+      .get("testuser") as { id: number };
 
     //Retrieve property id
-    const propertyId = db.prepare("SELECT id FROM properties WHERE address = ?").get("456 Oak Ave, Somewhere, USA") as { id: number };
+    const propertyId = db
+      .prepare("SELECT id FROM properties WHERE address = ?")
+      .get("456 Oak Ave, Somewhere, USA") as { id: number };
 
     // Finally insert viewed property
     db.prepare(
@@ -148,10 +152,14 @@ describe("Database Unit Tests", () => {
     );
 
     //Retrieve user id
-    const userId = db.prepare("SELECT id FROM users WHERE username = ?").get("testuser") as { id: number };
+    const userId = db
+      .prepare("SELECT id FROM users WHERE username = ?")
+      .get("testuser") as { id: number };
 
     //Retrieve property id
-    const propertyId = db.prepare("SELECT id FROM properties WHERE address = ?").get("456 Oak Ave, Somewhere, USA") as { id: number };
+    const propertyId = db
+      .prepare("SELECT id FROM properties WHERE address = ?")
+      .get("456 Oak Ave, Somewhere, USA") as { id: number };
 
     // Finally insert favorite
     db.prepare(
@@ -182,8 +190,11 @@ describe("Database Unit Tests", () => {
     await initialValues(db);
     expect(db.prepare("SELECT * FROM roles").get()).toBeDefined();
     expect(db.prepare("SELECT * FROM users").get()).toBeDefined();
-    expect(db.prepare("SELECT * FROM roles WHERE role_name = 'admin'").get()).toBeDefined();
-    expect(db.prepare("SELECT * FROM roles WHERE role_name = 'user'").get()).toBeDefined();
+    expect(
+      db.prepare("SELECT * FROM roles WHERE role_name = 'admin'").get()
+    ).toBeDefined();
+    expect(
+      db.prepare("SELECT * FROM roles WHERE role_name = 'user'").get()
+    ).toBeDefined();
   });
 });
-

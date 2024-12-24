@@ -32,7 +32,7 @@ export class UsersModel {
       user.password = await hash(user.password, 10);
       //Insert the user into the database and return the id of the user.
       try {
-        this.db.transaction(async (tx) => {
+        this.db.transaction(async (tx: BetterSQLite3Database) => {
           await tx.insert(users).values(user);
         });
       } catch (error) {
@@ -126,7 +126,7 @@ export class UsersModel {
       if ((await this.getUserByUsername(newUsername))) {
         return false;
       }
-      this.db.transaction(async (tx) => {
+      this.db.transaction(async (tx: BetterSQLite3Database) => {
         await tx.update(users).set({ username: newUsername }).where(eq(users.id, id));
       });
       return true;
@@ -146,7 +146,7 @@ export class UsersModel {
       if ((await this.getUserByEmail(newEmail))) {
         return false;
       }
-      this.db.transaction(async (tx) => {
+      this.db.transaction(async (tx: BetterSQLite3Database) => {
         await tx.update(users).set({ email: newEmail }).where(eq(users.id, id));
       });
       return true;
@@ -170,7 +170,7 @@ export class UsersModel {
       //Hash the password.
       newPassword = await hash(newPassword, 10);
       //Update the user's password in the database.
-      this.db.transaction(async (tx) => {
+      this.db.transaction(async (tx: BetterSQLite3Database) => {
         await tx
           .update(users)
           .set({ password: newPassword })
@@ -192,7 +192,7 @@ export class UsersModel {
       if (!(await this.getUserById(id))) {
         return false;
       }
-      this.db.transaction(async (tx) => {
+      this.db.transaction(async (tx: BetterSQLite3Database) => {
         await tx.delete(users).where(eq(users.id, id));
       });
 

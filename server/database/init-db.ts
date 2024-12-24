@@ -2,7 +2,6 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
 import Database, { Options } from "better-sqlite3";
 import { Database as BetterSQLite3Database } from "better-sqlite3";
-import DrizzleORM from "drizzle-orm";
 import type { BetterSQLite3Database as DrizzleDB } from "drizzle-orm/better-sqlite3";
 import dotenv from "dotenv";
 import * as schema from "./schema"; // Import your existing schema

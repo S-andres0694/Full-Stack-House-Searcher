@@ -1,4 +1,4 @@
-import { NewProperty, NewUser } from "../../src/models/table-types";
+import { NewProperty, NewUser } from "../../models/table-types";
 
 export const property: NewProperty = {
   url: "https://www.example.com",
@@ -36,4 +36,4 @@ export const user2: NewUser = {
   email: "test2@test.com",
   role: "user",
   name: "testuser2",
-};  
+};

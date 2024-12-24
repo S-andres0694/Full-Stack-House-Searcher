@@ -1,11 +1,11 @@
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
-import { NewUser } from "../../src/models/table-types";
-import usersModelFactory, { UsersModel } from "../../src/models/users";
+import { NewUser } from "../../models/table-types";
+import usersModelFactory, { UsersModel } from "../../models/users";
 import connectionGenerator, {
   dbTestOptions,
   initialValues,
   resetDatabase,
-} from "../../src/database/init-db";
+} from "../../database/init-db";
 import { Database } from "better-sqlite3";
 import { compare } from "bcrypt";
 import { testDbPath } from "../jest.setup";
@@ -27,7 +27,7 @@ beforeEach(async () => {
   await resetDatabase(db, dbTestOptions);
   await initialValues(db);
   await usersModel.createUser(user);
-  userId = await usersModel.getUserId(user.username) as number;
+  userId = (await usersModel.getUserId(user.username)) as number;
 });
 
 afterAll(() => {
@@ -125,6 +125,7 @@ describe("Users Model Unit Tests", () => {
     const emailExists = await usersModel.emailExists(user.email);
     expect(emailExists).toBe(true);
   });
+  
 
   //Test 13:
   it("should be able to check that a user has a specific role", async () => {
@@ -238,7 +239,10 @@ describe("Users Model Unit Tests", () => {
 
   //Test 26
   it("tests that it returns false when trying to update the password of a user that does not exist", async () => {
-    const result = await usersModel.updateUserPassword(-1020, "updatedpassword");
+    const result = await usersModel.updateUserPassword(
+      -1020,
+      "updatedpassword"
+    );
     expect(result).toBe(false);
   });
 
@@ -256,7 +260,10 @@ describe("Users Model Unit Tests", () => {
 
   //Test 29
   it("tests that it returns true when trying to update a user's username", async () => {
-    const result = await usersModel.updateUserUsername(userId, "updatedusername");
+    const result = await usersModel.updateUserUsername(
+      userId,
+      "updatedusername"
+    );
     expect(result).toBe(true);
   });
 

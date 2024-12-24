@@ -3,7 +3,6 @@
 import { sql } from "drizzle-orm";
 import { sqliteTable, unique } from "drizzle-orm/sqlite-core";
 import * as t from "drizzle-orm/sqlite-core";
-import { User } from "../models/table-types";
 
 //Defines the users table.
 export const users = sqliteTable(

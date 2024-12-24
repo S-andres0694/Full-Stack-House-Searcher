@@ -1,10 +1,16 @@
 import { describe, it, expect } from "@jest/globals";
 import { testDbPath } from "../jest.setup";
-import connectionGenerator, { dbTestOptions, initialValues, resetDatabase } from "../../src/database/init-db";
-import propertiesModelFactory, { PropertiesModel } from "../../src/models/properties";
+import connectionGenerator, {
+  dbTestOptions,
+  initialValues,
+  resetDatabase,
+} from "../../database/init-db";
+import propertiesModelFactory, {
+  PropertiesModel,
+} from "../../models/properties";
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import { Database } from "better-sqlite3";
-import { NewProperty, Property } from "../../src/models/table-types";
+import { NewProperty, Property } from "../../models/table-types";
 import { property, property2 } from "./constants";
 
 let db: Database;
@@ -32,7 +38,10 @@ afterAll(() => {
 describe("Properties Model Unit Tests", () => {
   //Test 1:
   it("should be able to get all properties", async () => {
-    const properties = await propertiesModel.insertProperties([property, property2]);
+    const properties = await propertiesModel.insertProperties([
+      property,
+      property2,
+    ]);
     const retrievedProperties = await propertiesModel.getAllProperties();
     expect(retrievedProperties).toBeDefined();
     expect(retrievedProperties.length).toBe(2);
@@ -58,7 +67,9 @@ describe("Properties Model Unit Tests", () => {
   //Test 4:
   it("should be able to get a property by address", async () => {
     const propertyId: number = await propertiesModel.createProperty(property);
-    const retrievedProperty = await propertiesModel.getPropertyByAddress(property.address);
+    const retrievedProperty = await propertiesModel.getPropertyByAddress(
+      property.address
+    );
     expect(retrievedProperty).toBeDefined();
     expect(retrievedProperty?.id).toBe(propertyId);
   });
@@ -66,7 +77,9 @@ describe("Properties Model Unit Tests", () => {
   //Test 5:
   it("should be able to get an identifier by id", async () => {
     const propertyId: number = await propertiesModel.createProperty(property);
-    const retrievedIdentifier = await propertiesModel.getIdentifierById(propertyId);
+    const retrievedIdentifier = await propertiesModel.getIdentifierById(
+      propertyId
+    );
     expect(retrievedIdentifier).toBeDefined();
     expect(retrievedIdentifier).toBe(property.identifier);
   });
@@ -74,7 +87,9 @@ describe("Properties Model Unit Tests", () => {
   //Test 6:
   it("should be able to get a property by identifier", async () => {
     const propertyId: number = await propertiesModel.createProperty(property);
-    const retrievedProperty = await propertiesModel.getPropertyByIdentifier(property.identifier);
+    const retrievedProperty = await propertiesModel.getPropertyByIdentifier(
+      property.identifier
+    );
     expect(retrievedProperty).toBeDefined();
     expect(retrievedProperty?.id).toBe(propertyId);
   });
@@ -97,7 +112,10 @@ describe("Properties Model Unit Tests", () => {
   //Test 9:
   it("should be able to update a property", async () => {
     const propertyId: number = await propertiesModel.createProperty(property);
-    const updatedProperty = { ...property, address: "456 Main St, Anytown, USA" };
+    const updatedProperty = {
+      ...property,
+      address: "456 Main St, Anytown, USA",
+    };
     await propertiesModel.updateProperty(propertyId, updatedProperty);
     const retrievedProperty = await propertiesModel.getPropertyById(propertyId);
     expect(retrievedProperty).toBeDefined();
@@ -116,7 +134,7 @@ describe("Properties Model Unit Tests", () => {
   it("should be able to get summary of a property", async () => {
     const propertyId: number = await propertiesModel.createProperty(property);
     const retrievedProperty = await propertiesModel.getPropertyById(propertyId);
-    expect(retrievedProperty).toBeDefined(); 
+    expect(retrievedProperty).toBeDefined();
     expect(retrievedProperty?.summary).toBe(property.summary);
   });
 
@@ -163,7 +181,9 @@ describe("Properties Model Unit Tests", () => {
   //Test 17:
   it("should be able to get a property by url", async () => {
     const propertyId: number = await propertiesModel.createProperty(property);
-    const retrievedProperty = await propertiesModel.getPropertyByUrl(property.url);
+    const retrievedProperty = await propertiesModel.getPropertyByUrl(
+      property.url
+    );
     expect(retrievedProperty).toBeDefined();
     expect(retrievedProperty?.id).toBe(propertyId);
   });
@@ -177,34 +197,34 @@ describe("Properties Model Unit Tests", () => {
   });
 
   //Test 19:
-    it("should be able to get the address of a property", async () => {
-      const propertyId: number = await propertiesModel.createProperty(property);
-      const retrievedProperty = await propertiesModel.getAddress(propertyId);
-      expect(retrievedProperty).toBeDefined();
-      expect(retrievedProperty).toBe(property.address);
-    });
+  it("should be able to get the address of a property", async () => {
+    const propertyId: number = await propertiesModel.createProperty(property);
+    const retrievedProperty = await propertiesModel.getAddress(propertyId);
+    expect(retrievedProperty).toBeDefined();
+    expect(retrievedProperty).toBe(property.address);
+  });
 
   //Test 20:
-    it("should be able to get the contact phone of a property", async () => {
-      const propertyId: number = await propertiesModel.createProperty(property);
-      const retrievedProperty = await propertiesModel.getContactPhone(propertyId);
-      expect(retrievedProperty).toBeDefined();
-      expect(retrievedProperty).toBe(property.contactPhone);
-    });
+  it("should be able to get the contact phone of a property", async () => {
+    const propertyId: number = await propertiesModel.createProperty(property);
+    const retrievedProperty = await propertiesModel.getContactPhone(propertyId);
+    expect(retrievedProperty).toBeDefined();
+    expect(retrievedProperty).toBe(property.contactPhone);
+  });
 
   //Test 21:
-    it("should be able to get the summary of a property", async () => {
-      const propertyId: number = await propertiesModel.createProperty(property);
-      const retrievedProperty = await propertiesModel.getSummary(propertyId);
-      expect(retrievedProperty).toBeDefined();
-      expect(retrievedProperty).toBe(property.summary);
-    });
+  it("should be able to get the summary of a property", async () => {
+    const propertyId: number = await propertiesModel.createProperty(property);
+    const retrievedProperty = await propertiesModel.getSummary(propertyId);
+    expect(retrievedProperty).toBeDefined();
+    expect(retrievedProperty).toBe(property.summary);
+  });
 
   //Test 22:
-    it("should be able to get the URL of a property", async () => {
-      const propertyId: number = await propertiesModel.createProperty(property);
-      const retrievedProperty = await propertiesModel.getUrl(propertyId);
-      expect(retrievedProperty).toBeDefined();
-      expect(retrievedProperty).toBe(property.url);
-    });
+  it("should be able to get the URL of a property", async () => {
+    const propertyId: number = await propertiesModel.createProperty(property);
+    const retrievedProperty = await propertiesModel.getUrl(propertyId);
+    expect(retrievedProperty).toBeDefined();
+    expect(retrievedProperty).toBe(property.url);
+  });
 });
