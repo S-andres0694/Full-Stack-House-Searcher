@@ -37,3 +37,20 @@ export const user2: NewUser = {
   role: "user",
   name: "testuser2",
 };
+
+//Test user with the same email as the first user
+export const userSameEmailAsUser: NewUser = {
+  username: "testuser3",
+  password: "testpassword3",
+  email: "test@test.com",
+  role: "user",
+  name: "testuser3",
+};
+
+export const independentUser: NewUser = {
+  username: "testuser4",
+  password: "testpassword4",
+  email: "test4@test.com",
+  role: "user",
+  name: "testuser4",
+};

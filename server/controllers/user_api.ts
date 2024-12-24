@@ -6,6 +6,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { eq } from "drizzle-orm";
 import { User, NewUser } from "../models/table-types";
 import { Request, response, Response } from "express";
+import rolesModelFactory, { RolesModel } from "../models/roles";
 
 /**
  * Test API to make sure that the server is running.
@@ -25,10 +26,13 @@ export class UserApi {
   private drizzle: BetterSQLite3Database;
   //Users Model Instance
   private usersModel: UsersModel;
+  //Roles Model Instance
+  private rolesModel: RolesModel;
 
   constructor(private db: Database) {
     this.drizzle = drizzle(db);
     this.usersModel = usersModelFactory(this.drizzle);
+    this.rolesModel = rolesModelFactory(this.drizzle);
   }
 
   /**
@@ -132,9 +136,20 @@ export class UserApi {
   ): Promise<void> => {
     const id: number = parseInt(request.params.id);
     const newUsername: string = request.body.newUsername;
+    const user: User | undefined = await this.usersModel.getUserById(id);
+
+    if (!user) {
+      response.status(404).json({ error: "User not found" });
+      return;
+    }
 
     if (!newUsername) {
       response.status(400).json({ error: "New username is required" });
+      return;
+    }
+
+    if (newUsername === user.username) {
+      response.status(400).json({ error: "Cannot update username to the same username" });
       return;
     }
 
@@ -144,7 +159,7 @@ export class UserApi {
     );
 
     if (result === false) {
-      response.status(404).json({ error: "Username already exists" });
+      response.status(409).json({ error: "Username already exists" });
       return;
     }
 
@@ -170,9 +185,20 @@ export class UserApi {
   ): Promise<void> => {
     const id: number = parseInt(request.params.id);
     const newEmail: string = request.body.newEmail;
+    const user: User | undefined = await this.usersModel.getUserById(id);
+
+    if (!user) {
+      response.status(404).json({ error: "User not found" });
+      return;
+    }
 
     if (!newEmail) {
       response.status(400).json({ error: "New email is required" });
+      return;
+    }
+
+    if (newEmail === user.email) {
+      response.status(400).json({ error: "Cannot update email to the same email" });
       return;
     }
 
@@ -182,7 +208,7 @@ export class UserApi {
     );
 
     if (result === false) {
-      response.status(404).json({ error: "User not found" });
+      response.status(409).json({ error: "Email already exists" });
       return;
     }
 
@@ -208,18 +234,18 @@ export class UserApi {
 
     const result: boolean | string = await this.usersModel.hasRole(id, role);
 
+    if (await this.rolesModel.checkRoleExists(role) === false) {
+      response.status(404).json({ error: "Role does not exist" });
+      return;
+    }
+
     if (result === "User does not exist") {
       response.status(404).json({ error: "User not found" });
       return;
     }
 
-    if (result === false) {
-      response.status(200).json({ hasRole: false });
-      return;
-    }
-
     if (result === true) {
-      response.status(200).json({ hasRole: true });
+      response.status(200).json({ hasRole: result });
     }
   };
 
