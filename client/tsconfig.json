@@ -8,8 +8,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["jest"]
+    "jsx": "react-jsx",
+    "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["server/**/*", "client/**/*"],
-  "exclude": ["node_modules", "dist", "tests"]
+  "include": ["**/*"],
+  "exclude": ["node_modules", "dist"]
 }

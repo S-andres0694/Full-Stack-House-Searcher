@@ -7,6 +7,19 @@ import { eq } from "drizzle-orm";
 import { User, NewUser } from "../models/table-types";
 import { Request, response, Response } from "express";
 
+/**
+ * Test API to make sure that the server is running.
+ * @param {Request} request - The request object
+ * @param {Response} response - The response object to send the user data
+ */
+
+export const testApi = async (
+  request: Request,
+  response: Response
+): Promise<void> => {
+  response.status(200).json({ message: "Server is running" });
+};
+
 export class UserApi {
   //Database Connection Instance
   private drizzle: BetterSQLite3Database;
@@ -81,17 +94,14 @@ export class UserApi {
       response.status(500).json({ error: "Failed to get all users" });
     }
   };
-  
+
   /**
    * Deletes a user by their ID.
    * @param {Request} request - The request object containing the user ID
    * @param {Response} response - The response object to send the user data
    */
 
-  deleteUser = async (
-    request: Request,
-    response: Response
-  ): Promise<void> => {
+  deleteUser = async (request: Request, response: Response): Promise<void> => {
     const id: number = parseInt(request.params.id);
     const result: boolean | string = await this.usersModel.deleteUser(id);
 
@@ -211,7 +221,7 @@ export class UserApi {
     if (result === true) {
       response.status(200).json({ hasRole: true });
     }
-  }
+  };
 
   /**
    * Gets a user's name.
@@ -222,14 +232,14 @@ export class UserApi {
   getName = async (request: Request, response: Response): Promise<void> => {
     const id: number = parseInt(request.params.id);
     const name: string | undefined = await this.usersModel.getName(id);
-    
+
     if (!name) {
       response.status(404).json({ error: "User not found" });
       return;
     }
     response.json(name);
-  }
-    
+  };
+
   /**
    * Gets a user's email.
    * @param {Request} request - The request object containing the user ID
@@ -244,8 +254,8 @@ export class UserApi {
       return;
     }
     response.json(email);
-  }
-    
+  };
+
   /**
    * Gets a user's ID.
    * @param {Request} request - The request object containing the user ID
@@ -260,7 +270,50 @@ export class UserApi {
       return;
     }
     response.json(id);
-  }
+  };
+
+  /**
+   * Creates a user.
+   * @param {Request} request - The request object containing the user data
+   * @param {Response} response - The response object to send the user data
+   */
+
+  createUser = async (request: Request, response: Response): Promise<void> => {
+    const user: NewUser = request.body;
+    if (
+      !user ||
+      !user.username ||
+      !user.email ||
+      !user.password ||
+      !user.name ||
+      !user.role
+    ) {
+      response.status(400).json({ error: "Invalid user data" });
+      return;
+    }
+
+    //Initialize the date if it was not passed.
+    user.createdAt = user.createdAt ? user.createdAt : new Date();
+
+    try {
+      await this.usersModel.createUser(user);
+      response.status(201).json({ message: "User created successfully" });
+    } catch (error) {
+      // Check for specific validation errors
+      if (error instanceof Error) {
+        if (
+          error.message === "Username already exists" ||
+          error.message === "Email already exists"
+        ) {
+          response.status(409).json({ error: error.message });
+          return;
+        }
+      }
+      // Handle other errors
+      console.error(error);
+      response.status(500).json({ error: "Failed to create user" });
+    }
+  };
 }
 
 export default function userApiFactory(db: Database): UserApi {

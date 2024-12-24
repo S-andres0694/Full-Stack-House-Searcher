@@ -11,7 +11,7 @@ import propertiesModelFactory, {
 import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
 import { Database } from "better-sqlite3";
 import { NewProperty, Property } from "../../models/table-types";
-import { property, property2 } from "./constants";
+import { property, property2 } from "../constants";
 
 let db: Database;
 let propertiesModel: PropertiesModel;

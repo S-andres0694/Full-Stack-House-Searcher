@@ -14,7 +14,7 @@ import viewedPropertiesModelFactory, {
 import usersModelFactory, { UsersModel } from "../../models/users";
 import { testDbPath } from "../jest.setup";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { property, property2, user, user2 } from "./constants";
+import { property, property2, user, user2 } from "../constants";
 import { ViewedProperty } from "../../models/table-types";
 
 let usersModel: UsersModel;

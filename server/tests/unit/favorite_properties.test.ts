@@ -13,8 +13,8 @@ import usersModelFactory, { UsersModel } from "../../models/users";
 import propertiesModelFactory, {
   PropertiesModel,
 } from "../../models/properties";
-import { property, property2 } from "./constants";
-import { user } from "./constants";
+import { property, property2 } from "../constants";
+import { user } from "../constants";
 
 let db: Database;
 let favoritePropertiesModel: FavoritePropertiesModel;

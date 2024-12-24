@@ -9,7 +9,7 @@ import connectionGenerator, {
 import { Database } from "better-sqlite3";
 import { compare } from "bcrypt";
 import { testDbPath } from "../jest.setup";
-import { user, user2 } from "./constants";
+import { user, user2 } from "../constants";
 
 let usersModel: UsersModel;
 let drizzleORM: BetterSQLite3Database;

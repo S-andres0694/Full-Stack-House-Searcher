@@ -4,7 +4,7 @@ import path from "path";
 import { createBackup, databaseCreator, dbProductionOptions, initialValues, runMigrations } from './database/init-db';
 import connectionGenerator from './database/init-db';
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import userRoutes from "./routes/user_routes";
+import userRoutesFactory from "./routes/user_routes";
 import { UsersModel } from "./models/users";
 
 //Express application
@@ -23,15 +23,7 @@ app.use(express.static(path.join(__dirname, "dist/public")));
 app.use(express.json());
 
 //Routes
-app.use("/users", userRoutes);
-
-// Initialize models
-const models = {
-  usersModel: new UsersModel(drizzle(db))
-};
-
-// Add models to app.locals
-app.locals.models = models;
+app.use("/users", userRoutesFactory(dbPath));
 
 //Start the database in the server.
 (async () => {

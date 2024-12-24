@@ -3,10 +3,10 @@ import { defineConfig } from "drizzle-kit";
 //Configuration for the Drizzle
 export default defineConfig({
   dialect: "sqlite",
-  schema: "./src/database/schema.ts",
-  out: "./src/database/migrations",
+  schema: "./database/schema.ts",
+  out: "./database/migrations",
   dbCredentials: {
-    url: "./src/database/database.sqlite",
+    url: "./database/database.sqlite",
   },
   verbose: true,
 });

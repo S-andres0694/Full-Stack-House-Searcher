@@ -17,7 +17,7 @@ export class UsersModel {
    * Creates an instance of UsersModel.
    * @param {BetterSQLite3Database} db - The database connection instance
    */
-  constructor(private db: BetterSQLite3Database) { }
+  constructor(private db: BetterSQLite3Database) {}
 
   /**
    * Creates a new user in the database.
@@ -52,12 +52,12 @@ export class UsersModel {
   async validateUniqueUsernameAndEmail(
     user: NewUser
   ): Promise<boolean | string> {
-    const usernameExists = await this.usernameExists(user.username);
-    const emailExists = await this.emailExists(user.email);
-    if (usernameExists) {
+    const usernameExists: boolean = await this.usernameExists(user.username);
+    const emailExists: boolean = await this.emailExists(user.email);
+    if (usernameExists === true) {
       return "Username already exists";
     }
-    if (emailExists) {
+    if (emailExists === true) {
       return "Email already exists";
     }
     return true;
@@ -121,13 +121,19 @@ export class UsersModel {
    * @param {string} username - The new username
    * @returns {Promise<void>}
    */
-  async updateUserUsername(id: number, newUsername: string): Promise<boolean | string> {
+  async updateUserUsername(
+    id: number,
+    newUsername: string
+  ): Promise<boolean | string> {
     try {
-      if ((await this.getUserByUsername(newUsername))) {
+      if (await this.getUserByUsername(newUsername)) {
         return false;
       }
       this.db.transaction(async (tx: BetterSQLite3Database) => {
-        await tx.update(users).set({ username: newUsername }).where(eq(users.id, id));
+        await tx
+          .update(users)
+          .set({ username: newUsername })
+          .where(eq(users.id, id));
       });
       return true;
     } catch (error) {
@@ -141,9 +147,12 @@ export class UsersModel {
    * @param {string} email - The new email address
    * @returns {Promise<void>}
    */
-  async updateUserEmail(id: number, newEmail: string): Promise<boolean | string> {
+  async updateUserEmail(
+    id: number,
+    newEmail: string
+  ): Promise<boolean | string> {
     try {
-      if ((await this.getUserByEmail(newEmail))) {
+      if (await this.getUserByEmail(newEmail)) {
         return false;
       }
       this.db.transaction(async (tx: BetterSQLite3Database) => {
@@ -161,7 +170,10 @@ export class UsersModel {
    * @param {string} password - The new password (will be hashed)
    * @returns {Promise<void>}
    */
-  async updateUserPassword(id: number, newPassword: string): Promise<boolean | string> {
+  async updateUserPassword(
+    id: number,
+    newPassword: string
+  ): Promise<boolean | string> {
     try {
       if (!(await this.getUserById(id))) {
         return false;

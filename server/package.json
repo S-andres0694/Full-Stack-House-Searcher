@@ -11,7 +11,8 @@
     "watch": "tsc --watch",
     "parcel-build": "parcel build src/public/index.html --dist-dir dist/public",
     "tailwind-build": "npx tailwindcss -i ./src/public/styles.css -o ./src/public/output.css --watch --minify",
-    "test": "jest tests/unit --coverage --verbose --runInBand",
+    "unit-tests": "jest tests/unit --coverage --verbose --runInBand",
+    "integration-tests": "jest tests/integration --coverage --verbose",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "migrate": "drizzle-kit migrate"
@@ -25,8 +26,7 @@
     "better-sqlite3": "^11.7.0",
     "express": "^4.21.2",
     "nodemon": "^3.1.9",
-    "permitio": "^2.7.2-rc",
-    "tailwindcss": "^3.4.17"
+    "permitio": "^2.7.2-rc"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
