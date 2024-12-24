@@ -15,8 +15,10 @@ let favoritePropertiesModel: FavoritePropertiesModel;
 let drizzleORM: BetterSQLite3Database;
 let usersModel: UsersModel;
 let propertiesModel: PropertiesModel;
+let userId: number;
+let propertyId: number;
 
-beforeAll(() => {
+beforeAll(async () => {
     db = connectionGenerator(testDbPath, dbTestOptions);
     drizzleORM = drizzle(db);
     favoritePropertiesModel = new FavoritePropertiesModel(drizzleORM);
@@ -28,6 +30,11 @@ beforeEach(async () => {
     db = connectionGenerator(testDbPath, dbTestOptions);
     await resetDatabase(db, dbTestOptions);
     await initialValues(db);
+    await usersModel.createUser(user);
+    await propertiesModel.createProperty(property);
+    userId = (await usersModel.getUserId(user.username)) as number;
+    propertyId = (await propertiesModel.getPropertyByAddress(property.address))!
+      .id;
 });
 
 afterAll(() => {
@@ -37,39 +44,23 @@ afterAll(() => {
 
 describe("FavoritePropertiesModel", () => {
     it("should be able to add a favorite property", async () => {
-        await usersModel.createUser(user);
-        await propertiesModel.createProperty(property);
-        const userId: number = await usersModel.getUserId(user.username)!;
-        const propertyId: number = (await propertiesModel.getPropertyByAddress(property.address))!.id;
         await favoritePropertiesModel.addFavoriteProperty({ userId, propertyId });
         expect(await favoritePropertiesModel.getAllFavoriteProperties(userId)).toContainEqual({"id": 1, "userId": userId, "propertyId": propertyId});
     });
 
     it("should be able to delete a favorite property", async () => {
-        await usersModel.createUser(user);
-        await propertiesModel.createProperty(property);
-        const userId: number = await usersModel.getUserId(user.username)!;
-        const propertyId: number = (await propertiesModel.getPropertyByAddress(property.address))!.id;
         await favoritePropertiesModel.addFavoriteProperty({ userId, propertyId });
         await favoritePropertiesModel.deleteFavoriteProperty(userId, propertyId);
         expect(await favoritePropertiesModel.getAllFavoriteProperties(userId)).not.toContainEqual([property]);
     });
 
     it("should be able to get the count of favorite properties", async () => {
-        await usersModel.createUser(user);
-        await propertiesModel.createProperty(property);
-        const userId: number = await usersModel.getUserId(user.username)!;
-        const propertyId: number = (await propertiesModel.getPropertyByAddress(property.address))!.id;
         await favoritePropertiesModel.addFavoriteProperty({ userId, propertyId });
         expect(await favoritePropertiesModel.getFavoritePropertiesCount(userId)).toBe(1);
     });
 
     it("should be able to clear favorite properties", async () => {
-        await usersModel.createUser(user);
-        await propertiesModel.createProperty(property);
         await propertiesModel.createProperty(property2);
-        const userId: number = await usersModel.getUserId(user.username)!;
-        const propertyId: number = (await propertiesModel.getPropertyByAddress(property.address))!.id;
         const propertyId2: number = (await propertiesModel.getPropertyByAddress(property2.address))!.id;
         await favoritePropertiesModel.addFavoriteProperty({ userId, propertyId });
         await favoritePropertiesModel.addFavoriteProperty({ userId, propertyId: propertyId2 });

@@ -14,8 +14,10 @@ let propertiesModel: PropertiesModel;
 let viewedPropertiesModel: ViewedPropertiesModel;   
 let db: Database;
 let drizzleORM: BetterSQLite3Database;
+let userId: number;
+let propertyId: number;
 
-beforeAll(() => {
+beforeAll(async () => {
     db = connectionGenerator(testDbPath, dbTestOptions);
     drizzleORM = drizzle(db);
     usersModel = usersModelFactory(drizzleORM);
@@ -26,6 +28,11 @@ beforeAll(() => {
 beforeEach(async () => {
     await resetDatabase(db, dbTestOptions);
     await initialValues(db);
+    await usersModel.createUser(user);
+    await propertiesModel.createProperty(property);
+    userId = (await usersModel.getUserId(user.username)) as number;
+    propertyId = (await propertiesModel.getPropertyByAddress(property.address))!
+      .id;
 });
 
 afterAll(() => {
@@ -36,9 +43,6 @@ afterAll(() => {
 
 describe("Viewed Properties Model Unit Tests", () => {
     it("should be able to add a property as viewed", async () => {
-        const propertyId: number = await propertiesModel.createProperty(property);
-        await usersModel.createUser(user);
-        const userId: number = await usersModel.getUserId(user.username)!;
         await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
         const viewedProperties: ViewedProperty[] = await viewedPropertiesModel.getAllViewedPropertiesFromUser(userId);
         expect(viewedProperties.length).toBe(1);
@@ -46,9 +50,6 @@ describe("Viewed Properties Model Unit Tests", () => {
     });
 
     it("should be able to get all viewed properties from a user", async () => {
-        const propertyId: number = await propertiesModel.createProperty(property);
-        await usersModel.createUser(user);
-        const userId: number = await usersModel.getUserId(user.username)!;
         await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
         const viewedProperties: ViewedProperty[] = await viewedPropertiesModel.getAllViewedPropertiesFromUser(userId);
         expect(viewedProperties.length).toBe(1);
@@ -56,9 +57,6 @@ describe("Viewed Properties Model Unit Tests", () => {
     });
 
     it("should be able to delete a viewed property", async () => {
-        const propertyId: number = await propertiesModel.createProperty(property);
-        await usersModel.createUser(user);
-        const userId: number = await usersModel.getUserId(user.username)!;
         await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
         await viewedPropertiesModel.deleteViewedProperty(propertyId);
         const viewedProperties: ViewedProperty[] = await viewedPropertiesModel.getAllViewedPropertiesFromUser(userId);
@@ -66,9 +64,6 @@ describe("Viewed Properties Model Unit Tests", () => {
     });
 
     it("should be able to clear all viewed properties from a user", async () => {
-        const propertyId: number = await propertiesModel.createProperty(property);
-        await usersModel.createUser(user);
-        const userId: number = await usersModel.getUserId(user.username)!;
         await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
         await viewedPropertiesModel.clearViewedProperties(userId);
         const viewedProperties: ViewedProperty[] = await viewedPropertiesModel.getAllViewedPropertiesFromUser(userId);
@@ -76,18 +71,12 @@ describe("Viewed Properties Model Unit Tests", () => {
     });
 
     it("should be able to get the count of viewed properties for a user", async () => {
-        const propertyId: number = await propertiesModel.createProperty(property);
-        await usersModel.createUser(user);
-        const userId: number = await usersModel.getUserId(user.username)!;
         await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
         const count: number = await viewedPropertiesModel.getViewedPropertiesCount(userId);
         expect(count).toBe(1);
     });
 
     it("should be able to get the last viewed property for a user", async () => {
-        const propertyId: number = await propertiesModel.createProperty(property);
-        await usersModel.createUser(user);
-        const userId: number = await usersModel.getUserId(user.username)!;
         await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
         const lastViewedProperty: ViewedProperty | undefined = await viewedPropertiesModel.getLastViewedProperty(userId);
         expect(lastViewedProperty).toBeDefined();
@@ -95,9 +84,6 @@ describe("Viewed Properties Model Unit Tests", () => {
     });
 
     it("should be able to add multiple properties as viewed", async () => {
-        const propertyId: number = await propertiesModel.createProperty(property);
-        await usersModel.createUser(user);
-        const userId: number = await usersModel.getUserId(user.username)!;
         const propertyId2: number = await propertiesModel.createProperty(property2);
         await viewedPropertiesModel.addMultiplePropertiesAsViewed(userId, [
             { ...property, id: propertyId }, 

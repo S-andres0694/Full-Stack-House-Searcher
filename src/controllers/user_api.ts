@@ -185,6 +185,82 @@ export class UserApi {
       response.status(204).send();
     }
   };
+
+  /**
+   * Checks if a user has a role.
+   * @param {Request} request - The request object containing the user ID and role
+   * @param {Response} response - The response object to send the user data
+   */
+
+  hasRole = async (request: Request, response: Response): Promise<void> => {
+    const id: number = parseInt(request.params.id);
+    const role: string = request.params.role;
+
+    const result: boolean | string = await this.usersModel.hasRole(id, role);
+
+    if (result === "User does not exist") {
+      response.status(404).json({ error: "User not found" });
+      return;
+    }
+
+    if (result === false) {
+      response.status(200).json({ hasRole: false });
+      return;
+    }
+
+    if (result === true) {
+      response.status(200).json({ hasRole: true });
+    }
+  }
+
+  /**
+   * Gets a user's name.
+   * @param {Request} request - The request object containing the user ID
+   * @param {Response} response - The response object to send the user data
+   */
+
+  getName = async (request: Request, response: Response): Promise<void> => {
+    const id: number = parseInt(request.params.id);
+    const name: string | undefined = await this.usersModel.getName(id);
+    
+    if (!name) {
+      response.status(404).json({ error: "User not found" });
+      return;
+    }
+    response.json(name);
+  }
+    
+  /**
+   * Gets a user's email.
+   * @param {Request} request - The request object containing the user ID
+   * @param {Response} response - The response object to send the user data
+   */
+
+  getEmail = async (request: Request, response: Response): Promise<void> => {
+    const id: number = parseInt(request.params.id);
+    const email: string | undefined = await this.usersModel.getEmail(id);
+    if (!email) {
+      response.status(404).json({ error: "User not found" });
+      return;
+    }
+    response.json(email);
+  }
+    
+  /**
+   * Gets a user's ID.
+   * @param {Request} request - The request object containing the user ID
+   * @param {Response} response - The response object to send the user data
+   */
+
+  getUserId = async (request: Request, response: Response): Promise<void> => {
+    const username: string = request.params.username;
+    const id: number | undefined = await this.usersModel.getUserId(username);
+    if (!id) {
+      response.status(404).json({ error: "User not found" });
+      return;
+    }
+    response.json(id);
+  }
 }
 
 export default function userApiFactory(db: Database): UserApi {

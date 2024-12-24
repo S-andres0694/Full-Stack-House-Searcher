@@ -27,7 +27,7 @@ beforeEach(async () => {
   await resetDatabase(db, dbTestOptions);
   await initialValues(db);
   await usersModel.createUser(user);
-  userId = await usersModel.getUserId(user.username)!;
+  userId = await usersModel.getUserId(user.username) as number;
 });
 
 afterAll(() => {
@@ -128,13 +128,13 @@ describe("Users Model Unit Tests", () => {
 
   //Test 13:
   it("should be able to check that a user has a specific role", async () => {
-    const userHasRole = await usersModel.hasRole(user.username, user.role);
+    const userHasRole = await usersModel.hasRole(userId, user.role);
     expect(userHasRole).toBe(true);
   });
 
   //Test 14:
   it("should be able to check that a user does not have a specific role", async () => {
-    const userHasRole = await usersModel.hasRole(user.username, "admin");
+    const userHasRole = await usersModel.hasRole(userId, "admin");
     expect(userHasRole).toBe(false);
   });
 
@@ -154,13 +154,13 @@ describe("Users Model Unit Tests", () => {
 
   //Test 17
   it("tests that the getName method works", async () => {
-    const retrievedUser = await usersModel.getName(user.username);
+    const retrievedUser = await usersModel.getName(userId);
     expect(retrievedUser).toBe(user.name);
   });
 
   //Test 18
   it("tests that the getEmail method works", async () => {
-    const retrievedUser = await usersModel.getEmail(user.username);
+    const retrievedUser = await usersModel.getEmail(userId);
     expect(retrievedUser).toBe(user.email);
   });
 
@@ -232,7 +232,8 @@ describe("Users Model Unit Tests", () => {
 
   //Test 25
   it("tests that it returns an error when trying to retrieve the id of a user that does not exist", async () => {
-    await expect(usersModel.getUserId("nonexistentuser")).rejects.toThrow();
+    const userId = await usersModel.getUserId("nonexistentuser");
+    expect(userId).toBeUndefined();
   });
 
   //Test 26
@@ -258,5 +259,28 @@ describe("Users Model Unit Tests", () => {
     const result = await usersModel.updateUserUsername(userId, "updatedusername");
     expect(result).toBe(true);
   });
-  
+
+  //Test 30
+  it("tests that it returns a string when trying to check the role of a user that does not exist", async () => {
+    const result = await usersModel.hasRole(-1020, "user");
+    expect(result).toBe("User does not exist");
+  });
+
+  //Test 31
+  it("tests that it returns undefined when trying to get the name of a user that does not exist", async () => {
+    const result = await usersModel.getName(-1020);
+    expect(result).toBeUndefined();
+  });
+
+  //Test 32
+  it("tests that it returns undefined when trying to get the email of a user that does not exist", async () => {
+    const result = await usersModel.getEmail(-1020);
+    expect(result).toBeUndefined();
+  });
+
+  //Test 33
+  it("tests that it returns undefined when trying to get the name of a user that does not exist", async () => {
+    const result = await usersModel.getName(-1020);
+    expect(result).toBeUndefined();
+  });
 });

@@ -228,9 +228,12 @@ export class UsersModel {
    * @param {string} role - The role to check for
    * @returns {Promise<boolean>} True if the user has the role, false otherwise
    */
-  async hasRole(username: string, role: string): Promise<boolean> {
-    const user = await this.getUserByUsername(username);
-    return user?.role === role;
+  async hasRole(id: number, role: string): Promise<boolean | string> {
+    const user = await this.getUserById(id);
+    if (!user) {
+      return "User does not exist";
+    }
+    return user.role === role;
   }
 
   /**
@@ -238,8 +241,8 @@ export class UsersModel {
    * @param {string} username - The username of the user to retrieve
    * @returns {Promise<string | undefined>} The name of the user if found, undefined otherwise
    */
-  async getName(username: string): Promise<string | undefined> {
-    const user = await this.getUserByUsername(username);
+  async getName(id: number): Promise<string | undefined> {
+    const user = await this.getUserById(id);
     return user?.name;
   }
 
@@ -248,23 +251,19 @@ export class UsersModel {
    * @param {string} username - The username of the user to retrieve
    * @returns {Promise<string | undefined>} The email of the user if found, undefined otherwise
    */
-  async getEmail(username: string): Promise<string | undefined> {
-    const user = await this.getUserByUsername(username);
+  async getEmail(id: number): Promise<string | undefined> {
+    const user = await this.getUserById(id);
     return user?.email;
   }
 
   /**
    * Retrieves the ID of a user by their username.
    * @param {string} username - The username of the user to retrieve
-   * @returns {Promise<number>} The ID of the user
+   * @returns {Promise<number | undefined>} The ID of the user or undefined if the user does not exist
    */
-  async getUserId(username: string): Promise<number> {
-    const userExists: boolean = await this.usernameExists(username);
-    if (!userExists) {
-      throw new Error("User does not exist");
-    }
+  async getUserId(username: string): Promise<number | undefined> {
     const user: User | undefined = await this.getUserByUsername(username);
-    return user!.id;
+    return user?.id;
   }
 }
 
