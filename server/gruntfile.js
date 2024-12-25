@@ -52,7 +52,8 @@ module.exports = function (grunt) {
         command: 'echo "Migrating database..." && npm run migrate',
       },
       build: {
-        command: 'echo "Building server application..." && npm run parcel-build',
+        command:
+          'echo "Building server application..." && npm run parcel-build',
       },
     },
   });
