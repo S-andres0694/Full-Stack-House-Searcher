@@ -24,6 +24,7 @@ jobs:
 
     - name: Build
       run: |
+        cd server
         npm install
         grunt
              
