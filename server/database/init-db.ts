@@ -1,28 +1,28 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
-import Database, { Options } from "better-sqlite3";
-import { Database as BetterSQLite3Database } from "better-sqlite3";
-import type { BetterSQLite3Database as DrizzleDB } from "drizzle-orm/better-sqlite3";
-import dotenv from "dotenv";
-import * as schema from "./schema"; // Import your existing schema
-import { existsSync } from "fs";
-import { SQLiteColumn } from "drizzle-orm/sqlite-core";
-import { eq } from "drizzle-orm";
-import rolesModelFactory from "../models/roles";
-import usersModelFactory from "../models/users";
-import { RolesModel } from "../models/roles";
-import { User } from "../models/table-types";
-import Backup from "better-sqlite3";
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
+import Database, { Options } from 'better-sqlite3';
+import { Database as BetterSQLite3Database } from 'better-sqlite3';
+import type { BetterSQLite3Database as DrizzleDB } from 'drizzle-orm/better-sqlite3';
+import dotenv from 'dotenv';
+import * as schema from './schema'; // Import your existing schema
+import { existsSync } from 'fs';
+import { SQLiteColumn } from 'drizzle-orm/sqlite-core';
+import { eq } from 'drizzle-orm';
+import rolesModelFactory from '../models/roles';
+import usersModelFactory from '../models/users';
+import { RolesModel } from '../models/roles';
+import { User } from '../models/table-types';
+import Backup from 'better-sqlite3';
 
-export const databasePath: string = __dirname + "/database.sqlite";
+export const databasePath: string = __dirname + '/database.sqlite';
 
 // Load environment variables
 dotenv.config();
 
 // Initialize admin values
-const adminPassword: string = process.env.ADMIN_PASSWORD || "";
-const adminUsername: string = process.env.ADMIN_USERNAME || "";
-const adminEmail: string = process.env.ADMIN_EMAIL || "";
+const adminPassword: string = process.env.ADMIN_PASSWORD || '';
+const adminUsername: string = process.env.ADMIN_USERNAME || '';
+const adminEmail: string = process.env.ADMIN_EMAIL || '';
 
 // Database options
 export const dbProductionOptions: Options = {
@@ -37,7 +37,7 @@ export const dbTestOptions: Options = {
 };
 
 //Migrations folder
-const migrationsFolder = __dirname + "/migrations";
+const migrationsFolder = __dirname + '/migrations';
 
 /**
  * Creates the database and populates it with the initial values.
@@ -47,7 +47,7 @@ const migrationsFolder = __dirname + "/migrations";
 
 export async function databaseCreator(
   databasePath: string,
-  dbOptions: Options
+  dbOptions: Options,
 ): Promise<boolean> {
   try {
     // Create SQLite connection
@@ -57,7 +57,7 @@ export async function databaseCreator(
     const db = drizzle(sqlite, { schema });
 
     // Enable foreign keys
-    sqlite.pragma("foreign_keys = ON");
+    sqlite.pragma('foreign_keys = ON');
 
     return true;
   } catch (error: any) {
@@ -77,7 +77,7 @@ export function runMigrations(db: DrizzleDB, migrationsFolder: string): void {
     // Verify tables were created
     const tables = db.all("SELECT name FROM sqlite_master WHERE type='table'");
   } catch (error) {
-    console.error("Migration failed:", error);
+    console.error('Migration failed:', error);
     throw error;
   }
 }
@@ -90,7 +90,7 @@ export function runMigrations(db: DrizzleDB, migrationsFolder: string): void {
 
 export default function connectionGenerator(
   databasePath: string,
-  dbOptions: Options
+  dbOptions: Options,
 ): BetterSQLite3Database {
   try {
     const sqlite: BetterSQLite3Database = new Database(databasePath, dbOptions);
@@ -112,23 +112,25 @@ export async function initialValues(db: BetterSQLite3Database): Promise<void> {
     const roleModel: RolesModel = rolesModelFactory(drizzle(db));
 
     //Check if the roles exist
-    const userRoleChecker: boolean = await roleModel.checkRoleExists("user");
-    const adminRoleChecker: boolean = await roleModel.checkRoleExists("admin");
+    const userRoleChecker: boolean = await roleModel.checkRoleExists('user');
+    const adminRoleChecker: boolean = await roleModel.checkRoleExists('admin');
 
     //Create the roles if they don't exist
     if (!userRoleChecker) {
       await roleModel.createRole(
-        "user",
-        "Standard user role with limited access"
+        'user',
+        'Standard user role with limited access',
       );
     }
     if (!adminRoleChecker) {
-      await roleModel.createRole("admin", "Admin role with full access");
+      await roleModel.createRole('admin', 'Admin role with full access');
     }
 
     //Users Model
     const userModel = usersModelFactory(drizzle(db));
-    const userChecker: User | undefined = await userModel.getUserByUsername(adminUsername);
+    const userChecker: User | undefined = await userModel.getUserByUsername(
+      adminUsername,
+    );
 
     //Create the user if they don't exist
     if (!userChecker) {
@@ -136,11 +138,10 @@ export async function initialValues(db: BetterSQLite3Database): Promise<void> {
         username: adminUsername,
         email: adminEmail,
         password: adminPassword,
-        role: "admin",
-        name: "Sebastian El Khoury",
+        role: 'admin',
+        name: 'Sebastian El Khoury',
       });
     }
-
   } catch (error: any) {
     console.error(`Error populating the database: ${error.stack}`);
   }
@@ -148,18 +149,18 @@ export async function initialValues(db: BetterSQLite3Database): Promise<void> {
 
 export async function resetDatabase(
   db: BetterSQLite3Database,
-  dbOptions: Options
+  dbOptions: Options,
 ): Promise<void> {
   try {
     const drizzleDb = drizzle(db, { schema });
-    db.pragma("foreign_keys = OFF");
+    db.pragma('foreign_keys = OFF');
     // Clear all tables in the correct order to avoid foreign key constraints
     await drizzleDb.delete(schema.users).execute();
     await drizzleDb.delete(schema.viewedProperties).execute();
     await drizzleDb.delete(schema.favorites).execute();
     await drizzleDb.delete(schema.properties).execute();
     await drizzleDb.delete(schema.roles).execute();
-    db.pragma("foreign_keys = ON");
+    db.pragma('foreign_keys = ON');
   } catch (error: any) {
     console.error(`Error resetting the database: ${error.stack}`);
     throw error;
@@ -170,9 +171,9 @@ export function createBackup(backupPath: string, db: BetterSQLite3Database) {
   const backup = db.backup(backupPath);
   backup
     .then(() => {
-      console.log("Backup completed successfully!");
+      console.log('Backup completed successfully!');
     })
     .catch((err: any) => {
-      console.error("Backup failed:", err);
+      console.error('Backup failed:', err);
     });
 }

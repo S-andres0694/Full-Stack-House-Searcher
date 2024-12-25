@@ -1,17 +1,17 @@
-import { existsSync, unlinkSync } from "fs";
+import { existsSync, unlinkSync } from 'fs';
 import connectionGenerator, {
   databaseCreator,
   dbTestOptions,
   initialValues,
   resetDatabase,
   runMigrations,
-} from "../database/init-db";
-import { beforeAll, afterAll } from "@jest/globals";
-import { Database } from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+} from '../database/init-db';
+import { beforeAll, afterAll } from '@jest/globals';
+import { Database } from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
 
 //Test database Path
-export const testDbPath: string = __dirname + "/unit/test-database.sqlite";
+export const testDbPath: string = __dirname + '/unit/test-database.sqlite';
 
 beforeAll(async () => {
   if (existsSync(testDbPath)) {
@@ -22,7 +22,7 @@ beforeAll(async () => {
   //Create a connection to the test database
   const connection: Database = connectionGenerator(testDbPath, dbTestOptions);
   //Run the migrations
-  runMigrations(drizzle(connection), __dirname + "/../database/migrations");
+  runMigrations(drizzle(connection), __dirname + '/../database/migrations');
   //Populate the database with initial values
   await initialValues(connection);
 });

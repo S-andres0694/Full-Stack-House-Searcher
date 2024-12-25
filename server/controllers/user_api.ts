@@ -1,12 +1,12 @@
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { Database } from "better-sqlite3";
-import connectionGenerator from "../database/init-db";
-import usersModelFactory, { UsersModel } from "../models/users";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { eq } from "drizzle-orm";
-import { User, NewUser } from "../models/table-types";
-import { Request, response, Response } from "express";
-import rolesModelFactory, { RolesModel } from "../models/roles";
+import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { Database } from 'better-sqlite3';
+import connectionGenerator from '../database/init-db';
+import usersModelFactory, { UsersModel } from '../models/users';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { eq } from 'drizzle-orm';
+import { User, NewUser } from '../models/table-types';
+import { Request, response, Response } from 'express';
+import rolesModelFactory, { RolesModel } from '../models/roles';
 
 /**
  * Test API to make sure that the server is running.
@@ -16,9 +16,9 @@ import rolesModelFactory, { RolesModel } from "../models/roles";
 
 export const testApi = async (
   request: Request,
-  response: Response
+  response: Response,
 ): Promise<void> => {
-  response.status(200).json({ message: "Server is running" });
+  response.status(200).json({ message: 'Server is running' });
 };
 
 export class UserApi {
@@ -46,12 +46,12 @@ export class UserApi {
       const id: number = parseInt(request.params.id);
       const user: User | undefined = await this.usersModel.getUserById(id);
       if (!user) {
-        response.status(404).json({ error: "User not found" });
+        response.status(404).json({ error: 'User not found' });
         return;
       }
       response.json(user);
     } catch (error) {
-      response.status(500).json({ error: "Failed to get user by ID" });
+      response.status(500).json({ error: 'Failed to get user by ID' });
     }
   };
 
@@ -63,20 +63,20 @@ export class UserApi {
 
   getUserByEmail = async (
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<void> => {
     try {
       const email: string = request.params.email;
       const user: User | undefined = await this.usersModel.getUserByEmail(
-        email
+        email,
       );
       if (!user) {
-        response.status(404).json({ error: "User not found" });
+        response.status(404).json({ error: 'User not found' });
         return;
       }
       response.json(user);
     } catch (error) {
-      response.status(500).json({ error: "Failed to get user by email" });
+      response.status(500).json({ error: 'Failed to get user by email' });
     }
   };
 
@@ -90,12 +90,12 @@ export class UserApi {
     try {
       const users: User[] = await this.usersModel.getAllUsers();
       if (users.length === 0) {
-        response.status(404).json({ error: "No users found" });
+        response.status(404).json({ error: 'No users found' });
         return;
       }
       response.json(users);
     } catch (error) {
-      response.status(500).json({ error: "Failed to get all users" });
+      response.status(500).json({ error: 'Failed to get all users' });
     }
   };
 
@@ -110,12 +110,12 @@ export class UserApi {
     const result: boolean | string = await this.usersModel.deleteUser(id);
 
     if (result === false) {
-      response.status(404).json({ error: "User not found" });
+      response.status(404).json({ error: 'User not found' });
       return;
     }
 
-    if (result === "Internal Database Failure") {
-      response.status(500).json({ error: "Failed to delete user" });
+    if (result === 'Internal Database Failure') {
+      response.status(500).json({ error: 'Failed to delete user' });
       return;
     }
 
@@ -132,41 +132,41 @@ export class UserApi {
 
   updateUserUsername = async (
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<void> => {
     const id: number = parseInt(request.params.id);
     const newUsername: string = request.body.newUsername;
     const user: User | undefined = await this.usersModel.getUserById(id);
 
     if (!user) {
-      response.status(404).json({ error: "User not found" });
+      response.status(404).json({ error: 'User not found' });
       return;
     }
 
     if (!newUsername) {
-      response.status(400).json({ error: "New username is required" });
+      response.status(400).json({ error: 'New username is required' });
       return;
     }
 
     if (newUsername === user.username) {
       response
         .status(400)
-        .json({ error: "Cannot update username to the same username" });
+        .json({ error: 'Cannot update username to the same username' });
       return;
     }
 
     const result: boolean | string = await this.usersModel.updateUserUsername(
       id,
-      newUsername
+      newUsername,
     );
 
     if (result === false) {
-      response.status(409).json({ error: "Username already exists" });
+      response.status(409).json({ error: 'Username already exists' });
       return;
     }
 
-    if (result === "Internal Database Failure") {
-      response.status(500).json({ error: "Failed to update user" });
+    if (result === 'Internal Database Failure') {
+      response.status(500).json({ error: 'Failed to update user' });
       return;
     }
 
@@ -183,41 +183,41 @@ export class UserApi {
 
   updateUserEmail = async (
     request: Request,
-    response: Response
+    response: Response,
   ): Promise<void> => {
     const id: number = parseInt(request.params.id);
     const newEmail: string = request.body.newEmail;
     const user: User | undefined = await this.usersModel.getUserById(id);
 
     if (!user) {
-      response.status(404).json({ error: "User not found" });
+      response.status(404).json({ error: 'User not found' });
       return;
     }
 
     if (!newEmail) {
-      response.status(400).json({ error: "New email is required" });
+      response.status(400).json({ error: 'New email is required' });
       return;
     }
 
     if (newEmail === user.email) {
       response
         .status(400)
-        .json({ error: "Cannot update email to the same email" });
+        .json({ error: 'Cannot update email to the same email' });
       return;
     }
 
     const result: boolean | string = await this.usersModel.updateUserEmail(
       id,
-      newEmail
+      newEmail,
     );
 
     if (result === false) {
-      response.status(409).json({ error: "Email already exists" });
+      response.status(409).json({ error: 'Email already exists' });
       return;
     }
 
-    if (result === "Internal Database Failure") {
-      response.status(500).json({ error: "Failed to update user" });
+    if (result === 'Internal Database Failure') {
+      response.status(500).json({ error: 'Failed to update user' });
       return;
     }
 
@@ -238,13 +238,13 @@ export class UserApi {
     const roleId: number | undefined = await this.rolesModel.getRoleId(role);
 
     if (!roleId) {
-      response.status(404).json({ error: "Role does not exist" });
+      response.status(404).json({ error: 'Role does not exist' });
       return;
     }
 
     const result: boolean | string = await this.usersModel.hasRole(id, role);
 
-    if (typeof result === "string") {
+    if (typeof result === 'string') {
       response.status(404).json({ error: result });
       return;
     }
@@ -263,7 +263,7 @@ export class UserApi {
     const name: string | undefined = await this.usersModel.getName(id);
 
     if (!name) {
-      response.status(404).json({ error: "User not found" });
+      response.status(404).json({ error: 'User not found' });
       return;
     }
     response.json(name);
@@ -279,7 +279,7 @@ export class UserApi {
     const id: number = parseInt(request.params.id);
     const email: string | undefined = await this.usersModel.getEmail(id);
     if (!email) {
-      response.status(404).json({ error: "User not found" });
+      response.status(404).json({ error: 'User not found' });
       return;
     }
     response.json(email);
@@ -295,7 +295,7 @@ export class UserApi {
     const username: string = request.params.username;
     const id: number | undefined = await this.usersModel.getUserId(username);
     if (!id) {
-      response.status(404).json({ error: "User not found" });
+      response.status(404).json({ error: 'User not found' });
       return;
     }
     response.json(id);
@@ -317,7 +317,7 @@ export class UserApi {
       !user.name ||
       !user.role
     ) {
-      response.status(400).json({ error: "Invalid user data" });
+      response.status(400).json({ error: 'Invalid user data' });
       return;
     }
 
@@ -326,13 +326,13 @@ export class UserApi {
 
     try {
       await this.usersModel.createUser(user);
-      response.status(201).json({ message: "User created successfully" });
+      response.status(201).json({ message: 'User created successfully' });
     } catch (error) {
       // Check for specific validation errors
       if (error instanceof Error) {
         if (
-          error.message === "Username already exists" ||
-          error.message === "Email already exists"
+          error.message === 'Username already exists' ||
+          error.message === 'Email already exists'
         ) {
           response.status(409).json({ error: error.message });
           return;
@@ -340,7 +340,7 @@ export class UserApi {
       }
       // Handle other errors
       console.error(error);
-      response.status(500).json({ error: "Failed to create user" });
+      response.status(500).json({ error: 'Failed to create user' });
     }
   };
 }

@@ -1,8 +1,7 @@
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import { eq } from "drizzle-orm";
-import { properties } from "../database/schema";
-import { NewProperty, Property } from "./table-types";
-
+import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { eq } from 'drizzle-orm';
+import { properties } from '../database/schema';
+import { NewProperty, Property } from './table-types';
 
 /**
  * Class representing a model for property operations in the database.
@@ -69,19 +68,19 @@ export class PropertiesModel {
       .where(eq(properties.id, identifier));
     return propertyRecord?.monthlyRent;
   }
-    
-    /**
-     * Retrieves the address for a property by its identifier.
-     * @param {number} identifier - The identifier of the property
-     * @returns {Promise<string | undefined>} A promise that resolves to the address if found, undefined otherwise
-     */
-    async getAddress(identifier: number): Promise<string | undefined> {
-        const [propertyRecord]: { address: string }[] = await this.db
-          .select({ address: properties.address })
-          .from(properties)
-          .where(eq(properties.id, identifier));
-        return propertyRecord?.address;
-    }
+
+  /**
+   * Retrieves the address for a property by its identifier.
+   * @param {number} identifier - The identifier of the property
+   * @returns {Promise<string | undefined>} A promise that resolves to the address if found, undefined otherwise
+   */
+  async getAddress(identifier: number): Promise<string | undefined> {
+    const [propertyRecord]: { address: string }[] = await this.db
+      .select({ address: properties.address })
+      .from(properties)
+      .where(eq(properties.id, identifier));
+    return propertyRecord?.address;
+  }
 
   /**
    * Retrieves the contact phone for a property by its identifier.
@@ -165,10 +164,16 @@ export class PropertiesModel {
    * @param {NewProperty} property - The property object to update
    * @returns {Promise<void>} A promise that resolves when the property is updated
    */
-  async updateProperty(identifier: number, property: NewProperty): Promise<void> {
+  async updateProperty(
+    identifier: number,
+    property: NewProperty,
+  ): Promise<void> {
     try {
       this.db.transaction(async (tx) => {
-        await tx.update(properties).set(property).where(eq(properties.id, identifier));
+        await tx
+          .update(properties)
+          .set(property)
+          .where(eq(properties.id, identifier));
       });
     } catch (error: any) {
       console.error(`Error updating property: ${error.stack}`);
@@ -180,13 +185,16 @@ export class PropertiesModel {
    * @param {NewProperty[]} properties - The array of properties to insert
    * @returns {Promise<void>} A promise that resolves when the properties are inserted
    */
-  
+
   async insertProperties(propertiesArray: NewProperty[]): Promise<number[]> {
     const addedIDs: number[] = [];
     try {
       this.db.transaction(async (tx) => {
         propertiesArray.forEach(async (property) => {
-          const [propertyRecord] = await tx.insert(properties).values(property).returning({ id: properties.id });
+          const [propertyRecord] = await tx
+            .insert(properties)
+            .values(property)
+            .returning({ id: properties.id });
           addedIDs.push(propertyRecord.id);
         });
       });
@@ -216,7 +224,10 @@ export class PropertiesModel {
    * @returns {Promise<Property | undefined>} A promise that resolves to the property if found, undefined otherwise
    */
   async getPropertyByAddress(address: string): Promise<Property | undefined> {
-    const [propertyRecord]: Property[] = await this.db.select().from(properties).where(eq(properties.address, address));
+    const [propertyRecord]: Property[] = await this.db
+      .select()
+      .from(properties)
+      .where(eq(properties.address, address));
     return propertyRecord;
   }
 
@@ -225,12 +236,15 @@ export class PropertiesModel {
    * @param {number} identifier - The identifier of the property
    * @returns {Promise<Property | undefined>} A promise that resolves to the property if found, undefined otherwise
    */
-  async getPropertyByIdentifier(identifier: number): Promise<Property | undefined> {
-    const [propertyRecord]: Property[] = await this.db.select().from(properties).where(eq(properties.identifier, identifier));
+  async getPropertyByIdentifier(
+    identifier: number,
+  ): Promise<Property | undefined> {
+    const [propertyRecord]: Property[] = await this.db
+      .select()
+      .from(properties)
+      .where(eq(properties.identifier, identifier));
     return propertyRecord;
   }
-
-  
 }
 
 /**
@@ -239,8 +253,7 @@ export class PropertiesModel {
  * @returns {PropertiesModel} An instance of PropertiesModel
  */
 export default function propertiesModelFactory(
-  db: BetterSQLite3Database
+  db: BetterSQLite3Database,
 ): PropertiesModel {
   return new PropertiesModel(db);
 }
-

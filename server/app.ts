@@ -1,39 +1,48 @@
-import express, { Application } from "express";
-import morgan from "morgan";
-import path from "path";
-import { createBackup, databaseCreator, dbProductionOptions, initialValues, runMigrations } from './database/init-db';
+import express, { Application } from 'express';
+import morgan from 'morgan';
+import path from 'path';
+import {
+  createBackup,
+  databaseCreator,
+  dbProductionOptions,
+  initialValues,
+  runMigrations,
+} from './database/init-db';
 import connectionGenerator from './database/init-db';
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import userRoutesFactory from "./routes/user_routes";
-import { UsersModel } from "./models/users";
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import userRoutesFactory from './routes/user_routes';
+import { UsersModel } from './models/users';
 
 //Express application
 const app: Application = express();
 
-const dbPath = __dirname + "/database/database.sqlite";
+const dbPath = __dirname + '/database/database.sqlite';
 const db = connectionGenerator(dbPath, dbProductionOptions);
 
 //Logging middleware
-app.use(morgan("common"));
+app.use(morgan('common'));
 
 //Static file serving
-app.use(express.static(path.join(__dirname, "dist/public")));
+app.use(express.static(path.join(__dirname, 'dist/public')));
 
 //Extra middleware
 app.use(express.json());
 
 //Routes
-app.use("/users", userRoutesFactory(dbPath));
+app.use('/users', userRoutesFactory(dbPath));
 
 //Start the database in the server.
 (async () => {
-  const initializationStatus = await databaseCreator(dbPath, dbProductionOptions);
-  runMigrations(drizzle(db), __dirname + "/database/migrations");
+  const initializationStatus = await databaseCreator(
+    dbPath,
+    dbProductionOptions,
+  );
+  runMigrations(drizzle(db), __dirname + '/database/migrations');
   await initialValues(db);
   if (initializationStatus) {
-    console.log("Database initialized successfully.");
+    console.log('Database initialized successfully.');
   } else {
-    console.error("Database initialization failed.");
+    console.error('Database initialization failed.');
   }
 })();
 

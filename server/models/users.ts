@@ -1,13 +1,13 @@
-import { BetterSQLite3Database, drizzle } from "drizzle-orm/better-sqlite3";
-import { integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
-import { eq } from "drizzle-orm";
+import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
+import { integer, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
+import { eq } from 'drizzle-orm';
 import connectionGenerator, {
   databasePath,
   dbProductionOptions,
-} from "../database/init-db";
-import { roles, users } from "../database/schema";
-import { NewUser, Role, User } from "./table-types";
-import { hash } from "bcrypt";
+} from '../database/init-db';
+import { roles, users } from '../database/schema';
+import { NewUser, Role, User } from './table-types';
+import { hash } from 'bcrypt';
 
 /**
  * Class representing a model for user operations in the database.
@@ -36,7 +36,7 @@ export class UsersModel {
           await tx.insert(users).values(user);
         });
       } catch (error) {
-        throw new Error("Failed to create user");
+        throw new Error('Failed to create user');
       }
     } else {
       throw new Error(validationResult as string);
@@ -50,15 +50,15 @@ export class UsersModel {
    */
 
   async validateUniqueUsernameAndEmail(
-    user: NewUser
+    user: NewUser,
   ): Promise<boolean | string> {
     const usernameExists: boolean = await this.usernameExists(user.username);
     const emailExists: boolean = await this.emailExists(user.email);
     if (usernameExists === true) {
-      return "Username already exists";
+      return 'Username already exists';
     }
     if (emailExists === true) {
-      return "Email already exists";
+      return 'Email already exists';
     }
     return true;
   }
@@ -123,7 +123,7 @@ export class UsersModel {
    */
   async updateUserUsername(
     id: number,
-    newUsername: string
+    newUsername: string,
   ): Promise<boolean | string> {
     try {
       if (await this.getUserByUsername(newUsername)) {
@@ -137,7 +137,7 @@ export class UsersModel {
       });
       return true;
     } catch (error) {
-      return "Internal Database Failure";
+      return 'Internal Database Failure';
     }
   }
 
@@ -149,7 +149,7 @@ export class UsersModel {
    */
   async updateUserEmail(
     id: number,
-    newEmail: string
+    newEmail: string,
   ): Promise<boolean | string> {
     try {
       if (await this.getUserByEmail(newEmail)) {
@@ -160,7 +160,7 @@ export class UsersModel {
       });
       return true;
     } catch (error) {
-      return "Internal Database Failure";
+      return 'Internal Database Failure';
     }
   }
 
@@ -172,7 +172,7 @@ export class UsersModel {
    */
   async updateUserPassword(
     id: number,
-    newPassword: string
+    newPassword: string,
   ): Promise<boolean | string> {
     try {
       if (!(await this.getUserById(id))) {
@@ -190,7 +190,7 @@ export class UsersModel {
       });
       return true;
     } catch (error) {
-      return "Internal Database Failure";
+      return 'Internal Database Failure';
     }
   }
 
@@ -210,7 +210,7 @@ export class UsersModel {
 
       return true;
     } catch (error) {
-      return "Internal Database Failure";
+      return 'Internal Database Failure';
     }
   }
 
@@ -243,7 +243,7 @@ export class UsersModel {
   async hasRole(id: number, role: string): Promise<boolean | string> {
     const user = await this.getUserById(id);
     if (!user) {
-      return "User does not exist";
+      return 'User does not exist';
     }
     return user.role === role;
   }
@@ -285,7 +285,7 @@ export class UsersModel {
  * @returns {UsersModel} An instance of UsersModel
  */
 export default function usersModelFactory(
-  db: BetterSQLite3Database
+  db: BetterSQLite3Database,
 ): UsersModel {
   return new UsersModel(db);
 }
