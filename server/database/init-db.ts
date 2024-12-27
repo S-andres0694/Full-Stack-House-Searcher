@@ -27,12 +27,12 @@ const adminEmail: string = process.env.ADMIN_EMAIL || '';
 // Database options
 export const dbProductionOptions: Options = {
   fileMustExist: false,
-  verbose: console.log,
   readonly: false,
 };
 
 export const dbTestOptions: Options = {
   fileMustExist: false,
+  verbose: console.log,
   readonly: false,
 };
 
