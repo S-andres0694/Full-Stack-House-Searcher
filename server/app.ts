@@ -2,11 +2,11 @@ import express, { Application } from 'express';
 import morgan from 'morgan';
 import path from 'path';
 import {
-  createBackup,
-  databaseCreator,
-  dbProductionOptions,
-  initialValues,
-  runMigrations,
+	createBackup,
+	databaseCreator,
+	dbProductionOptions,
+	initialValues,
+	runMigrations,
 } from './database/init-db';
 import connectionGenerator from './database/init-db';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
@@ -20,9 +20,9 @@ import rolesRoutesFactory from './routes/roles_routes';
 const app: Application = express();
 
 const dbPath: string =
-  process.env.DB_PATH || __dirname + '/database/database.sqlite';
+	process.env.DB_PATH || __dirname + '/database/database.sqlite';
 const migrationsPath: string =
-  process.env.MIGRATIONS_PATH || __dirname + '/database/migrations';
+	process.env.MIGRATIONS_PATH || __dirname + '/database/migrations';
 const db: Database = connectionGenerator(dbPath, dbProductionOptions);
 
 //Logging middleware
@@ -41,17 +41,17 @@ app.use('/roles', rolesRoutesFactory(dbPath));
 
 //Start the database in the server.
 (async () => {
-  const initializationStatus = await databaseCreator(
-    dbPath,
-    dbProductionOptions,
-  );
-  runMigrations(drizzle(db), migrationsPath);
-  await initialValues(db);
-  if (initializationStatus) {
-    console.log('Database initialized successfully.');
-  } else {
-    console.error('Database initialization failed.');
-  }
+	const initializationStatus = await databaseCreator(
+		dbPath,
+		dbProductionOptions,
+	);
+	runMigrations(drizzle(db), migrationsPath);
+	await initialValues(db);
+	if (initializationStatus) {
+		console.log('Database initialized successfully.');
+	} else {
+		console.error('Database initialization failed.');
+	}
 })();
 
 //Export the app for other files to use.

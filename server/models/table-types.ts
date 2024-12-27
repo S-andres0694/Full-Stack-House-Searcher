@@ -5,11 +5,11 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { databasePath, dbProductionOptions } from '../database/init-db';
 import connectionGenerator from '../database/init-db';
 import {
-  roles,
-  properties,
-  favorites,
-  users,
-  viewedProperties,
+	roles,
+	properties,
+	favorites,
+	users,
+	viewedProperties,
 } from '../database/schema';
 
 // Define types based on schema
@@ -29,56 +29,56 @@ export type ViewedProperty = typeof viewedProperties.$inferSelect;
 export type NewViewedProperty = typeof viewedProperties.$inferInsert;
 
 export type RightmoveRequestBody = {
-  identifier: string;
-  sort: string;
-  radius: number;
-  bedrooms: string;
-  furnishedType: string;
-  typeOfLet: string;
-  page: number;
+	identifier: string;
+	sort: string;
+	radius: number;
+	bedrooms: string;
+	furnishedType: string;
+	typeOfLet: string;
+	page: number;
 };
 
 export type RightmoveProperty = {
-  identifier: number;
-  bedrooms: number;
-  address: string;
-  propertyType: string;
-  status: null;
-  transactionTypeId: number;
-  photoCount: number;
-  floorplanCount: number;
-  price: number;
-  monthlyRent: number;
-  priceQualifier: string;
-  photoThumbnailUrl: string;
-  photoThumbnail2Url: null;
-  photoThumbnail3Url: null;
-  photoThumbnail4Url: null;
-  photoLargeThumbnailUrl: string;
-  displayPrices: any[];
-  thumbnailPhotos: any[];
-  keywords: any[];
-  development: boolean;
-  autoEmailReasonType: string;
-  sortDate: number;
-  onlineViewing: boolean;
-  buildToRent: boolean;
-  summary: string;
-  premiumDisplay: boolean;
-  latitude: number;
-  longitude: number;
-  showMap: boolean;
-  distance: null;
-  featuredProperty: boolean;
-  branch: {
-    contactTelephoneNumber: string;
-  };
-  updateDate: number;
-  listingUpdateReason: string;
-  saved: boolean;
-  hidden: boolean;
-  premiumDisplayStickerName: string;
-  enquiredTimestamp: null;
-  visible: boolean;
-  hasVideoContent: boolean;
+	identifier: number;
+	bedrooms: number;
+	address: string;
+	propertyType: string;
+	status: null;
+	transactionTypeId: number;
+	photoCount: number;
+	floorplanCount: number;
+	price: number;
+	monthlyRent: number;
+	priceQualifier: string;
+	photoThumbnailUrl: string;
+	photoThumbnail2Url: null;
+	photoThumbnail3Url: null;
+	photoThumbnail4Url: null;
+	photoLargeThumbnailUrl: string;
+	displayPrices: any[];
+	thumbnailPhotos: any[];
+	keywords: any[];
+	development: boolean;
+	autoEmailReasonType: string;
+	sortDate: number;
+	onlineViewing: boolean;
+	buildToRent: boolean;
+	summary: string;
+	premiumDisplay: boolean;
+	latitude: number;
+	longitude: number;
+	showMap: boolean;
+	distance: null;
+	featuredProperty: boolean;
+	branch: {
+		contactTelephoneNumber: string;
+	};
+	updateDate: number;
+	listingUpdateReason: string;
+	saved: boolean;
+	hidden: boolean;
+	premiumDisplayStickerName: string;
+	enquiredTimestamp: null;
+	visible: boolean;
+	hasVideoContent: boolean;
 };

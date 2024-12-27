@@ -26,14 +26,14 @@ const adminEmail: string = process.env.ADMIN_EMAIL || '';
 
 // Database options
 export const dbProductionOptions: Options = {
-  fileMustExist: false,
-  readonly: false,
+	fileMustExist: false,
+	readonly: false,
 };
 
 export const dbTestOptions: Options = {
-  fileMustExist: false,
-  verbose: console.log,
-  readonly: false,
+	fileMustExist: false,
+	verbose: console.log,
+	readonly: false,
 };
 
 //Migrations folder
@@ -46,24 +46,24 @@ const migrationsFolder = __dirname + '/migrations';
  */
 
 export async function databaseCreator(
-  databasePath: string,
-  dbOptions: Options,
+	databasePath: string,
+	dbOptions: Options,
 ): Promise<boolean> {
-  try {
-    // Create SQLite connection
-    const sqlite = new Database(databasePath, dbOptions);
+	try {
+		// Create SQLite connection
+		const sqlite = new Database(databasePath, dbOptions);
 
-    // Create Drizzle instance
-    const db = drizzle(sqlite, { schema });
+		// Create Drizzle instance
+		const db = drizzle(sqlite, { schema });
 
-    // Enable foreign keys
-    sqlite.pragma('foreign_keys = ON');
+		// Enable foreign keys
+		sqlite.pragma('foreign_keys = ON');
 
-    return true;
-  } catch (error: any) {
-    console.error(`Error creating database: ${error.stack}`);
-    return false;
-  }
+		return true;
+	} catch (error: any) {
+		console.error(`Error creating database: ${error.stack}`);
+		return false;
+	}
 }
 
 /**
@@ -72,14 +72,14 @@ export async function databaseCreator(
  * @param migrationsFolder - The path to the migrations folder.
  */
 export function runMigrations(db: DrizzleDB, migrationsFolder: string): void {
-  try {
-    migrate(db, { migrationsFolder });
-    // Verify tables were created
-    const tables = db.all("SELECT name FROM sqlite_master WHERE type='table'");
-  } catch (error) {
-    console.error('Migration failed:', error);
-    throw error;
-  }
+	try {
+		migrate(db, { migrationsFolder });
+		// Verify tables were created
+		const tables = db.all("SELECT name FROM sqlite_master WHERE type='table'");
+	} catch (error) {
+		console.error('Migration failed:', error);
+		throw error;
+	}
 }
 
 /**
@@ -89,16 +89,16 @@ export function runMigrations(db: DrizzleDB, migrationsFolder: string): void {
  */
 
 export default function connectionGenerator(
-  databasePath: string,
-  dbOptions: Options,
+	databasePath: string,
+	dbOptions: Options,
 ): BetterSQLite3Database {
-  try {
-    const sqlite: BetterSQLite3Database = new Database(databasePath, dbOptions);
-    return sqlite;
-  } catch (error) {
-    console.error(`Failed to connect to database at ${databasePath}:`, error);
-    throw error;
-  }
+	try {
+		const sqlite: BetterSQLite3Database = new Database(databasePath, dbOptions);
+		return sqlite;
+	} catch (error) {
+		console.error(`Failed to connect to database at ${databasePath}:`, error);
+		throw error;
+	}
 }
 
 /**
@@ -107,73 +107,73 @@ export default function connectionGenerator(
  */
 
 export async function initialValues(db: BetterSQLite3Database): Promise<void> {
-  try {
-    //Roles Model
-    const roleModel: RolesModel = rolesModelFactory(drizzle(db));
+	try {
+		//Roles Model
+		const roleModel: RolesModel = rolesModelFactory(drizzle(db));
 
-    //Check if the roles exist
-    const userRoleChecker: boolean = await roleModel.checkRoleExists('user');
-    const adminRoleChecker: boolean = await roleModel.checkRoleExists('admin');
+		//Check if the roles exist
+		const userRoleChecker: boolean = await roleModel.checkRoleExists('user');
+		const adminRoleChecker: boolean = await roleModel.checkRoleExists('admin');
 
-    //Create the roles if they don't exist
-    if (!userRoleChecker) {
-      await roleModel.createRole(
-        'user',
-        'Standard user role with limited access',
-      );
-    }
-    if (!adminRoleChecker) {
-      await roleModel.createRole('admin', 'Admin role with full access');
-    }
+		//Create the roles if they don't exist
+		if (!userRoleChecker) {
+			await roleModel.createRole(
+				'user',
+				'Standard user role with limited access',
+			);
+		}
+		if (!adminRoleChecker) {
+			await roleModel.createRole('admin', 'Admin role with full access');
+		}
 
-    //Users Model
-    const userModel = usersModelFactory(drizzle(db));
-    const userChecker: User | undefined = await userModel.getUserByUsername(
-      adminUsername,
-    );
+		//Users Model
+		const userModel = usersModelFactory(drizzle(db));
+		const userChecker: User | undefined = await userModel.getUserByUsername(
+			adminUsername,
+		);
 
-    //Create the user if they don't exist
-    if (!userChecker) {
-      await userModel.createUser({
-        username: adminUsername,
-        email: adminEmail,
-        password: adminPassword,
-        role: 'admin',
-        name: 'Sebastian El Khoury',
-      });
-    }
-  } catch (error: any) {
-    console.error(`Error populating the database: ${error.stack}`);
-  }
+		//Create the user if they don't exist
+		if (!userChecker) {
+			await userModel.createUser({
+				username: adminUsername,
+				email: adminEmail,
+				password: adminPassword,
+				role: 'admin',
+				name: 'Sebastian El Khoury',
+			});
+		}
+	} catch (error: any) {
+		console.error(`Error populating the database: ${error.stack}`);
+	}
 }
 
 export async function resetDatabase(
-  db: BetterSQLite3Database,
-  dbOptions: Options,
+	db: BetterSQLite3Database,
+	dbOptions: Options,
 ): Promise<void> {
-  try {
-    const drizzleDb = drizzle(db, { schema });
-    db.pragma('foreign_keys = OFF');
-    // Clear all tables in the correct order to avoid foreign key constraints
-    await drizzleDb.delete(schema.users).execute();
-    await drizzleDb.delete(schema.viewedProperties).execute();
-    await drizzleDb.delete(schema.favorites).execute();
-    await drizzleDb.delete(schema.properties).execute();
-    await drizzleDb.delete(schema.roles).execute();
-    db.pragma('foreign_keys = ON');
-  } catch (error: any) {
-    console.error(`Error resetting the database: ${error.stack}`);
-    throw error;
-  }
+	try {
+		const drizzleDb = drizzle(db, { schema });
+		db.pragma('foreign_keys = OFF');
+		// Clear all tables in the correct order to avoid foreign key constraints
+		await drizzleDb.delete(schema.users).execute();
+		await drizzleDb.delete(schema.viewedProperties).execute();
+		await drizzleDb.delete(schema.favorites).execute();
+		await drizzleDb.delete(schema.properties).execute();
+		await drizzleDb.delete(schema.roles).execute();
+		db.pragma('foreign_keys = ON');
+	} catch (error: any) {
+		console.error(`Error resetting the database: ${error.stack}`);
+		throw error;
+	}
 }
 
 export function createBackup(backupPath: string, db: BetterSQLite3Database) {
-  const backup = db.backup(backupPath);
-  backup
-    .then(() => {
-      console.log('Backup completed successfully!');
-    })
-    .catch((err: any) => {
-      console.error('Backup failed:', err);
-    });
+	const backup = db.backup(backupPath);
+	backup
+		.then(() => {
+			console.log('Backup completed successfully!');
+		})
+		.catch((err: any) => {
+			console.error('Backup failed:', err);
+		});
 }

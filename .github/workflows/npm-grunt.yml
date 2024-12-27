@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
 
     strategy:
       matrix:
@@ -32,7 +35,6 @@ jobs:
         DB_PATH: ${{ vars.DB_PATH }}
         MIGRATIONS_PATH: ${{ vars.MIGRATIONS_PATH }}
       run: |
-        cd server
         npm install
         grunt
              

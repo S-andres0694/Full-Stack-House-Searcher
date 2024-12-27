@@ -15,4 +15,4 @@ coverage
 .idea
 ./dist
 .parcel-cache
-
+docs
