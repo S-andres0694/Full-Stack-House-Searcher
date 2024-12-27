@@ -25,6 +25,10 @@ export const testApi = async (
 	response.status(200).json({ message: 'Server is running' });
 };
 
+/**
+ * Class containing all of the properties API endpoints and their handler functions.
+ */
+
 export class PropertiesApi {
 	//Database Connection Instance
 	private drizzle: BetterSQLite3Database;
