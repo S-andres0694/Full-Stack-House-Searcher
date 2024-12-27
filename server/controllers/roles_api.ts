@@ -145,6 +145,11 @@ export class RolesApi {
   };
 }
 
+/**
+ * Factory function to create a new RolesApi instance.
+ * @param {Database} db - The database instance
+ * @returns {RolesApi} The RolesApi instance
+ */
 export default function rolesApiFactory(db: Database): RolesApi {
   return new RolesApi(db);
 }

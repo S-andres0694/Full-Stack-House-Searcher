@@ -39,8 +39,9 @@ beforeEach(async () => {
   await usersModel.createUser(user);
   await propertiesModel.createProperty(property);
   userId = (await usersModel.getUserId(user.username)) as number;
-  propertyId = (await propertiesModel.getPropertyByAddress(property.address))!
-    .id;
+  propertyId = (await propertiesModel.getPropertyByIdentifier(
+    property.identifier,
+  ))!.id;
 });
 
 afterAll(() => {

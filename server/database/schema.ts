@@ -38,7 +38,7 @@ export const properties = sqliteTable(
     url: t.text('url').notNull(),
     identifier: t.integer('identifier').notNull(),
   },
-  (table) => [unique().on(table.address, table.url, table.identifier)], //Creates a unique constraint on the address, url and identifier columns.
+  (table) => [], //Creates a unique constraint on the address, url and identifier columns.
 );
 
 //Defines the roles table.

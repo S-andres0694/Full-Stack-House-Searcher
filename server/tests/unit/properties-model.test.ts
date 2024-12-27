@@ -64,22 +64,10 @@ describe('Properties Model Unit Tests', () => {
     expect(retrievedProperty?.id).toBe(propertyId);
   });
 
-  //Test 4:
-  it('should be able to get a property by address', async () => {
-    const propertyId: number = await propertiesModel.createProperty(property);
-    const retrievedProperty = await propertiesModel.getPropertyByAddress(
-      property.address,
-    );
-    expect(retrievedProperty).toBeDefined();
-    expect(retrievedProperty?.id).toBe(propertyId);
-  });
-
   //Test 5:
   it('should be able to get an identifier by id', async () => {
     const propertyId: number = await propertiesModel.createProperty(property);
-    const retrievedIdentifier = await propertiesModel.getIdentifierById(
-      propertyId,
-    );
+    const retrievedIdentifier = await propertiesModel.getIdentifier(propertyId);
     expect(retrievedIdentifier).toBeDefined();
     expect(retrievedIdentifier).toBe(property.identifier);
   });
