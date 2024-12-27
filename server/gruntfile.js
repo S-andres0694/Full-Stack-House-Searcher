@@ -29,7 +29,7 @@ module.exports = function (grunt) {
         '*.ts',
         '*.js',
       ],
-      tasks: ['prettify'],
+      tasks: ['prettify', 'lint', 'shell:document'],
       options: {
         spawn: false,
         interval: 1000,
@@ -75,6 +75,9 @@ module.exports = function (grunt) {
       test: {
         command:
           'echo "Running tests..." && npm run unit-tests && npm run integration-tests',
+      },
+      document: {
+        command: 'echo "Generating documentation..." && npm run doc',
       },
     },
   });

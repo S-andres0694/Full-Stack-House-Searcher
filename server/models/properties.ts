@@ -19,7 +19,7 @@ export class PropertiesModel {
 
   /**
    * Retrieves a property by its identifier.
-   * @param {number} identifier - The identifier of the property to retrieve
+   * @param {number} id - The ID of the property to retrieve
    * @returns {Promise<Property | undefined>} A promise that resolves to the property if found, undefined otherwise
    */
   async getPropertyById(id: number): Promise<Property | undefined> {
@@ -45,7 +45,7 @@ export class PropertiesModel {
 
   /**
    * Retrieves the number of bedrooms for a property by its ID.
-   * @param {number} id - The identifier of the property
+   * @param {number} id - The ID of the property
    * @returns {Promise<number | undefined>} A promise that resolves to the number of bedrooms if found, undefined otherwise
    */
   async getBedrooms(id: number): Promise<number | undefined> {
@@ -177,7 +177,7 @@ export class PropertiesModel {
 
   /**
    * Allows for a insertion of multiple properties into the database.
-   * @param {NewProperty[]} properties - The array of properties to insert
+   * @param {NewProperty[]} propertiesArray - The array of new properties to insert
    * @returns {Promise<void>} A promise that resolves when the properties are inserted
    */
 

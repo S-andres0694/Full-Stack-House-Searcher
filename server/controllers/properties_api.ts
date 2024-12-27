@@ -165,8 +165,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves a property by its ID.
-   * @param {number} id - The ID of the property to retrieve
-   * @returns {Promise<Property | undefined>} A promise that resolves to the property if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getPropertyById = async (
     request: Request,
@@ -193,8 +193,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves a property by its URL.
-   * @param {string} url - The URL of the property to retrieve
-   * @returns {Promise<Property | undefined>} A promise that resolves to the property if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getPropertyByUrl = async (
     request: Request,
@@ -212,8 +212,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves a property by its identifier.
-   * @param {number} identifier - The identifier of the property to retrieve
-   * @returns {Promise<Property | undefined>} A promise that resolves to the property if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
 
   getPropertyByIdentifier = async (
@@ -244,8 +244,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves the number of bedrooms for a property by its ID.
-   * @param {number} id - The ID of the property
-   * @returns {Promise<number | undefined>} A promise that resolves to the number of bedrooms if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getBedrooms = async (request: Request, response: Response): Promise<void> => {
     try {
@@ -273,8 +273,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves the monthly rent for a property by its ID.
-   * @param {number} id - The ID of the property
-   * @returns {Promise<number | undefined>} A promise that resolves to the monthly rent if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getMonthlyRent = async (
     request: Request,
@@ -304,8 +304,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves the address for a property by its ID.
-   * @param {number} id - The ID of the property
-   * @returns {Promise<string | undefined>} A promise that resolves to the address if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getAddress = async (request: Request, response: Response): Promise<void> => {
     try {
@@ -334,8 +334,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves the contact phone for a property by its ID.
-   * @param {number} id - The ID of the property
-   * @returns {Promise<string | undefined>} A promise that resolves to the contact phone if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getContactPhone = async (
     request: Request,
@@ -366,8 +366,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves the summary for a property by its ID.
-   * @param {number} id - The ID of the property
-   * @returns {Promise<string | undefined>} A promise that resolves to the summary if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getSummary = async (request: Request, response: Response): Promise<void> => {
     try {
@@ -396,8 +396,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves the URL for a property by its ID.
-   * @param {number} id - The ID of the property
-   * @returns {Promise<string | undefined>} A promise that resolves to the URL if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getUrl = async (request: Request, response: Response): Promise<void> => {
     try {
@@ -424,8 +424,8 @@ export class PropertiesApi {
 
   /**
    * Deletes a property from the database by its ID.
-   * @param {number} id - The ID of the property to delete
-   * @returns {Promise<void>} A promise that resolves when the property is deleted
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   deleteProperty = async (
     request: Request,
@@ -454,8 +454,8 @@ export class PropertiesApi {
 
   /**
    * Updates a property in the database by its ID.
-   * @param {number} id - The ID of the property to update
-   * @returns {Promise<void>} A promise that resolves when the property is updated
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   updateProperty = async (
     request: Request,
@@ -504,8 +504,8 @@ export class PropertiesApi {
 
   /**
    * Retrieves the identifier for a property by its ID.
-   * @param {number} id - The ID of the property
-   * @returns {Promise<number | undefined>} A promise that resolves to the identifier if found, undefined otherwise
+   * @param {Request} request - The request object
+   * @param {Response} response - The response object
    */
   getIdentifier = async (
     request: Request,
@@ -538,7 +538,6 @@ export class PropertiesApi {
    * Inserts a property into the database
    * @param {Request} request - The request object
    * @param {Response} response - The response object
-   * @returns {Promise<void>} A promise that resolves when the property is inserted
    */
   insertProperty = async (
     request: Request,

@@ -1,0 +1,10 @@
+// typedoc.json
+{
+  "entryPointStrategy": "expand",
+  "entryPoints": ["./**/*.ts"],
+  "exclude": ["**/node_modules/**", "**/dist/**", "**/tests/**"],
+  "out": "docs",
+  "includeVersion": true,
+  "tsconfig": "./tsconfig.json",
+  "commentStyle": "all"
+}

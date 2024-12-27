@@ -38,7 +38,8 @@ export class FavoritePropertiesModel {
 
   /**
    * Deletes a favorite property record from the database.
-   * @param {number} id - The ID of the favorite property to delete
+   * @param {number} propertyID - The ID of the favorite property to delete
+   * @param {number} userID - The ID of the user whose favorite property to delete
    * @returns {Promise<void>} A promise that resolves when the deletion is complete
    */
   async deleteFavoriteProperty(

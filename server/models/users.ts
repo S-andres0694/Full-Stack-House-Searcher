@@ -118,7 +118,7 @@ export class UsersModel {
   /**
    * Updates a user's username.
    * @param {number} id - The ID of the user to update
-   * @param {string} username - The new username
+   * @param {string} newUsername - The new username
    * @returns {Promise<void>}
    */
   async updateUserUsername(
@@ -143,8 +143,8 @@ export class UsersModel {
 
   /**
    * Updates a user's email address.
-   * @param {string} username - The username of the user to update
-   * @param {string} email - The new email address
+   * @param {number} id - The ID of the user to update
+   * @param {string} newEmail - The new email address
    * @returns {Promise<void>}
    */
   async updateUserEmail(
@@ -166,8 +166,8 @@ export class UsersModel {
 
   /**
    * Updates a user's password.
-   * @param {string} username - The username of the user to update
-   * @param {string} password - The new password (will be hashed)
+   * @param {number} id - The ID of the user to update
+   * @param {string} newPassword - The new password (will be hashed)
    * @returns {Promise<void>}
    */
   async updateUserPassword(
@@ -236,7 +236,7 @@ export class UsersModel {
 
   /**
    * Checks if a user has a specific role.
-   * @param {string} username - The username of the user to check
+   * @param {number} id - The ID of the user to check
    * @param {string} role - The role to check for
    * @returns {Promise<boolean | string>} True if the user has the role, false otherwise
    */
@@ -249,8 +249,8 @@ export class UsersModel {
   }
 
   /**
-   * Retrieves the name of a user by their username.
-   * @param {string} username - The username of the user to retrieve
+   * Retrieves the name of a user by their ID.
+   * @param {number} id - The ID of the user to retrieve
    * @returns {Promise<string | undefined>} The name of the user if found, undefined otherwise
    */
   async getName(id: number): Promise<string | undefined> {
@@ -259,8 +259,8 @@ export class UsersModel {
   }
 
   /**
-   * Retrieves the email of a user by their username.
-   * @param {string} username - The username of the user to retrieve
+   * Retrieves the email of a user by their ID.
+   * @param {number} id - The ID of the user to retrieve
    * @returns {Promise<string | undefined>} The email of the user if found, undefined otherwise
    */
   async getEmail(id: number): Promise<string | undefined> {
