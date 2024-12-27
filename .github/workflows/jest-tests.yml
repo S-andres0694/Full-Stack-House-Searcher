@@ -32,4 +32,12 @@ jobs:
         run: npm run unit-tests
 
       - name: Integration Tests
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          API_HOST: ${{ secrets.API_HOST }}
+          DB_PATH: ${{ vars.DB_PATH }}
+          MIGRATIONS_PATH: ${{ vars.MIGRATIONS_PATH }}
         run: npm run integration-tests
