@@ -32,7 +32,6 @@ export const dbProductionOptions: Options = {
 
 export const dbTestOptions: Options = {
 	fileMustExist: false,
-	verbose: console.log,
 	readonly: false,
 };
 

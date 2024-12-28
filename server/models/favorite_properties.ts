@@ -1,7 +1,7 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { favorites } from '../database/schema';
 import { Favorite, NewFavorite } from './table-types';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 
 /**
  * Class representing a model for favorite properties operations in the database.
@@ -24,7 +24,6 @@ export class FavoritePropertiesModel {
 	/**
 	 * Adds a new favorite property record to the database.
 	 * @param {NewFavorite} favorite - The favorite property object to add
-	 * @returns {Promise<number>} The ID of the newly created favorite property
 	 */
 	async addFavoriteProperty(favorite: NewFavorite): Promise<void> {
 		try {
@@ -51,8 +50,10 @@ export class FavoritePropertiesModel {
 				await tx
 					.delete(favorites)
 					.where(
-						(eq(favorites.propertyId, propertyID),
-						eq(favorites.userId, userID)),
+						and(
+							eq(favorites.propertyId, propertyID),
+							eq(favorites.userId, userID),
+						),
 					);
 			});
 		} catch (error) {
