@@ -103,5 +103,5 @@ module.exports = function (grunt) {
 		'migrate',
 		'build',
 	]);
-	grunt.registerTask('development', ['default', 'watch']);
+	grunt.registerTask('development', ['watch']);
 };

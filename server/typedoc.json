@@ -2,7 +2,7 @@
 {
   "entryPointStrategy": "expand",
   "entryPoints": ["./**/*.ts"],
-  "exclude": ["**/node_modules/**", "**/dist/**", "**/tests/**"],
+  "exclude": ["**/node_modules/**", "**/dist/**", "**/tests/**", "**/*.config.{ts,js, json}"],
   "out": "docs",
   "includeVersion": true,
   "tsconfig": "./tsconfig.json",

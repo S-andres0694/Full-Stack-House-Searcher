@@ -15,6 +15,7 @@ import { UsersModel } from './models/users';
 import { Database } from 'better-sqlite3';
 import propertiesRoutesFactory from './routes/properties_routes';
 import rolesRoutesFactory from './routes/roles_routes';
+import viewedPropertiesRoutesFactory from './routes/viewed_properties-routes';
 
 //Express application
 const app: Application = express();
@@ -38,6 +39,7 @@ app.use(express.json());
 app.use('/users', userRoutesFactory(dbPath));
 app.use('/properties', propertiesRoutesFactory(dbPath));
 app.use('/roles', rolesRoutesFactory(dbPath));
+app.use('/viewed-properties', viewedPropertiesRoutesFactory(dbPath));
 
 //Start the database in the server.
 (async () => {

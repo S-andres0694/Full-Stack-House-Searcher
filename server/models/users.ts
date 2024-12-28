@@ -22,7 +22,6 @@ export class UsersModel {
 	/**
 	 * Creates a new user in the database.
 	 * @param {NewUser} user - The user object containing user details
-	 * @returns {Promise<number>} The ID of the newly created user
 	 */
 	async createUser(user: NewUser): Promise<void> {
 		const validationResult: boolean | string =
@@ -46,7 +45,7 @@ export class UsersModel {
 	/**
 	 * Validates the fact that the username and email are unique.
 	 * @param {NewUser} user - The user object containing user details
-	 * @returns {Promise<boolean>} True if the username and email are unique, false otherwise
+	 * @returns {Promise<boolean | string>} True if the username and email are unique, an error message (string) otherwise
 	 */
 
 	async validateUniqueUsernameAndEmail(

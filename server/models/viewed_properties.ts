@@ -2,6 +2,7 @@ import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { viewedProperties } from '../database/schema';
 import { NewViewedProperty, Property, ViewedProperty } from './table-types';
 import { eq, sql, desc, and } from 'drizzle-orm';
+import { users, properties } from '../database/schema';
 /**
  * Class representing a model for viewed properties operations in the database.
  */
@@ -105,6 +106,51 @@ export class ViewedPropertiesModel {
 			.orderBy(desc(viewedProperties.id))
 			.limit(1);
 		return lastViewedProperty;
+	}
+
+	/**
+	 * Adds multiple properties as viewed for a specific user.
+	 * @param {number} userId - The ID of the user to add the properties to
+	 * @param {number[]} propertyIds - The IDs of the properties to add
+	 * @returns {Promise<void>} A promise that resolves when the addition is complete
+	 */
+	async addMultiplePropertiesAsViewed(
+		userId: number,
+		propertyIds: number[],
+	): Promise<void> {
+		try {
+			// Check if user exists using Drizzle ORM SQL
+			const userExists = await this.db
+				.select({
+					exists: sql<boolean>`exists(select 1 from users where id = ${userId})`,
+				})
+				.from(users)
+				.then(([result]) => result.exists);
+			if (!userExists) {
+				throw new Error(`User with ID ${userId} does not exist`);
+			}
+
+			// Check if all properties exist using Drizzle ORM SQL
+			for (const propertyId of propertyIds) {
+				const propertyExists = await this.db
+					.select({
+						exists: sql<boolean>`exists(select 1 from properties where id = ${propertyId})`,
+					})
+					.from(properties)
+					.then(([result]) => result.exists);
+				if (!propertyExists) {
+					throw new Error(`Property with ID ${propertyId} does not exist`);
+				}
+			}
+
+			await this.db.transaction(async (tx) => {
+				await tx
+					.insert(viewedProperties)
+					.values(propertyIds.map((propertyId) => ({ userId, propertyId })));
+			});
+		} catch (error) {
+			throw new Error('Failed to add multiple properties as viewed');
+		}
 	}
 }
 

@@ -63,14 +63,14 @@ export class ViewedPropertiesApi {
 			}
 
 			if ((await this.usersModel.getUserById(userID)) === undefined) {
-				response.status(400).json({ error: 'User not found' });
+				response.status(404).json({ error: 'User not found' });
 				return;
 			}
 
 			const properties: ViewedProperty[] | undefined =
 				await this.viewedPropertiesModel.getAllViewedPropertiesFromUser(userID);
 
-			if (properties === undefined) {
+			if (properties === undefined || properties.length === 0) {
 				response.status(400).json({ error: 'No properties found' });
 				return;
 			}
@@ -100,7 +100,7 @@ export class ViewedPropertiesApi {
 			}
 
 			if ((await this.usersModel.getUserById(userID)) === undefined) {
-				response.status(400).json({ error: 'User not found' });
+				response.status(404).json({ error: 'User not found' });
 				return;
 			}
 
@@ -114,7 +114,7 @@ export class ViewedPropertiesApi {
 			if (
 				(await this.propertiesModel.getPropertyById(propertyId)) === undefined
 			) {
-				response.status(400).json({ error: 'Property not found' });
+				response.status(404).json({ error: 'Property not found' });
 				return;
 			}
 
@@ -150,7 +150,7 @@ export class ViewedPropertiesApi {
 			}
 
 			if ((await this.usersModel.getUserById(userID)) === undefined) {
-				response.status(400).json({ error: 'User not found' });
+				response.status(404).json({ error: 'User not found' });
 				return;
 			}
 
@@ -164,7 +164,7 @@ export class ViewedPropertiesApi {
 			if (
 				(await this.propertiesModel.getPropertyById(propertyId)) === undefined
 			) {
-				response.status(400).json({ error: 'Property not found' });
+				response.status(404).json({ error: 'Property not found' });
 				return;
 			}
 
@@ -200,7 +200,7 @@ export class ViewedPropertiesApi {
 			}
 
 			if ((await this.usersModel.getUserById(userID)) === undefined) {
-				response.status(400).json({ error: 'User not found' });
+				response.status(404).json({ error: 'User not found' });
 				return;
 			}
 
@@ -231,7 +231,7 @@ export class ViewedPropertiesApi {
 			}
 
 			if ((await this.usersModel.getUserById(userID)) === undefined) {
-				response.status(400).json({ error: 'User not found' });
+				response.status(404).json({ error: 'User not found' });
 				return;
 			}
 
@@ -270,18 +270,19 @@ export class ViewedPropertiesApi {
 			}
 
 			if ((await this.usersModel.getUserById(userID)) === undefined) {
-				response.status(400).json({ error: 'User not found' });
+				response.status(404).json({ error: 'User not found' });
 				return;
 			}
 
 			const propertyIDs: any[] = request.body.properties;
 
-			if (propertyIDs.length === 0) {
+			if (propertyIDs === undefined || propertyIDs.length === 0) {
 				response.status(400).json({ error: 'No properties provided' });
 				return;
 			}
 
-			propertyIDs.forEach(async (propertyID) => {
+			// Validate all properties first
+			for (const propertyID of propertyIDs) {
 				if (isNaN(parseInt(propertyID))) {
 					response.status(400).json({ error: 'Invalid property ID' });
 					return;
@@ -291,15 +292,17 @@ export class ViewedPropertiesApi {
 					(await this.propertiesModel.getPropertyById(parseInt(propertyID))) ===
 					undefined
 				) {
-					response.status(400).json({ error: 'Property not found' });
+					response
+						.status(404)
+						.json({ error: `Property ${propertyID} not found` });
 					return;
 				}
+			}
 
-				await this.viewedPropertiesModel.addPropertyAsViewed({
-					userId: userID,
-					propertyId: parseInt(propertyID),
-				});
-			});
+			await this.viewedPropertiesModel.addMultiplePropertiesAsViewed(
+				userID,
+				propertyIDs,
+			);
 
 			response.status(200).json({ message: 'All properties added as viewed' });
 		} catch (error) {
@@ -309,4 +312,16 @@ export class ViewedPropertiesApi {
 				.json({ error: 'Error adding multiple properties as viewed' });
 		}
 	};
+}
+
+/**
+ * Factory function to create a new ViewedPropertiesApi instance.
+ * @param {Database} db - The database instance
+ * @returns {ViewedPropertiesApi} - The ViewedPropertiesApi instance
+ */
+
+export default function viewedPropertiesApiFactory(
+	db: Database,
+): ViewedPropertiesApi {
+	return new ViewedPropertiesApi(db);
 }

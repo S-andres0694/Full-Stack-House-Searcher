@@ -24,6 +24,7 @@ let db: Database;
 let drizzleORM: BetterSQLite3Database;
 let userId: number;
 let propertyId: number;
+let property2Id: number;
 
 beforeAll(async () => {
 	db = connectionGenerator(testDbPath, dbTestOptions);
@@ -38,9 +39,13 @@ beforeEach(async () => {
 	await initialValues(db);
 	await usersModel.createUser(user);
 	await propertiesModel.createProperty(property);
+	await propertiesModel.createProperty(property2);
 	userId = (await usersModel.getUserId(user.username)) as number;
 	propertyId = (await propertiesModel.getPropertyByIdentifier(
 		property.identifier,
+	))!.id;
+	property2Id = (await propertiesModel.getPropertyByIdentifier(
+		property2.identifier,
 	))!.id;
 });
 
@@ -108,5 +113,26 @@ describe('Viewed Properties Model Unit Tests', () => {
 			await viewedPropertiesModel.getLastViewedProperty(userId);
 		expect(lastViewedProperty).toBeDefined();
 		expect(lastViewedProperty?.propertyId).toBe(propertyId);
+	});
+
+	it('should be able to add multiple properties as viewed', async () => {
+		await viewedPropertiesModel.addMultiplePropertiesAsViewed(userId, [
+			propertyId,
+			property2Id,
+		]);
+		const viewedProperties: ViewedProperty[] | undefined =
+			await viewedPropertiesModel.getAllViewedPropertiesFromUser(userId);
+		expect(viewedProperties?.length).toBe(2);
+		expect(viewedProperties?.[0].propertyId).toBe(propertyId);
+		expect(viewedProperties?.[1].propertyId).toBe(property2Id);
+	});
+
+	it('should thrown an error when adding multiple properties as viewed with a non-existent User ID', async () => {
+		await expect(
+			viewedPropertiesModel.addMultiplePropertiesAsViewed(100000000, [
+				propertyId,
+				property2Id,
+			]),
+		).rejects.toThrow();
 	});
 });

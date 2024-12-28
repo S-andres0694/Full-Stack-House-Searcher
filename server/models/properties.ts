@@ -128,7 +128,6 @@ export class PropertiesModel {
 	 */
 	async createProperty(property: NewProperty): Promise<number> {
 		try {
-			// Use DrizzleORM's transaction functionality
 			const result = await this.db.transaction(async (tx) => {
 				const [propertyRecord] = await tx
 					.insert(properties)
@@ -139,7 +138,7 @@ export class PropertiesModel {
 			return result.id;
 		} catch (error: any) {
 			console.error(`Error creating property: ${error.stack}`);
-			return -1;
+			throw error;
 		}
 	}
 
