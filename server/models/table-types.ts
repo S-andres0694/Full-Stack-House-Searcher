@@ -82,3 +82,15 @@ export type RightmoveProperty = {
 	visible: boolean;
 	hasVideoContent: boolean;
 };
+
+export type LoginRequestBody = {
+	email: string;
+	password: string;
+};
+
+export type RegisterRequestBody = {
+	email: string;
+	password: string;
+	name: string;
+	username: string;
+};
