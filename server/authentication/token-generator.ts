@@ -14,8 +14,8 @@ const ACCESS_JWT_SECRET: string = process.env.ACCESS_JWT_SECRET || '';
 const REFRESH_JWT_SECRET: string = process.env.REFRESH_JWT_SECRET || '';
 
 /**
- * Generates a JWT token for the given payload.
- * @param payload - The payload to be encoded in the token.
+ * Generates a JWT token for the given user passed as a parameter.
+ * @param user - The user to be encoded in the token.
  * @returns The JWT token.
  */
 
@@ -27,7 +27,7 @@ export function generateAccessToken(user: User): string {
 
 /**
  * Generates a refresh token for the given payload.
- * @param payload - The payload to be encoded in the token.
+ * @param user - The user to be encoded in the token.
  * @returns The refresh token.
  */
 

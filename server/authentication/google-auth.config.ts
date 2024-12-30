@@ -79,7 +79,6 @@ passportObj.serializeUser((user: any, done: any) => {
 	done(null, user.id);
 });
 
-
 /*
  * Deserializes the user object from the session.
  * Defines how the user information is retrieved from the session and restored to the user object. It reconstructs the user object from the session data.

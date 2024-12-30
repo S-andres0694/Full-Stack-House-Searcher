@@ -1,18 +1,23 @@
 /* eslint-env node */
+
+const projectFiles = [
+	'routes/**/*.ts',
+	'models/**/*.ts',
+	'controllers/**/*.ts',
+	'database/**/*.ts',
+	'tests/**/*.ts',
+	'*.ts',
+	'*.js',
+	'authentication/**/*.ts',
+	'middleware/**/*.ts',
+];
+
 module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('./package.json'),
 		//ESLint
 		eslint: {
-			target: [
-				'routes/**/*.ts',
-				'models/**/*.ts',
-				'controllers/**/*.ts',
-				'database/**/*.ts',
-				'tests/**/*.ts',
-				'*.ts',
-				'*.js',
-			],
+			target: projectFiles,
 			options: {
 				overrideConfigFile: './eslint.config.mjs',
 				ignore: true,
@@ -20,15 +25,7 @@ module.exports = function (grunt) {
 		},
 		//Watch
 		watch: {
-			files: [
-				'routes/**/*.ts',
-				'models/**/*.ts',
-				'controllers/**/*.ts',
-				'database/**/*.ts',
-				'tests/**/*.ts',
-				'*.ts',
-				'*.js',
-			],
+			files: projectFiles,
 			tasks: ['prettify', 'lint', 'shell:document'],
 			options: {
 				spawn: false,
@@ -38,15 +35,7 @@ module.exports = function (grunt) {
 		//Prettier
 		prettier: {
 			files: {
-				src: [
-					'routes/**/*.ts',
-					'models/**/*.ts',
-					'controllers/**/*.ts',
-					'database/**/*.ts',
-					'tests/**/*.ts',
-					'*.ts',
-					'*.js',
-				],
+				src: projectFiles,
 			},
 		},
 		shell: {
