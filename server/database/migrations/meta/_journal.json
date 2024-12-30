@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1734965953396,
+      "tag": "0000_tough_zarek",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1735053075736,
+      "tag": "0001_short_dragon_lord",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1735261104109,
+      "tag": "0002_daily_quasimodo",
+      "breakpoints": true
+    }
+  ]
+}

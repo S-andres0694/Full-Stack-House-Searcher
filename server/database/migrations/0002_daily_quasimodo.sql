@@ -1,0 +1,1 @@
+DROP INDEX `properties_address_url_identifier_unique`;
