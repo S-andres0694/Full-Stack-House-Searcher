@@ -11,7 +11,12 @@ import connectionGenerator from '../database/init-db';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { databasePath } from '../database/init-db';
 import bcrypt from 'bcrypt';
-import { generateAccessToken, generateRefreshToken } from './token-generator';
+import {
+	generateAccessToken,
+	generateRefreshToken,
+	UserTokenPayload,
+	verifyRefreshToken,
+} from './token-manipulator';
 //Defines the router for the authentication controllers.
 const router: Router = Router();
 
@@ -47,12 +52,27 @@ export const loginController = async (
 		return;
 	}
 
-	//Generate a JWT token for the user.
-	const accessToken: string = generateAccessToken(user);
-	const refreshToken: string = generateRefreshToken(user);
+	//Generate a JWT access token for the user.
+	const accessToken: string = generateAccessToken({
+		id: user.id.toString(),
+		role: user.role,
+	});
 
-	//If the password is correct, return the user.
-	res.status(200).json(user);
+	//Generate a refresh token for the user.
+	const refreshToken: string = generateRefreshToken({
+		id: user.id.toString(),
+		role: user.role,
+	});
+
+	//Attach the refresh token to the cookie of the user.
+	res.cookie('refreshToken', refreshToken, {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === 'production',
+		maxAge: 24 * 60 * 60 * 1000, // 1 day
+	});
+
+	//If the password is correct, return the access token.
+	res.status(200).json({ accessToken });
 };
 
 /**
@@ -112,4 +132,42 @@ export const logoutController = (req: Request, res: Response) => {
 			res.status(200).json({ message: 'Logged out successfully.' });
 		});
 	});
+};
+
+/**
+ * Handles the refresh token request for JWT.
+ * @param req - The request object.
+ * @param res - The response object.
+ */
+
+export const refreshTokenController = async (req: Request, res: Response) => {
+	const refreshToken: string = req.cookies.refreshToken;
+
+	//If the refresh token is not present, return an error.
+	if (!refreshToken) {
+		return res.status(401).redirect('/auth/login');
+	}
+
+	try {
+		const userDetails: UserTokenPayload = verifyRefreshToken(
+			refreshToken,
+		) as UserTokenPayload;
+
+		//Generate a new access token for the user.
+		const accessToken: string = generateAccessToken(userDetails);
+
+		console.log(`Token has been refreshed for ${userDetails.id}`);
+
+		//Attach the access token to the cookie of the user.
+		res.cookie('accessToken', accessToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+		});
+
+		//Return a success message.
+		res.status(200).json({ message: 'Token refreshed successfully.' });
+	} catch (error) {
+		res.clearCookie('refreshToken');
+		return res.redirect('/auth/login');
+	}
 };
