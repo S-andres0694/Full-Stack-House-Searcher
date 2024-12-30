@@ -1,14 +1,38 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/table-types';
 
-//Secret key for the JWT to enable the symmetric encryption.
-const JWT_SECRET: string = process.env.JWT_SECRET || '';
+/*
+    Access token for the JWT Authentication process.
+    This token is used to authenticate the user in the application.
+*/
+const ACCESS_JWT_SECRET: string = process.env.ACCESS_JWT_SECRET || '';
+
+/*
+    Refresh token for the JWT Authentication process.
+    This token is used to refresh the access token when it expires.
+*/
+const REFRESH_JWT_SECRET: string = process.env.REFRESH_JWT_SECRET || '';
 
 /**
  * Generates a JWT token for the given payload.
  * @param payload - The payload to be encoded in the token.
  * @returns The JWT token.
  */
-export function generateToken(user: User): string {
-    return jwt.sign({ id: user.id, role: 'user' }, JWT_SECRET, { expiresIn: '1h' });
+
+export function generateAccessToken(user: User): string {
+	return jwt.sign({ id: user.id, role: 'user' }, ACCESS_JWT_SECRET, {
+		expiresIn: '1h',
+	});
+}
+
+/**
+ * Generates a refresh token for the given payload.
+ * @param payload - The payload to be encoded in the token.
+ * @returns The refresh token.
+ */
+
+export function generateRefreshToken(user: User): string {
+	return jwt.sign({ id: user.id, role: 'user' }, REFRESH_JWT_SECRET, {
+		expiresIn: '1d',
+	});
 }

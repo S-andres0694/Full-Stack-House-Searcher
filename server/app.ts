@@ -17,6 +17,9 @@ import propertiesRoutesFactory from './routes/properties_routes';
 import rolesRoutesFactory from './routes/roles_routes';
 import viewedPropertiesRoutesFactory from './routes/viewed_properties-routes';
 import authenticationRoutesFactory from './routes/authentication-routes';
+import sessionMiddleware from './middleware/express-session-config';
+import { passportObj } from './authentication/google-auth.config';
+import protectedTestRoutesFactory from './routes/protected-test-routes';
 
 //Express application
 const app: Application = express();
@@ -36,6 +39,13 @@ app.use(express.static(path.join(__dirname, 'dist/public')));
 //Extra middleware
 app.use(express.json());
 
+//Session middleware
+app.use(sessionMiddleware);
+
+//Passport middleware
+app.use(passportObj.initialize());
+app.use(passportObj.session());
+
 //Routes
 app.use('/users', userRoutesFactory(dbPath));
 app.use('/properties', propertiesRoutesFactory(dbPath));
@@ -45,9 +55,12 @@ app.use('/viewed-properties', viewedPropertiesRoutesFactory(dbPath));
 //Authentication routes
 app.use('/auth', authenticationRoutesFactory(dbPath));
 
+//Protected test routes
+app.use('/protected-test', protectedTestRoutesFactory(dbPath));
+
 //Start the database in the server.
 (async () => {
-	const initializationStatus = await databaseCreator(
+	const initializationStatus: boolean = await databaseCreator(
 		dbPath,
 		dbProductionOptions,
 	);
