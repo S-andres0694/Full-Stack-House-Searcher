@@ -21,7 +21,7 @@ const usersModel: UsersModel = usersModelFactory(
 );
 
 /**
- * Handles the login request for new users.
+ * Handles the login requests for new users.
  * @param req - The request object.
  * @param res - The response object.
  */
@@ -55,6 +55,12 @@ export const loginController = async (
 	res.status(200).json(user);
 };
 
+/**
+ * Handles the register request for new users.
+ * @param req - The request object.
+ * @param res - The response object.
+ */
+
 export const registerController = async (req: Request, res: Response) => {
 	try {
 		//Take the new user parameters from the request body.
@@ -87,7 +93,9 @@ export const registerController = async (req: Request, res: Response) => {
 };
 
 /**
- * Logout controller for Google OAuth2.
+ * Handles the logout request for Google OAuth2.
+ * @param req - The request object.
+ * @param res - The response object.
  */
 
 export const logoutController = (req: Request, res: Response) => {

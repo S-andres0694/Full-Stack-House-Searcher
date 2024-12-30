@@ -5,7 +5,7 @@ import {
 	loginController,
 	logoutController,
 	registerController,
-} from '../authentication/authentication-controllers';
+} from '../authentication/authentication-JWT-controllers';
 
 const authenticationRoutesFactory = (dbPath: string) => {
 	const router: Router = Router();

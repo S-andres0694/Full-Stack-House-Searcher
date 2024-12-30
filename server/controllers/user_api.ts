@@ -322,7 +322,8 @@ export class UserApi {
 		}
 
 		//Initialize the date if it was not passed.
-		user.createdAt = user.createdAt ? user.createdAt : new Date();
+		user.createdAt =
+			user.createdAt || new Date(new Date().toISOString());
 
 		try {
 			await this.usersModel.createUser(user);
