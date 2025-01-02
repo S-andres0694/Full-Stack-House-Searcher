@@ -129,6 +129,9 @@ export const logoutController = (req: Request, res: Response) => {
 			if (err) {
 				return res.status(500).json({ message: 'Error destroying session.' });
 			}
+			req.user = undefined;
+			res.clearCookie('connect.sid');
+			res.clearCookie('refreshToken');
 			res.status(200).json({ message: 'Logged out successfully.' });
 		});
 	});

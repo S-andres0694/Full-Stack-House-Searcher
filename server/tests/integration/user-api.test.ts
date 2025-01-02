@@ -22,6 +22,15 @@ import { Server } from 'http';
 import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import usersModelFactory from '../../models/users';
 import { UsersModel } from '../../models/users';
+import {
+	addBearerToken,
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+} from '../../middleware/auth-middleware';
+import authenticationRoutesFactory from '../../routes/authentication-routes';
+import sessionMiddleware from '../../middleware/express-session-config';
+import cookieParser from 'cookie-parser';
+import { passportObj } from '../../authentication/google-auth.config';
 
 let app: Application;
 let dbConnection: Database;
@@ -29,8 +38,11 @@ let db: BetterSQLite3Database;
 const port: number = 4000;
 let server: Server;
 let userModel: UsersModel;
+let accessJwtToken: string;
+const ADMIN_EMAIL: string = process.env.ADMIN_EMAIL!;
+const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
-beforeAll(() => {
+beforeAll(async () => {
 	app = express();
 	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
 	db = drizzle(dbConnection);
@@ -40,9 +52,56 @@ beforeAll(() => {
 	app.use(morgan('common'));
 	//Extra middleware
 	app.use(express.json());
-	//Routes
-	app.use('/users', userRoutesFactory(testDbPath));
+
+	//Authentication routes
+	app.use('/auth', authenticationRoutesFactory(testDbPath));
+
 	//Start the server
+	server = app.listen(port, () => {
+		console.log(`Server is running on port ${port}`);
+	});
+
+	console.log(`${ADMIN_EMAIL} ${ADMIN_PASSWORD}`);
+	console.log(await userModel.getAllUsers());
+
+	//Login the admin user
+	const response: Response = await fetch(
+		`http://localhost:${port}/auth/login`,
+		{
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				email: process.env.ADMIN_EMAIL,
+				password: process.env.ADMIN_PASSWORD,
+			}),
+			method: 'POST',
+		},
+	);
+
+	//Get the access token from the response
+	accessJwtToken = (await response.json()).accessToken;
+	console.log(`Access JWT Token: ${accessJwtToken}`);
+
+	server.close();
+
+	//Session middleware
+	app.use(sessionMiddleware);
+
+	//Cookie parser middleware
+	app.use(cookieParser());
+
+	//Passport middleware
+	app.use(passportObj.initialize());
+	app.use(passportObj.session());
+
+	//Routes
+	app.use(
+		'/users',
+		addBearerToken(accessJwtToken),
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		userRoutesFactory(testDbPath),
+	);
+
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
 	});

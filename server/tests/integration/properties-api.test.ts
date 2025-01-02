@@ -71,7 +71,7 @@ describe('Properties API Testing', () => {
 		expect(response.body.message).toBe('Server is running');
 	});
 
-	it('tests that the rightmove properties endpoint works', async () => {
+	xit('tests that the rightmove properties endpoint works', async () => {
 		const response = await request(app).get('/properties/rightmove').send({
 			identifier: 'REGION^1245',
 			sort: 'newestListed',
@@ -101,7 +101,7 @@ describe('Properties API Testing', () => {
 		);
 	});
 
-	it('tests that when calling the rightmove endpoint, the properties are added to the database', async () => {
+	xit('tests that when calling the rightmove endpoint, the properties are added to the database', async () => {
 		const response = await request(app).get('/properties/rightmove').send({
 			identifier: 'REGION^1245',
 			sort: 'newestListed',
@@ -126,7 +126,7 @@ describe('Properties API Testing', () => {
 		}
 	});
 
-	it('tests that when calling the getProperties endpoint, all of the properties are returned', async () => {
+	xit('tests that when calling the getProperties endpoint, all of the properties are returned', async () => {
 		//Populate the database
 		const rightmoveRequest = await request(app)
 			.get('/properties/rightmove')

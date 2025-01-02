@@ -20,7 +20,11 @@ import authenticationRoutesFactory from './routes/authentication-routes';
 import sessionMiddleware from './middleware/express-session-config';
 import { passportObj } from './authentication/google-auth.config';
 import protectedTestRoutesFactory from './routes/protected-test-routes';
-
+import {
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+} from './middleware/auth-middleware';
+import cookieParser from 'cookie-parser';
 //Express application
 const app: Application = express();
 
@@ -42,15 +46,38 @@ app.use(express.json());
 //Session middleware
 app.use(sessionMiddleware);
 
+//Cookie parser middleware
+app.use(cookieParser());
+
 //Passport middleware
 app.use(passportObj.initialize());
 app.use(passportObj.session());
 
-//Routes
-app.use('/users', userRoutesFactory(dbPath));
-app.use('/properties', propertiesRoutesFactory(dbPath));
-app.use('/roles', rolesRoutesFactory(dbPath));
-app.use('/viewed-properties', viewedPropertiesRoutesFactory(dbPath));
+//Routes with authentication support
+app.use(
+	'/users',
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+	userRoutesFactory(dbPath),
+);
+app.use(
+	'/properties',
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+	propertiesRoutesFactory(dbPath),
+);
+app.use(
+	'/roles',
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+	rolesRoutesFactory(dbPath),
+);
+app.use(
+	'/viewed-properties',
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+	viewedPropertiesRoutesFactory(dbPath),
+);
 
 //Authentication routes
 app.use('/auth', authenticationRoutesFactory(dbPath));
