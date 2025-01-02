@@ -40,4 +40,9 @@ jobs:
           API_HOST: ${{ secrets.API_HOST }}
           DB_PATH: ${{ vars.DB_PATH }}
           MIGRATIONS_PATH: ${{ vars.MIGRATIONS_PATH }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          REFRESH_JWT_SECRET: ${{ secrets.REFRESH_JWT_SECRET }}
+          ACCESS_JWT_SECRET: ${{ secrets.ACCESS_JWT_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: npm run integration-tests
