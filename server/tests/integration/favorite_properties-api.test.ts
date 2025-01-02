@@ -26,11 +26,17 @@ import favoritePropertiesRoutesFactory from '../../routes/favorite_properties-ro
 import { property, property2, user } from '../constants';
 import { Response } from 'supertest';
 import { Favorite } from '../../models/table-types';
+import authenticationRoutesFactory from '../../routes/authentication-routes';
+import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
+import { isUserLoggedInThroughGoogle } from '../../middleware/auth-middleware';
+import sessionMiddleware from '../../middleware/express-session-config';
+import { passportObj } from '../../authentication/google-auth.config';
+import cookieParser from 'cookie-parser';
+import { addBearerToken } from '../../middleware/auth-middleware';
 
 let app: Application;
 let dbConnection: Database;
 let db: BetterSQLite3Database;
-let favoritePropertiesApi: FavoritePropertiesApi;
 const port: number = 4000;
 let server: Server;
 let favoritePropertiesModel: FavoritePropertiesModel;
@@ -39,14 +45,56 @@ let propertiesModel: PropertiesModel;
 let userId: number;
 let propertyId: number;
 let propertyId2: number;
+let accessJwtToken: string;
+const ADMIN_EMAIL: string = process.env.ADMIN_EMAIL!;
+const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
-beforeAll(() => {
+beforeAll(async () => {
 	app = express();
 	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
 	db = drizzle(dbConnection);
 	app.use(morgan('common'));
 	app.use(express.json());
-	app.use('/favorite_properties', favoritePropertiesRoutesFactory(testDbPath));
+	//Authentication routes
+	app.use('/auth', authenticationRoutesFactory(testDbPath));
+
+	//Start the server
+	server = app.listen(port, () => {
+		console.log(`Server is running on port ${port}`);
+	});
+
+	//Login the admin user
+	const response = await fetch(`http://localhost:${port}/auth/login`, {
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			email: ADMIN_EMAIL,
+			password: ADMIN_PASSWORD,
+		}),
+		method: 'POST',
+	});
+
+	//Retrieve the access token
+	accessJwtToken = (await response.json()).accessToken;
+
+	server.close();
+
+	//Session middleware
+	app.use(sessionMiddleware);
+
+	//Cookie parser middleware
+	app.use(cookieParser());
+
+	//Passport middleware
+	app.use(passportObj.initialize());
+	app.use(passportObj.session());
+
+	app.use(
+		'/favorite_properties',
+		addBearerToken(accessJwtToken),
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		favoritePropertiesRoutesFactory(testDbPath),
+	);
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
 	});

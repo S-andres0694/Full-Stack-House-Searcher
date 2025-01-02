@@ -21,8 +21,18 @@ import viewedPropertiesRoutesFactory from '../../routes/viewed_properties-routes
 import morgan from 'morgan';
 import request from 'supertest';
 import { user, property, property2 } from '../constants';
-import { Response } from 'supertest';
+import { Response as SupertestResponse } from 'supertest';
 import { ViewedProperty } from '../../models/table-types';
+import authenticationRoutesFactory from '../../routes/authentication-routes';
+import { passportObj } from '../../authentication/google-auth.config';
+import cookieParser from 'cookie-parser';
+import sessionMiddleware from '../../middleware/express-session-config';
+import {
+	addBearerToken,
+	isUserLoggedInThroughGoogle,
+} from '../../middleware/auth-middleware';
+import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
+
 let app: Application;
 let dbConnection: Database;
 let db: BetterSQLite3Database;
@@ -34,8 +44,11 @@ let propertiesModel: PropertiesModel;
 let userID: number;
 let propertyId: number;
 let property2Id: number;
+let accessJwtToken: string;
+const ADMIN_EMAIL: string = process.env.ADMIN_EMAIL!;
+const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
-beforeAll(() => {
+beforeAll(async () => {
 	app = express();
 	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
 	db = drizzle(dbConnection);
@@ -47,8 +60,47 @@ beforeAll(() => {
 	app.use(morgan('common'));
 	//Extra middleware
 	app.use(express.json());
+
+	//Authentication routes
+	app.use('/auth', authenticationRoutesFactory(testDbPath));
+
+	//Start the server to obtain the access token
+	server = app.listen(port, () => {
+		console.log(`Server is running on port ${port}`);
+	});
+
+	//Login the admin user
+	const response = await fetch(`http://localhost:${port}/auth/login`, {
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			email: ADMIN_EMAIL,
+			password: ADMIN_PASSWORD,
+		}),
+		method: 'POST',
+	});
+
+	accessJwtToken = (await response.json()).accessToken;
+
+	server.close();
+
+	//Session middleware
+	app.use(sessionMiddleware);
+
+	//Cookie parser middleware
+	app.use(cookieParser());
+
+	//Passport middleware
+	app.use(passportObj.initialize());
+	app.use(passportObj.session());
+
 	//Routes
-	app.use('/viewed-properties', viewedPropertiesRoutesFactory(testDbPath));
+	app.use(
+		'/viewed-properties',
+		addBearerToken(accessJwtToken),
+		isUserLoggedInThroughJWT,
+		isUserLoggedInThroughGoogle,
+		viewedPropertiesRoutesFactory(testDbPath),
+	);
 
 	//Start the server
 	server = app.listen(port, () => {
@@ -71,7 +123,7 @@ afterAll(() => {
 
 describe('Viewed Properties API Testing', () => {
 	it('Tests that the route is alive and that the server is running', async () => {
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			'/viewed-properties/test',
 		);
 		expect(response.status).toBe(200);
@@ -87,7 +139,7 @@ describe('Viewed Properties API Testing', () => {
 			userId: userID,
 			propertyId: property2Id,
 		});
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			`/viewed-properties/${userID}`,
 		);
 		expect(response.status).toBe(200);
@@ -97,21 +149,21 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('it tests that when passing an non-number user id, the response is 400', async () => {
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			`/viewed-properties/notanumber`,
 		);
 		expect(response.status).toBe(400);
 	});
 
 	it('tests that when passing a user ID for a user that does not exists, the response is 404', async () => {
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			`/viewed-properties/100000000`,
 		);
 		expect(response.status).toBe(404);
 	});
 
 	it('tests that when retrieving properties for a user that has no properties, the response is 400', async () => {
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			`/viewed-properties/${userID}`,
 		);
 		expect(response.status).toBe(400);
@@ -119,7 +171,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding a property as viewed, the response is 200', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/${userID}`)
 			.send({
 				propertyId: propertyId,
@@ -134,7 +186,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding a property with a non-number User ID, the response is 400', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/notanumber`)
 			.send({
 				propertyId: propertyId,
@@ -143,7 +195,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding a property with a non-number property ID, the response is 400', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/${userID}`)
 			.send({
 				propertyId: 'notanumber',
@@ -152,7 +204,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding a property with a User ID that does not exist, the response is 404', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/100000000`)
 			.send({
 				propertyId: propertyId,
@@ -161,7 +213,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding a property with a property ID that does not exist, the response is 404', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/${userID}`)
 			.send({
 				propertyId: 100000000,
@@ -174,7 +226,7 @@ describe('Viewed Properties API Testing', () => {
 			userId: userID,
 			propertyId: propertyId,
 		});
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.delete(`/viewed-properties/${userID}`)
 			.send({
 				propertyId: propertyId,
@@ -187,7 +239,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when deleting a property with a non-number User ID, the response is 400', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.delete(`/viewed-properties/notanumber`)
 			.send({
 				propertyId: propertyId,
@@ -196,7 +248,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when deleting a property with a non-number property ID, the response is 400', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.delete(`/viewed-properties/${userID}`)
 			.send({
 				propertyId: 'notanumber',
@@ -205,7 +257,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when deleting a property with a User ID that does not exist, the response is 404', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.delete(`/viewed-properties/100000000`)
 			.send({
 				propertyId: propertyId,
@@ -214,7 +266,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when deleting a property with a property ID that does not exist, the response is 404', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.delete(`/viewed-properties/${userID}`)
 			.send({
 				propertyId: 100000000,
@@ -231,7 +283,7 @@ describe('Viewed Properties API Testing', () => {
 			userId: userID,
 			propertyId: property2Id,
 		});
-		const response: Response = await request(app).delete(
+		const response: SupertestResponse = await request(app).delete(
 			`/viewed-properties/${userID}/clear`,
 		);
 		expect(response.status).toBe(201);
@@ -242,14 +294,14 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when clearing all viewed properties for a user that does not exist, the response is 404', async () => {
-		const response: Response = await request(app).delete(
+		const response: SupertestResponse = await request(app).delete(
 			`/viewed-properties/100000000/clear`,
 		);
 		expect(response.status).toBe(404);
 	});
 
 	it('tests that when passing a non-number User ID, the response is 400 when trying to clear all viewed properties', async () => {
-		const response: Response = await request(app).delete(
+		const response: SupertestResponse = await request(app).delete(
 			`/viewed-properties/notanumber/clear`,
 		);
 		expect(response.status).toBe(400);
@@ -266,7 +318,7 @@ describe('Viewed Properties API Testing', () => {
 			propertyId: property2Id,
 		});
 
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			`/viewed-properties/${userID}/last`,
 		);
 
@@ -275,7 +327,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when getting the last viewed property for a user that has no properties, the response is 400', async () => {
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			`/viewed-properties/${userID}/last`,
 		);
 		expect(response.status).toBe(400);
@@ -283,21 +335,21 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when getting the last viewed property for a user that does not exist, the response is 404', async () => {
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			`/viewed-properties/100000000/last`,
 		);
 		expect(response.status).toBe(404);
 	});
 
 	it('tests that when passing a non-number User ID, the response is 400 when trying to get the last viewed property', async () => {
-		const response: Response = await request(app).get(
+		const response: SupertestResponse = await request(app).get(
 			`/viewed-properties/notanumber/last`,
 		);
 		expect(response.status).toBe(400);
 	});
 
 	it('tests that when adding multiple properties as viewed, the response is 200', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/multiple/${userID}`)
 			.send({
 				properties: [propertyId, property2Id],
@@ -312,7 +364,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding multiple properties as viewed with a non-number User ID, the response is 400', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/multiple/notanumber`)
 			.send({
 				properties: [propertyId, property2Id],
@@ -321,7 +373,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding multiple properties as viewed with a non-number property ID, the response is 400', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/multiple/${userID}`)
 			.send({
 				properties: ['notanumber', property2Id],
@@ -330,7 +382,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding multiple properties as viewed with a User ID that does not exist, the response is 404', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/multiple/100000000`)
 			.send({
 				properties: [propertyId, property2Id],
@@ -339,7 +391,7 @@ describe('Viewed Properties API Testing', () => {
 	});
 
 	it('tests that when adding multiple properties as viewed with a property ID that does not exist, the response is 404', async () => {
-		const response: Response = await request(app)
+		const response: SupertestResponse = await request(app)
 			.post(`/viewed-properties/multiple/${userID}`)
 			.send({
 				properties: [100000000, property2Id],

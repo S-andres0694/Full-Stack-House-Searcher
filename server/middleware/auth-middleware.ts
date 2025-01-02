@@ -21,10 +21,7 @@ export function isUserLoggedInThroughGoogle(
 	res: Response,
 	next: NextFunction,
 ) {
-	if (
-		!req.cookies['connect.sid'] ||
-		req.get('X-Auth-Method') === 'JWT'
-	) {
+	if (!req.cookies['connect.sid'] || req.get('X-Auth-Method') === 'JWT') {
 		return next();
 	}
 

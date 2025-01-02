@@ -61,9 +61,6 @@ beforeAll(async () => {
 		console.log(`Server is running on port ${port}`);
 	});
 
-	console.log(`${ADMIN_EMAIL} ${ADMIN_PASSWORD}`);
-	console.log(await userModel.getAllUsers());
-
 	//Login the admin user
 	const response: Response = await fetch(
 		`http://localhost:${port}/auth/login`,
@@ -79,7 +76,6 @@ beforeAll(async () => {
 
 	//Get the access token from the response
 	accessJwtToken = (await response.json()).accessToken;
-	console.log(`Access JWT Token: ${accessJwtToken}`);
 
 	server.close();
 
