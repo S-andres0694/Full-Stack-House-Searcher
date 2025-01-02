@@ -63,21 +63,20 @@ beforeAll(async () => {
 		console.log(`Server is running on port ${port}`);
 	});
 
-	try {
-		//Login the admin user
-		const response = await fetch(`http://localhost:${port}/auth/login`, {
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				email: ADMIN_EMAIL,
-				password: ADMIN_PASSWORD,
-			}),
-			method: 'POST',
-		});
+	//Login the admin user
+	const response = await fetch(`http://localhost:${port}/auth/login`, {
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			email: ADMIN_EMAIL,
+			password: ADMIN_PASSWORD,
+		}),
+		method: 'POST',
+	});
 
-		//Retrieve the access token
+	if (response.status !== 200) {
+		throw new Error('Failed to login: ' + response.statusText);
+	} else {
 		accessJwtToken = (await response.json()).accessToken;
-	} catch (error) {
-		console.error(error);
 	}
 
 	server.close();
