@@ -59,7 +59,7 @@ beforeAll(async () => {
 	});
 
 	if (response.status !== 200) {
-		console.error(`Failed to login: ${response.status} and ${response.body}`);
+		console.error(`Failed to login: ${response.status} and ${response.text}`);
 		throw new Error('Failed to login');
 	} else {
 		console.log('Access token has been retrieved');

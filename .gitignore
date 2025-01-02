@@ -17,3 +17,4 @@ coverage
 .parcel-cache
 docs
 server/my.secrets
+my.secrets
