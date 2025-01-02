@@ -31,14 +31,15 @@ import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
 import { addBearerToken } from '../../middleware/auth-middleware';
 import { isUserLoggedInThroughGoogle } from '../../middleware/auth-middleware';
 import { Response } from 'supertest';
+import usersModelFactory, { UsersModel } from '../../models/users';
 
 let app: Application;
 let dbConnection: Database;
 let db: BetterSQLite3Database;
-let propertiesApi: PropertiesApi;
 const port: number = 4000;
 let server: Server;
 let propertiesModel: PropertiesModel;
+let usersModel: UsersModel;
 let accessJwtToken: string;
 const ADMIN_EMAIL: string = process.env.ADMIN_EMAIL!;
 const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
@@ -57,6 +58,7 @@ beforeAll(async () => {
 	app = express();
 	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
 	db = drizzle(dbConnection);
+	usersModel = usersModelFactory(db);
 	propertiesModel = propertiesModelFactory(db);
 	app.use(morgan('common'));
 	app.use(express.json());
@@ -101,6 +103,11 @@ beforeAll(async () => {
 		isUserLoggedInThroughGoogle,
 		isUserLoggedInThroughJWT,
 		propertiesRoutesFactory(testDbPath),
+	);
+
+	console.log(
+		`${ADMIN_EMAIL} and ${ADMIN_PASSWORD}`,
+		`${await usersModel.getUserByEmail(ADMIN_EMAIL)}`,
 	);
 
 	//Start the server
