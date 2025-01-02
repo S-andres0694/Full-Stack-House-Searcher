@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { Application } from 'express';
+import { Application, response } from 'express';
 import { testDbPath } from '../jest.setup';
 import { RolesModel } from '../../models/roles';
 import {
@@ -22,6 +22,7 @@ import cookieParser from 'cookie-parser';
 import { isUserLoggedInThroughGoogle } from '../../middleware/auth-middleware';
 import { addBearerToken } from '../../middleware/auth-middleware';
 import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
+import { Response } from 'supertest';
 
 let app: Application;
 let dbConnection: Database;
@@ -52,17 +53,18 @@ beforeAll(async () => {
 	});
 
 	//Login the admin user
-	const response = await fetch(`http://localhost:${port}/auth/login`, {
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({
-			email: ADMIN_EMAIL,
-			password: ADMIN_PASSWORD,
-		}),
-		method: 'POST',
+	const response: Response = await request(app).post('/auth/login').send({
+		email: ADMIN_EMAIL,
+		password: ADMIN_PASSWORD,
 	});
 
-	//Retrieve the access token
-	accessJwtToken = (await response.json()).accessToken;
+	if (response.status !== 200) {
+		console.error(`Failed to login: ${response.status} and ${response.body}`);
+		throw new Error('Failed to login');
+	} else {
+		console.log('Access token has been retrieved');
+		accessJwtToken = response.body.accessToken;
+	}
 
 	server.close();
 

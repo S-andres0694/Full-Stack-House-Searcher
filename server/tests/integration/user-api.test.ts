@@ -31,6 +31,7 @@ import authenticationRoutesFactory from '../../routes/authentication-routes';
 import sessionMiddleware from '../../middleware/express-session-config';
 import cookieParser from 'cookie-parser';
 import { passportObj } from '../../authentication/google-auth.config';
+import { Response } from 'supertest';
 
 let app: Application;
 let dbConnection: Database;
@@ -62,20 +63,18 @@ beforeAll(async () => {
 	});
 
 	//Login the admin user
-	const response: Response = await fetch(
-		`http://localhost:${port}/auth/login`,
-		{
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				email: process.env.ADMIN_EMAIL,
-				password: process.env.ADMIN_PASSWORD,
-			}),
-			method: 'POST',
-		},
-	);
+	const response: Response = await request(app).post('/auth/login').send({
+		email: ADMIN_EMAIL,
+		password: ADMIN_PASSWORD,
+	});
 
-	//Get the access token from the response
-	accessJwtToken = (await response.json()).accessToken;
+	if (response.status !== 200) {
+		console.error(`Failed to login: ${response.status} and ${response.body}`);
+		throw new Error('Failed to login');
+	} else {
+		console.log('Access token has been retrieved');
+		accessJwtToken = response.body.accessToken;
+	}
 
 	server.close();
 

@@ -16,3 +16,4 @@ coverage
 ./dist
 .parcel-cache
 docs
+server/my.secrets
