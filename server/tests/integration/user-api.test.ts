@@ -22,6 +22,16 @@ import { Server } from 'http';
 import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import usersModelFactory from '../../models/users';
 import { UsersModel } from '../../models/users';
+import {
+	addBearerToken,
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+} from '../../middleware/auth-middleware';
+import authenticationRoutesFactory from '../../routes/authentication-routes';
+import sessionMiddleware from '../../middleware/express-session-config';
+import cookieParser from 'cookie-parser';
+import { passportObj } from '../../authentication/google-auth.config';
+import { Response } from 'supertest';
 
 let app: Application;
 let dbConnection: Database;
@@ -29,8 +39,11 @@ let db: BetterSQLite3Database;
 const port: number = 4000;
 let server: Server;
 let userModel: UsersModel;
+let accessJwtToken: string;
+const ADMIN_EMAIL: string = process.env.ADMIN_EMAIL!;
+const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
-beforeAll(() => {
+beforeAll(async () => {
 	app = express();
 	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
 	db = drizzle(dbConnection);
@@ -40,9 +53,50 @@ beforeAll(() => {
 	app.use(morgan('common'));
 	//Extra middleware
 	app.use(express.json());
-	//Routes
-	app.use('/users', userRoutesFactory(testDbPath));
+
+	//Authentication routes
+	app.use('/auth', authenticationRoutesFactory(testDbPath));
+
 	//Start the server
+	server = app.listen(port, () => {
+		console.log(`Server is running on port ${port}`);
+	});
+
+	//Login the admin user
+	const response: Response = await request(app).post('/auth/login').send({
+		email: ADMIN_EMAIL,
+		password: ADMIN_PASSWORD,
+	});
+
+	if (response.status !== 200) {
+		console.error(`Failed to login: ${response.status} and ${response.text}`);
+		throw new Error('Failed to login');
+	} else {
+		console.log('Access token has been retrieved');
+		accessJwtToken = response.body.accessToken;
+	}
+
+	server.close();
+
+	//Session middleware
+	app.use(sessionMiddleware);
+
+	//Cookie parser middleware
+	app.use(cookieParser());
+
+	//Passport middleware
+	app.use(passportObj.initialize());
+	app.use(passportObj.session());
+
+	//Routes
+	app.use(
+		'/users',
+		addBearerToken(accessJwtToken),
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		userRoutesFactory(testDbPath),
+	);
+
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
 	});

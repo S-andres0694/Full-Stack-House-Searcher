@@ -309,6 +309,7 @@ export class UserApi {
 
 	createUser = async (request: Request, response: Response): Promise<void> => {
 		const user: NewUser = request.body;
+
 		if (
 			!user ||
 			!user.username ||
@@ -321,26 +322,24 @@ export class UserApi {
 			return;
 		}
 
-		//Initialize the date if it was not passed.
-		user.createdAt = user.createdAt || new Date(new Date().toISOString());
-
 		try {
+			user.createdAt =
+				user.createdAt || new Date(new Date().toISOString().split('T')[0]);
+
 			await this.usersModel.createUser(user);
+
 			response.status(201).json({ message: 'User created successfully' });
-		} catch (error) {
-			// Check for specific validation errors
-			if (error instanceof Error) {
-				if (
-					error.message === 'Username already exists' ||
-					error.message === 'Email already exists'
-				) {
-					response.status(409).json({ error: error.message });
-					return;
-				}
+		} catch (err: any) {
+			if (
+				err.message === 'Username already exists' ||
+				err.message === 'Email already exists'
+			) {
+				response.status(409).json({ error: err.message });
+				return;
+			} else {
+				console.error(err);
+				response.status(500).json({ error: 'Failed to create user' });
 			}
-			// Handle other errors
-			console.error(error);
-			response.status(500).json({ error: 'Failed to create user' });
 		}
 	};
 }

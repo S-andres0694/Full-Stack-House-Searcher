@@ -21,9 +21,11 @@ export function isUserLoggedInThroughGoogle(
 	res: Response,
 	next: NextFunction,
 ) {
-	if (!req.user || typeof req.user !== 'object') {
-		next();
+	if (!req.cookies['connect.sid'] || req.get('X-Auth-Method') === 'JWT') {
+		return next();
 	}
+
+	console.log(req.cookies['connect.sid'], req.get('X-Auth-Method'));
 
 	const user: User = req.user as User;
 	console.log(`User ${user.username} is logged in through Google OAuth2.`);
@@ -59,6 +61,7 @@ export function isUserLoggedInThroughJWT(
 		const payload: JwtPayload = verifyAccessToken(token);
 		req.user = payload; // Attach user data to the request object
 		res.setHeader('X-Auth-Method', 'JWT');
+		console.log(`User is logged in through JWT.`);
 		next();
 	} catch (err) {
 		return res.status(401).json({ message: 'Invalid or expired access token' });
@@ -118,4 +121,15 @@ function checkUserRole(
 				.json({ message: 'Invalid or expired access token' });
 		}
 	}
+}
+
+/**
+ * Middleware to automatically add a bearer token to the request.
+ * @param token - The bearer token to add.
+ */
+export function addBearerToken(token: string) {
+	return (req: Request, res: Response, next: NextFunction) => {
+		req.headers['authorization'] = `Bearer ${token}`;
+		next();
+	};
 }

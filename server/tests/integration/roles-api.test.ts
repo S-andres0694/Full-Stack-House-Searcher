@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { Application } from 'express';
+import { Application, response } from 'express';
 import { testDbPath } from '../jest.setup';
 import { RolesModel } from '../../models/roles';
 import {
@@ -15,6 +15,14 @@ import express from 'express';
 import { Server } from 'http';
 import morgan from 'morgan';
 import rolesRoutesFactory from '../../routes/roles_routes';
+import authenticationRoutesFactory from '../../routes/authentication-routes';
+import sessionMiddleware from '../../middleware/express-session-config';
+import { passportObj } from '../../authentication/google-auth.config';
+import cookieParser from 'cookie-parser';
+import { isUserLoggedInThroughGoogle } from '../../middleware/auth-middleware';
+import { addBearerToken } from '../../middleware/auth-middleware';
+import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
+import { Response } from 'supertest';
 
 let app: Application;
 let dbConnection: Database;
@@ -22,8 +30,11 @@ let db: BetterSQLite3Database;
 let rolesModel: RolesModel;
 const port: number = 4000;
 let server: Server;
+let accessJwtToken: string;
+const ADMIN_EMAIL: string = process.env.ADMIN_EMAIL!;
+const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
-beforeAll(() => {
+beforeAll(async () => {
 	app = express();
 	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
 	db = drizzle(dbConnection);
@@ -32,8 +43,50 @@ beforeAll(() => {
 	app.use(morgan('common'));
 	//Extra middleware
 	app.use(express.json());
+
+	//Authentication routes
+	app.use('/auth', authenticationRoutesFactory(testDbPath));
+
+	//Start the server
+	server = app.listen(port, () => {
+		console.log(`Server is running on port ${port}`);
+	});
+
+	//Login the admin user
+	const response: Response = await request(app).post('/auth/login').send({
+		email: ADMIN_EMAIL,
+		password: ADMIN_PASSWORD,
+	});
+
+	if (response.status !== 200) {
+		console.error(`Failed to login: ${response.status} and ${response.text}`);
+		throw new Error('Failed to login');
+	} else {
+		console.log('Access token has been retrieved');
+		accessJwtToken = response.body.accessToken;
+	}
+
+	server.close();
+
+	//Session middleware
+	app.use(sessionMiddleware);
+
+	//Cookie parser middleware
+	app.use(cookieParser());
+
+	//Passport middleware
+	app.use(passportObj.initialize());
+	app.use(passportObj.session());
+
 	//Routes
-	app.use('/roles', rolesRoutesFactory(testDbPath));
+	app.use(
+		'/roles',
+		addBearerToken(accessJwtToken),
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		rolesRoutesFactory(testDbPath),
+	);
+
 	//Start the server
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
