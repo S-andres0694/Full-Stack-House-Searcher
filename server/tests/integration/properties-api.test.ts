@@ -105,11 +105,6 @@ beforeAll(async () => {
 		propertiesRoutesFactory(testDbPath),
 	);
 
-	console.log(
-		`${ADMIN_EMAIL} and ${ADMIN_PASSWORD}`,
-		`${await usersModel.getUserByEmail(ADMIN_EMAIL)}`,
-	);
-
 	//Start the server
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
