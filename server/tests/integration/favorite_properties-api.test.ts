@@ -91,8 +91,6 @@ beforeAll(async () => {
 	app.use(
 		'/favorite_properties',
 		addBearerToken(accessJwtToken),
-		isUserLoggedInThroughGoogle,
-		isUserLoggedInThroughJWT,
 		favoritePropertiesRoutesFactory(testDbPath),
 	);
 	server = app.listen(port, () => {

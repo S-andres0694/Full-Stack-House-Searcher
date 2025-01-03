@@ -100,8 +100,6 @@ beforeAll(async () => {
 	app.use(
 		'/properties',
 		addBearerToken(accessJwtToken),
-		isUserLoggedInThroughGoogle,
-		isUserLoggedInThroughJWT,
 		propertiesRoutesFactory(testDbPath),
 	);
 

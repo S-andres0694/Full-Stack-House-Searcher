@@ -78,7 +78,6 @@ export function isUserLoggedInThroughJWT(
 export function requiresRoleOf(requiredRoles: string[]) {
 	return (req: Request, res: Response, next: NextFunction) => {
 		checkUserRole(req, res, next, requiredRoles);
-		next();
 	};
 }
 
@@ -96,32 +95,11 @@ function checkUserRole(
 	next: NextFunction,
 	requiredRoles: string[],
 ) {
-	const authMethod: string = req.get('X-Auth-Method') || '';
-
-	//If the user is logged in through Google OAuth2, check if the user has the required role using the session.
-	if (authMethod === 'Google OAuth2') {
-		const user: User = req.user as User;
-		if (!requiredRoles.includes(user.role)) {
-			return res.status(403).json({ message: 'Unauthorized' });
-		}
-		next();
+	const user: User = req.user as User;
+	if (!requiredRoles.includes(user.role)) {
+		return res.status(403).json({ message: 'Unauthorized' });
 	}
-
-	//If the user is logged in through JWT, check if the user has the required role using the access token.
-	if (authMethod === 'JWT') {
-		const user: User = req.user as User;
-		try {
-			const payload: UserTokenPayload = parseAccessToken(req);
-			if (!requiredRoles.includes(payload.role)) {
-				return res.status(403).json({ message: 'Unauthorized' });
-			}
-			next();
-		} catch (err) {
-			return res
-				.status(401)
-				.json({ message: 'Invalid or expired access token' });
-		}
-	}
+	next();
 }
 
 /**

@@ -32,7 +32,13 @@ export default function userRoutesFactory(dbPath: string): Router {
 	);
 
 	//Gets all users
-	router.get('/', requiresRoleOf(['admin']), userApi.getAllUsers);
+	router.get(
+		'/',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin']),
+		userApi.getAllUsers,
+	);
 
 	//Gets a user by email
 	router.get(

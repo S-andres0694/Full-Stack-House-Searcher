@@ -23,7 +23,8 @@ dotenv.config();
 const adminPassword: string = process.env.ADMIN_PASSWORD || '';
 const adminUsername: string = process.env.ADMIN_USERNAME || '';
 const adminEmail: string = process.env.ADMIN_EMAIL || '';
-
+const testUserEmail: string = process.env.TEST_USER_EMAIL || '';
+const testUserPassword: string = process.env.TEST_USER_PASSWORD || '';
 // Database options
 export const dbProductionOptions: Options = {
 	fileMustExist: false,
@@ -127,12 +128,11 @@ export async function initialValues(db: BetterSQLite3Database): Promise<void> {
 
 		//Users Model
 		const userModel = usersModelFactory(drizzle(db));
-		const userChecker: User | undefined = await userModel.getUserByUsername(
-			adminUsername,
-		);
+		const adminUserChecker: User | undefined =
+			await userModel.getUserByUsername(adminUsername);
 
 		//Create the user if they don't exist
-		if (!userChecker) {
+		if (!adminUserChecker) {
 			await userModel.createUser({
 				username: adminUsername,
 				email: adminEmail,

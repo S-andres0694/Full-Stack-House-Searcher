@@ -82,8 +82,6 @@ beforeAll(async () => {
 	app.use(
 		'/roles',
 		addBearerToken(accessJwtToken),
-		isUserLoggedInThroughGoogle,
-		isUserLoggedInThroughJWT,
 		rolesRoutesFactory(testDbPath),
 	);
 
