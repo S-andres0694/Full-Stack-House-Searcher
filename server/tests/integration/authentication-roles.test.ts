@@ -40,6 +40,16 @@ beforeAll(async () => {
 	db = drizzle(dbConnection);
 	userModel = usersModelFactory(db);
 
+	console.log(testUserEmail, testUserPassword, 'ALERT');
+
+	await userModel.createUser({
+		username: 'A Test User',
+		email: testUserEmail,
+		password: testUserPassword,
+		role: 'user',
+		name: 'Test User',
+	});
+
 	//Logging middleware
 	app.use(morgan('common'));
 	//Extra middleware
@@ -82,7 +92,9 @@ beforeAll(async () => {
 		},
 	);
 
-	userAccessJwtToken = (await userResponse.json()).accessToken;
+	const userResponseBody = await userResponse.json();
+	console.log('Request Body for the user:', userResponseBody);
+	userAccessJwtToken = userResponseBody.accessToken;
 
 	console.log(userAccessJwtToken, adminAccessJwtToken);
 
@@ -126,7 +138,6 @@ describe('Authentication and Roles API Testing', () => {
 				headers: { Authorization: `Bearer ${userAccessJwtToken}` },
 			},
 		);
-		console.log(await userResponse.json());
 		expect(userResponse.status).toBe(403);
 	});
 });
