@@ -40,8 +40,6 @@ beforeAll(async () => {
 	db = drizzle(dbConnection);
 	userModel = usersModelFactory(db);
 
-	console.log(testUserEmail, testUserPassword, 'ALERT');
-
 	await userModel.createUser({
 		username: 'A Test User',
 		email: testUserEmail,
@@ -92,11 +90,7 @@ beforeAll(async () => {
 		},
 	);
 
-	const userResponseBody = await userResponse.json();
-	console.log('Request Body for the user:', userResponseBody);
-	userAccessJwtToken = userResponseBody.accessToken;
-
-	console.log(userAccessJwtToken, adminAccessJwtToken);
+	userAccessJwtToken = (await userResponse.json()).accessToken;
 
 	server.close();
 
