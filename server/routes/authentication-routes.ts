@@ -6,6 +6,11 @@ import {
 	logoutController,
 	registerController,
 } from '../authentication/authentication-JWT-controllers';
+import {
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+	requiresRoleOf,
+} from '../middleware/auth-middleware';
 
 const authenticationRoutesFactory = (dbPath: string) => {
 	const router: Router = Router();
@@ -32,7 +37,13 @@ const authenticationRoutesFactory = (dbPath: string) => {
 	router.post('/register', registerController);
 
 	//Logout Route
-	router.get('/logout', logoutController);
+	router.get(
+		'/logout',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin', 'user']),
+		logoutController,
+	);
 
 	return router;
 };

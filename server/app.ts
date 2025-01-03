@@ -19,7 +19,6 @@ import viewedPropertiesRoutesFactory from './routes/viewed_properties-routes';
 import authenticationRoutesFactory from './routes/authentication-routes';
 import sessionMiddleware from './middleware/express-session-config';
 import { passportObj } from './authentication/google-auth.config';
-import protectedTestRoutesFactory from './routes/protected-test-routes';
 import {
 	isUserLoggedInThroughGoogle,
 	isUserLoggedInThroughJWT,
@@ -54,36 +53,13 @@ app.use(passportObj.initialize());
 app.use(passportObj.session());
 
 //Routes with authentication support
-app.use(
-	'/users',
-	isUserLoggedInThroughGoogle,
-	isUserLoggedInThroughJWT,
-	userRoutesFactory(dbPath),
-);
-app.use(
-	'/properties',
-	isUserLoggedInThroughGoogle,
-	isUserLoggedInThroughJWT,
-	propertiesRoutesFactory(dbPath),
-);
-app.use(
-	'/roles',
-	isUserLoggedInThroughGoogle,
-	isUserLoggedInThroughJWT,
-	rolesRoutesFactory(dbPath),
-);
-app.use(
-	'/viewed-properties',
-	isUserLoggedInThroughGoogle,
-	isUserLoggedInThroughJWT,
-	viewedPropertiesRoutesFactory(dbPath),
-);
+app.use('/users', userRoutesFactory(dbPath));
+app.use('/properties', propertiesRoutesFactory(dbPath));
+app.use('/roles', rolesRoutesFactory(dbPath));
+app.use('/viewed-properties', viewedPropertiesRoutesFactory(dbPath));
 
 //Authentication routes
 app.use('/auth', authenticationRoutesFactory(dbPath));
-
-//Protected test routes
-app.use('/protected-test', protectedTestRoutesFactory(dbPath));
 
 //Start the database in the server.
 (async () => {

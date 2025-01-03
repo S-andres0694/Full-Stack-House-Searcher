@@ -6,6 +6,11 @@ import { Database } from 'better-sqlite3';
 import { Router } from 'express';
 import { testApi } from '../controllers/favorite_properties-api';
 import connectionGenerator from '../database/init-db';
+import {
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+	requiresRoleOf,
+} from '../middleware/auth-middleware';
 
 export default function favoritePropertiesRoutesFactory(
 	dbPath: string,
@@ -16,23 +21,56 @@ export default function favoritePropertiesRoutesFactory(
 		favoritePropertiesApiFactory(db);
 
 	//Tests that the route is alive
-	router.get('/test', testApi);
+	router.get(
+		'/test',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin', 'user']),
+		testApi,
+	);
 
 	//Gets all favorite properties for a user
-	router.get('/:userId', favoritePropertiesApi.getAllFavoriteProperties);
+	router.get(
+		'/:userId',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin', 'user']),
+		favoritePropertiesApi.getAllFavoriteProperties,
+	);
 
 	//Adds a favorite property for a user
-	router.post('/:userId', favoritePropertiesApi.addFavoriteProperty);
+	router.post(
+		'/:userId',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin', 'user']),
+		favoritePropertiesApi.addFavoriteProperty,
+	);
 
 	//Deletes a favorite property for a user
-	router.delete('/:userId', favoritePropertiesApi.deleteFavoriteProperty);
+	router.delete(
+		'/:userId',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin', 'user']),
+		favoritePropertiesApi.deleteFavoriteProperty,
+	);
 
 	//Clears all favorite properties for a user
-	router.delete('/:userId/all', favoritePropertiesApi.clearFavoriteProperties);
+	router.delete(
+		'/:userId/all',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin', 'user']),
+		favoritePropertiesApi.clearFavoriteProperties,
+	);
 
 	//Gets the count of favorite properties for a user
 	router.get(
 		'/:userId/count',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin', 'user']),
 		favoritePropertiesApi.getFavoritePropertiesCount,
 	);
 

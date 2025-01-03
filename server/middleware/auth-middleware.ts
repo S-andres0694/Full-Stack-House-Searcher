@@ -78,6 +78,7 @@ export function isUserLoggedInThroughJWT(
 export function requiresRoleOf(requiredRoles: string[]) {
 	return (req: Request, res: Response, next: NextFunction) => {
 		checkUserRole(req, res, next, requiredRoles);
+		next();
 	};
 }
 
