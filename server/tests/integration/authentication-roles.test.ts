@@ -2,7 +2,7 @@ import { Database } from 'better-sqlite3';
 import { Application } from 'express';
 import usersModelFactory, { UsersModel } from '../../models/users';
 import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
-import { request, Server } from 'http';
+import { Server } from 'http';
 import {
 	dbTestOptions,
 	initialValues,
@@ -13,13 +13,12 @@ import { testDbPath } from '../jest.setup';
 import express from 'express';
 import morgan from 'morgan';
 import authenticationRoutesFactory from '../../routes/authentication-routes';
-import { isUserLoggedInThroughGoogle } from '../../middleware/auth-middleware';
-import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
-import { addBearerToken } from '../../middleware/auth-middleware';
 import userRoutesFactory from '../../routes/user_routes';
 import sessionMiddleware from '../../middleware/express-session-config';
 import { passportObj } from '../../authentication/google-auth.config';
 import cookieParser from 'cookie-parser';
+import { user } from '../constants';
+import request from 'supertest';
 
 let app: Application;
 let dbConnection: Database;
@@ -33,6 +32,7 @@ const ADMIN_EMAIL: string = process.env.ADMIN_EMAIL!;
 const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 const testUserEmail: string = process.env.TEST_USER_EMAIL!;
 const testUserPassword: string = process.env.TEST_USER_PASSWORD!;
+const ADMIN_USERNAME: string = process.env.ADMIN_USERNAME!;
 
 beforeAll(async () => {
 	app = express();
@@ -49,7 +49,7 @@ beforeAll(async () => {
 	});
 
 	//Logging middleware
-	app.use(morgan('common'));
+	app.use(morgan('dev'));
 	//Extra middleware
 	app.use(express.json());
 
@@ -133,5 +133,187 @@ describe('Authentication and Roles API Testing', () => {
 			},
 		);
 		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests only admin users can access the getUserById endpoint', async () => {
+		const userID: number = (await userModel.getUserByEmail(ADMIN_EMAIL))!.id;
+		const adminResponse: Response = await fetch(
+			`http://localhost:${port}/users/${userID}`,
+			{
+				headers: { Authorization: `Bearer ${adminAccessJwtToken}` },
+			},
+		);
+		expect(adminResponse.status).toBe(200);
+
+		const userResponse: Response = await fetch(
+			`http://localhost:${port}/users/${userID}`,
+			{
+				headers: { Authorization: `Bearer ${userAccessJwtToken}` },
+			},
+		);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can access the getAllUsers endpoint', async () => {
+		const adminResponse: Response = await fetch(
+			`http://localhost:${port}/users`,
+			{
+				headers: { Authorization: `Bearer ${adminAccessJwtToken}` },
+			},
+		);
+		expect(adminResponse.status).toBe(200);
+
+		const userResponse: Response = await fetch(
+			`http://localhost:${port}/users`,
+			{
+				headers: { Authorization: `Bearer ${userAccessJwtToken}` },
+			},
+		);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can access the getUserByEmail endpoint', async () => {
+		const adminResponse: Response = await fetch(
+			`http://localhost:${port}/users/email/${ADMIN_EMAIL}`,
+			{
+				headers: { Authorization: `Bearer ${adminAccessJwtToken}` },
+			},
+		);
+		expect(adminResponse.status).toBe(200);
+
+		const userResponse: Response = await fetch(
+			`http://localhost:${port}/users/email/${ADMIN_EMAIL}`,
+			{
+				headers: { Authorization: `Bearer ${userAccessJwtToken}` },
+			},
+		);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can access the getUserId endpoint', async () => {
+		const adminResponse: Response = await fetch(
+			`http://localhost:${port}/users/id/${ADMIN_USERNAME}`,
+			{
+				headers: { Authorization: `Bearer ${adminAccessJwtToken}` },
+			},
+		);
+
+		expect(adminResponse.status).toBe(200);
+
+		const userResponse: Response = await fetch(
+			`http://localhost:${port}/users/id/${ADMIN_USERNAME}`,
+			{
+				headers: { Authorization: `Bearer ${userAccessJwtToken}` },
+			},
+		);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can access the createUser endpoint', async () => {
+		const adminResponse: Response = await fetch(
+			`http://localhost:${port}/users`,
+			{
+				headers: { Authorization: `Bearer ${adminAccessJwtToken}` },
+			},
+		);
+	});
+
+	it('tests that only admin users can create a user', async () => {
+		const adminResponse = await request(app)
+			.post('/users')
+			.send(user)
+			.set('Authorization', `Bearer ${adminAccessJwtToken}`);
+		expect(adminResponse.status).toBe(201);
+
+		const userResponse = await request(app)
+			.post('/users')
+			.send(user)
+			.set('Authorization', `Bearer ${userAccessJwtToken}`);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can delete a user', async () => {
+		const userId: number = (await userModel.getUserByEmail(ADMIN_EMAIL))!.id;
+		const adminResponse = await request(app)
+			.delete(`/users/${userId}`)
+			.set('Authorization', `Bearer ${adminAccessJwtToken}`);
+		expect(adminResponse.status).toBe(204);
+
+		const userResponse = await request(app)
+			.delete(`/users/${userId}`)
+			.set('Authorization', `Bearer ${userAccessJwtToken}`);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can check if a user has a role', async () => {
+		const userId: number = (await userModel.getUserByEmail(ADMIN_EMAIL))!.id;
+
+		const adminResponse = await request(app)
+			.get(`/users/${userId}/hasRole/user`)
+			.set('Authorization', `Bearer ${adminAccessJwtToken}`);
+		expect(adminResponse.status).toBe(200);
+
+		const userResponse = await request(app)
+			.get(`/users/${userId}/hasRole/user`)
+			.set('Authorization', `Bearer ${userAccessJwtToken}`);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can get a user name', async () => {
+		const userId: number = (await userModel.getUserByEmail(ADMIN_EMAIL))!.id;
+
+		const adminResponse = await request(app)
+			.get(`/users/${userId}/name`)
+			.set('Authorization', `Bearer ${adminAccessJwtToken}`);
+		expect(adminResponse.status).toBe(200);
+
+		const userResponse = await request(app)
+			.get(`/users/${userId}/name`)
+			.set('Authorization', `Bearer ${userAccessJwtToken}`);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can get a user email', async () => {
+		const userId: number = (await userModel.getUserByEmail(ADMIN_EMAIL))!.id;
+
+		const adminResponse = await request(app)
+			.get(`/users/${userId}/email`)
+			.set('Authorization', `Bearer ${adminAccessJwtToken}`);
+		expect(adminResponse.status).toBe(200);
+
+		const userResponse = await request(app)
+			.get(`/users/${userId}/email`)
+			.set('Authorization', `Bearer ${userAccessJwtToken}`);
+		expect(userResponse.status).toBe(403);
+	});
+
+	it('tests that only admin users can update a user username', async () => {
+		const userId: number = (await userModel.getUserByEmail(ADMIN_EMAIL))!.id;
+		const adminResponse = await request(app)
+			.put(`/users/${userId}/username`)
+			.send({ newUsername: 'New Username' })
+			.set('Authorization', `Bearer ${adminAccessJwtToken}`);
+		expect(adminResponse.status).toBe(204);
+
+		const userResponse = await request(app)
+			.put(`/users/${userId}/username`)
+			.send({ newUsername: 'New Username2' })
+			.set('Authorization', `Bearer ${userAccessJwtToken}`);
+		expect(userResponse.status).toBe(204);
+	});
+
+	it('tests that only admin users can update a user email', async () => {
+		const userId: number = (await userModel.getUserByEmail(ADMIN_EMAIL))!.id;
+		const adminResponse = await request(app)
+			.put(`/users/${userId}/email`)
+			.send({ newEmail: 'newemail@test.com' })
+			.set('Authorization', `Bearer ${adminAccessJwtToken}`);
+		expect(adminResponse.status).toBe(204);
+
+		const userResponse = await request(app)
+			.put(`/users/${userId}/email`)
+			.send({ newEmail: 'newemail2@test.com' })
+			.set('Authorization', `Bearer ${userAccessJwtToken}`);
+		expect(userResponse.status).toBe(204);
 	});
 });

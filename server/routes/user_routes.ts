@@ -59,7 +59,13 @@ export default function userRoutesFactory(dbPath: string): Router {
 	);
 
 	//Creates a user
-	router.post('/', userApi.createUser);
+	router.post(
+		'/',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin']),
+		userApi.createUser,
+	);
 
 	//Deletes a user
 	router.delete(
