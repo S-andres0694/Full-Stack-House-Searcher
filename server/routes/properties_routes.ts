@@ -22,7 +22,7 @@ export default function propertiesRoutesFactory(dbPath: string): Router {
 		'/test',
 		isUserLoggedInThroughGoogle,
 		isUserLoggedInThroughJWT,
-		requiresRoleOf(['admin', 'user']),
+		requiresRoleOf(['admin']),
 		testApi,
 	);
 

@@ -17,7 +17,7 @@ export default function rolesRoutesFactory(dbPath: string): Router {
 		'/test',
 		isUserLoggedInThroughGoogle,
 		isUserLoggedInThroughJWT,
-		requiresRoleOf(['admin', 'user']),
+		requiresRoleOf(['admin']),
 		testApi,
 	);
 
@@ -44,7 +44,7 @@ export default function rolesRoutesFactory(dbPath: string): Router {
 		'/',
 		isUserLoggedInThroughGoogle,
 		isUserLoggedInThroughJWT,
-		requiresRoleOf(['admin', 'user']),
+		requiresRoleOf(['admin']),
 		rolesApi.getAllRoles,
 	);
 
@@ -62,7 +62,7 @@ export default function rolesRoutesFactory(dbPath: string): Router {
 		'/:name/id',
 		isUserLoggedInThroughGoogle,
 		isUserLoggedInThroughJWT,
-		requiresRoleOf(['admin', 'user']),
+		requiresRoleOf(['admin']),
 		rolesApi.getRoleId,
 	);
 
@@ -71,7 +71,7 @@ export default function rolesRoutesFactory(dbPath: string): Router {
 		'/:id/name',
 		isUserLoggedInThroughGoogle,
 		isUserLoggedInThroughJWT,
-		requiresRoleOf(['admin', 'user']),
+		requiresRoleOf(['admin']),
 		rolesApi.getRoleName,
 	);
 

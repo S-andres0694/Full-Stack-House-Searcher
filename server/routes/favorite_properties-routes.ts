@@ -25,7 +25,7 @@ export default function favoritePropertiesRoutesFactory(
 		'/test',
 		isUserLoggedInThroughGoogle,
 		isUserLoggedInThroughJWT,
-		requiresRoleOf(['admin', 'user']),
+		requiresRoleOf(['admin']),
 		testApi,
 	);
 

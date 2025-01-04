@@ -5,7 +5,7 @@ import { FavoritePropertiesModel } from '../models/favorite_properties';
 import favoritePropertiesModelFactory from '../models/favorite_properties';
 import usersModelFactory, { UsersModel } from '../models/users';
 import propertiesModelFactory, { PropertiesModel } from '../models/properties';
-import { Favorite, NewFavorite } from '../models/table-types';
+import { Favorite, NewFavorite, User } from '../models/table-types';
 /**
  * Test API to make sure that the endpoint is working.
  * @param {Request} request - The request object
@@ -67,10 +67,16 @@ export class FavoritePropertiesApi {
 				return;
 			}
 
-			const favoriteProperties: Favorite[] =
-				await this.favoritePropertiesModel.getAllFavoriteProperties(userId);
-
-			response.status(200).json({ favoriteProperties: favoriteProperties });
+			if (
+				(request.user as User).role === 'admin' ||
+				(request.user as User).id === userId
+			) {
+				const favoriteProperties: Favorite[] =
+					await this.favoritePropertiesModel.getAllFavoriteProperties(userId);
+				response.status(200).json({ favoriteProperties: favoriteProperties });
+			} else {
+				response.status(403).json({ message: 'Forbidden' });
+			}
 		} catch (error) {
 			console.error(error);
 			response
@@ -102,25 +108,34 @@ export class FavoritePropertiesApi {
 				return;
 			}
 
-			if (isNaN(propertyID)) {
-				response.status(400).json({ message: 'Invalid property ID' });
-				return;
-			}
-
 			if (
-				(await this.propertiesModel.getPropertyById(propertyID)) === undefined
+				(request.user as User).role === 'admin' ||
+				(request.user as User).id === userID
 			) {
-				response.status(404).json({ message: 'Property not found' });
-				return;
+				if (isNaN(propertyID)) {
+					response.status(400).json({ message: 'Invalid property ID' });
+					return;
+				}
+
+				if (
+					(await this.propertiesModel.getPropertyById(propertyID)) === undefined
+				) {
+					response.status(404).json({ message: 'Property not found' });
+					return;
+				}
+
+				const favoriteProperty: NewFavorite = {
+					userId: userID,
+					propertyId: propertyID,
+				};
+
+				await this.favoritePropertiesModel.addFavoriteProperty(
+					favoriteProperty,
+				);
+				response.status(200).json({ message: 'Favorite property added' });
+			} else {
+				response.status(403).json({ message: 'Forbidden' });
 			}
-
-			const favoriteProperty: NewFavorite = {
-				userId: userID,
-				propertyId: propertyID,
-			};
-
-			await this.favoritePropertiesModel.addFavoriteProperty(favoriteProperty);
-			response.status(200).json({ message: 'Favorite property added' });
 		} catch (error) {
 			console.error(error);
 			response.status(500).json({ message: 'Failed to add favorite property' });
@@ -150,26 +165,33 @@ export class FavoritePropertiesApi {
 				return;
 			}
 
-			if (isNaN(propertyID)) {
-				response
-					.status(400)
-					.json({ message: 'Invalid or missing property ID' });
-				return;
-			}
-
 			if (
-				(await this.propertiesModel.getPropertyById(propertyID)) === undefined
+				(request.user as User).role === 'admin' ||
+				(request.user as User).id === userID
 			) {
-				response.status(404).json({ message: 'Property not found' });
-				return;
+				if (isNaN(propertyID)) {
+					response
+						.status(400)
+						.json({ message: 'Invalid or missing property ID' });
+					return;
+				}
+
+				if (
+					(await this.propertiesModel.getPropertyById(propertyID)) === undefined
+				) {
+					response.status(404).json({ message: 'Property not found' });
+					return;
+				}
+
+				await this.favoritePropertiesModel.deleteFavoriteProperty(
+					propertyID,
+					userID,
+				);
+
+				response.status(200).json({ message: 'Favorite property deleted' });
+			} else {
+				response.status(403).json({ message: 'Forbidden' });
 			}
-
-			await this.favoritePropertiesModel.deleteFavoriteProperty(
-				propertyID,
-				userID,
-			);
-
-			response.status(200).json({ message: 'Favorite property deleted' });
 		} catch (error) {
 			console.error(error);
 			response
@@ -200,8 +222,15 @@ export class FavoritePropertiesApi {
 				return;
 			}
 
-			await this.favoritePropertiesModel.clearFavoriteProperties(userID);
-			response.status(200).json({ message: 'Favorite properties cleared' });
+			if (
+				(request.user as User).role === 'admin' ||
+				(request.user as User).id === userID
+			) {
+				await this.favoritePropertiesModel.clearFavoriteProperties(userID);
+				response.status(200).json({ message: 'Favorite properties cleared' });
+			} else {
+				response.status(403).json({ message: 'Forbidden' });
+			}
 		} catch (error) {
 			console.error(error);
 			response
@@ -231,10 +260,16 @@ export class FavoritePropertiesApi {
 				return;
 			}
 
-			const count: number =
-				await this.favoritePropertiesModel.getFavoritePropertiesCount(userID);
-
-			response.status(200).json({ count: count });
+			if (
+				(request.user as User).role === 'admin' ||
+				(request.user as User).id === userID
+			) {
+				const count: number =
+					await this.favoritePropertiesModel.getFavoritePropertiesCount(userID);
+				response.status(200).json({ count: count });
+			} else {
+				response.status(403).json({ message: 'Forbidden' });
+			}
 		} catch (error) {
 			console.error(error);
 			response
