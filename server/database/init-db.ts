@@ -4,15 +4,11 @@ import Database, { Options } from 'better-sqlite3';
 import { Database as BetterSQLite3Database } from 'better-sqlite3';
 import type { BetterSQLite3Database as DrizzleDB } from 'drizzle-orm/better-sqlite3';
 import dotenv from 'dotenv';
-import * as schema from './schema'; // Import your existing schema
-import { existsSync } from 'fs';
-import { SQLiteColumn } from 'drizzle-orm/sqlite-core';
-import { eq } from 'drizzle-orm';
+import * as schema from './schema';
 import rolesModelFactory from '../models/roles';
 import usersModelFactory from '../models/users';
 import { RolesModel } from '../models/roles';
 import { User } from '../models/table-types';
-import Backup from 'better-sqlite3';
 
 export const databasePath: string = __dirname + '/database.sqlite';
 
@@ -23,8 +19,7 @@ dotenv.config();
 const adminPassword: string = process.env.ADMIN_PASSWORD || '';
 const adminUsername: string = process.env.ADMIN_USERNAME || '';
 const adminEmail: string = process.env.ADMIN_EMAIL || '';
-const testUserEmail: string = process.env.TEST_USER_EMAIL || '';
-const testUserPassword: string = process.env.TEST_USER_PASSWORD || '';
+
 // Database options
 export const dbProductionOptions: Options = {
 	fileMustExist: false,
@@ -74,8 +69,6 @@ export async function databaseCreator(
 export function runMigrations(db: DrizzleDB, migrationsFolder: string): void {
 	try {
 		migrate(db, { migrationsFolder });
-		// Verify tables were created
-		const tables = db.all("SELECT name FROM sqlite_master WHERE type='table'");
 	} catch (error) {
 		console.error('Migration failed:', error);
 		throw error;
@@ -159,6 +152,8 @@ export async function resetDatabase(
 		await drizzleDb.delete(schema.favorites).execute();
 		await drizzleDb.delete(schema.properties).execute();
 		await drizzleDb.delete(schema.roles).execute();
+		await drizzleDb.delete(schema.invitationTokens).execute();
+		await drizzleDb.delete(schema.usedInvitationTokens).execute();
 		db.pragma('foreign_keys = ON');
 	} catch (error: any) {
 		console.error(`Error resetting the database: ${error.stack}`);

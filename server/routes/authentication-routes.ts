@@ -1,20 +1,16 @@
 import app from '../app';
 import { Router } from 'express';
 import { passportObj } from '../authentication/google-auth.config';
-import {
-	loginController,
-	logoutController,
-	registerController,
-} from '../authentication/authentication-JWT-controllers';
-import {
-	isUserLoggedInThroughGoogle,
-	isUserLoggedInThroughJWT,
-	requiresRoleOf,
-} from '../middleware/auth-middleware';
-
+import { AuthenticationJWTControllers } from '../authentication/authentication-JWT-controllers';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { dbProductionOptions } from '../database/init-db';
+import connectionGenerator from '../database/init-db';
+import { isUserLoggedInThroughGoogle, isUserLoggedInThroughJWT, requiresRoleOf } from '../middleware/auth-middleware';
 const authenticationRoutesFactory = (dbPath: string) => {
 	const router: Router = Router();
-
+	const authenticationJWTControllers: AuthenticationJWTControllers = new AuthenticationJWTControllers(
+		drizzle(connectionGenerator(dbPath, dbProductionOptions)),
+	);
 	//Google Authentication Callback Route
 	router.get(
 		'/google',
@@ -31,10 +27,10 @@ const authenticationRoutesFactory = (dbPath: string) => {
 	});
 
 	//Login Route
-	router.post('/login', loginController);
+	router.post('/login', authenticationJWTControllers.loginController);
 
 	//Register Route
-	router.post('/register', registerController);
+	router.post('/register', authenticationJWTControllers.registerController);
 
 	//Logout Route
 	router.get(
@@ -42,7 +38,7 @@ const authenticationRoutesFactory = (dbPath: string) => {
 		isUserLoggedInThroughGoogle,
 		isUserLoggedInThroughJWT,
 		requiresRoleOf(['admin', 'user']),
-		logoutController,
+		authenticationJWTControllers.logoutController,
 	);
 
 	return router;

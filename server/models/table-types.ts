@@ -10,6 +10,8 @@ import {
 	favorites,
 	users,
 	viewedProperties,
+	invitationTokens,
+	usedInvitationTokens,
 } from '../database/schema';
 
 // Define types based on schema
@@ -93,4 +95,8 @@ export type RegisterRequestBody = {
 	password: string;
 	name: string;
 	username: string;
+	invitationToken: string;
 };
+
+export type InvitationToken = typeof invitationTokens.$inferSelect;	
+export type UsedInvitationToken = typeof usedInvitationTokens.$inferSelect;

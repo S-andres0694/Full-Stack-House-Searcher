@@ -38,7 +38,7 @@ export const properties = sqliteTable(
 		url: t.text('url').notNull(),
 		identifier: t.integer('identifier').notNull(),
 	},
-	(table) => [], //Creates a unique constraint on the address, url and identifier columns.
+	(table) => [],
 );
 
 //Defines the roles table.
@@ -85,3 +85,26 @@ export const viewedProperties = sqliteTable(
 	},
 	(table) => [unique().on(table.userId, table.propertyId)],
 ); //Creates a unique constraint on the userId and propertyId columns.
+
+//Defines the invitation tokens table for each one of the users.
+export const invitationTokens = sqliteTable(
+	'invitation_tokens',
+	{
+		id: t.integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		token: t.text('token').notNull(),
+	},
+	(table) => [unique().on(table.token)],
+);
+
+//Defines a table for the invitation tokens that were already used before.
+export const usedInvitationTokens = sqliteTable(
+	'used_invitation_tokens',
+	{
+		id: t.integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+		used_tokenID: t
+			.integer('used_token_id')
+			.notNull()
+			.references(() => invitationTokens.id),
+	},
+	(table) => [unique().on(table.used_tokenID)],
+);
