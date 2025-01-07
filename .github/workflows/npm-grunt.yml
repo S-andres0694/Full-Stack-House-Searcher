@@ -41,8 +41,9 @@ jobs:
         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
         TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
-
       run: |
         npm install
-        grunt
-             
+        
+    - name: Run tests
+      run: |
+        grunt test
