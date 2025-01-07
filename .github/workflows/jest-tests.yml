@@ -9,6 +9,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+          API_KEY: ${{ secrets.API_KEY }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          API_HOST: ${{ secrets.API_HOST }}
+          DB_PATH: ${{ vars.DB_PATH }}
+          MIGRATIONS_PATH: ${{ vars.MIGRATIONS_PATH }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          REFRESH_JWT_SECRET: ${{ secrets.REFRESH_JWT_SECRET }}
+          ACCESS_JWT_SECRET: ${{ secrets.ACCESS_JWT_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
     defaults:
       run:
         working-directory: server
@@ -32,19 +47,4 @@ jobs:
         run: npm run unit-tests
 
       - name: Integration Tests Run
-        env:
-          API_KEY: ${{ secrets.API_KEY }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          API_HOST: ${{ secrets.API_HOST }}
-          DB_PATH: ${{ vars.DB_PATH }}
-          MIGRATIONS_PATH: ${{ vars.MIGRATIONS_PATH }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-          REFRESH_JWT_SECRET: ${{ secrets.REFRESH_JWT_SECRET }}
-          ACCESS_JWT_SECRET: ${{ secrets.ACCESS_JWT_SECRET }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
-          TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
         run: npm run integration-tests
