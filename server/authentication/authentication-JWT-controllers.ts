@@ -19,7 +19,9 @@ import {
 	UserTokenPayload,
 	verifyRefreshToken,
 } from './token-manipulator';
-import invitationTokenModelFactory, { InvitationTokenModel } from '../models/invitation-token';
+import invitationTokenModelFactory, {
+	InvitationTokenModel,
+} from '../models/invitation-token';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 //Defines the router for the authentication controllers.
 const router: Router = Router();
@@ -29,14 +31,10 @@ export class AuthenticationJWTControllers {
 	invitationTokenModel: InvitationTokenModel;
 	constructor(private db: BetterSQLite3Database) {
 		//Defines the users model.
-		this.usersModel = usersModelFactory(
-			this.db,
-		);
+		this.usersModel = usersModelFactory(this.db);
 
 		//Defines the invitation token model.
-		this.invitationTokenModel = invitationTokenModelFactory(
-			this.db,
-		);
+		this.invitationTokenModel = invitationTokenModelFactory(this.db);
 	}
 
 	/**
@@ -138,7 +136,9 @@ export class AuthenticationJWTControllers {
 			}
 
 			//Consume the invitation token.
-			await this.invitationTokenModel.consumeInvitationToken(isInvitationTokenValid);
+			await this.invitationTokenModel.consumeInvitationToken(
+				isInvitationTokenValid,
+			);
 
 			//If the user does not exist, create a new user.
 			await this.usersModel.createUser({
@@ -221,4 +221,3 @@ export class AuthenticationJWTControllers {
 		}
 	};
 }
-

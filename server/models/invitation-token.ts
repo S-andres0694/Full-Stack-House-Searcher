@@ -56,14 +56,16 @@ export class InvitationTokenModel {
 	 * @returns {Promise<boolean>} True if the invitation token has been used, false otherwise
 	 */
 
-	private async hasInvitationTokenBeenUsed(invitationToken: string): Promise<boolean> {
+	private async hasInvitationTokenBeenUsed(
+		invitationToken: string,
+	): Promise<boolean> {
 		const invitationTokenID: number | undefined = await this.db
 			.select()
 			.from(invitationTokens)
 			.where(eq(invitationTokens.token, invitationToken))
 			.then((result) => result[0].id);
-		
-		if(invitationTokenID === undefined) {
+
+		if (invitationTokenID === undefined) {
 			return false;
 		}
 
@@ -81,14 +83,18 @@ export class InvitationTokenModel {
 	 * @returns {Promise<void>}
 	 */
 
-	async createInvitationToken(invitationToken: string): Promise<InvitationToken | undefined> {
+	async createInvitationToken(
+		invitationToken: string,
+	): Promise<InvitationToken | undefined> {
 		try {
-			const result = await this.db.transaction(async (tx: BetterSQLite3Database) => {
-				return await tx
-					.insert(invitationTokens)
-					.values({ token: invitationToken })
-					.returning();
-			});
+			const result = await this.db.transaction(
+				async (tx: BetterSQLite3Database) => {
+					return await tx
+						.insert(invitationTokens)
+						.values({ token: invitationToken })
+						.returning();
+				},
+			);
 			return result[0];
 		} catch (error) {
 			console.error('Failed to create invitation token:', error);

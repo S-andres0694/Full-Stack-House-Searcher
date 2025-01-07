@@ -5,7 +5,12 @@ import connectionGenerator, {
 	databasePath,
 	dbProductionOptions,
 } from '../database/init-db';
-import { invitationTokens, roles, usedInvitationTokens, users } from '../database/schema';
+import {
+	invitationTokens,
+	roles,
+	usedInvitationTokens,
+	users,
+} from '../database/schema';
 import { InvitationToken, NewUser, Role, User } from './table-types';
 import { hash } from 'bcrypt';
 

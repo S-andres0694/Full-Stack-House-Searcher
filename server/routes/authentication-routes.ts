@@ -5,12 +5,17 @@ import { AuthenticationJWTControllers } from '../authentication/authentication-J
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { dbProductionOptions } from '../database/init-db';
 import connectionGenerator from '../database/init-db';
-import { isUserLoggedInThroughGoogle, isUserLoggedInThroughJWT, requiresRoleOf } from '../middleware/auth-middleware';
+import {
+	isUserLoggedInThroughGoogle,
+	isUserLoggedInThroughJWT,
+	requiresRoleOf,
+} from '../middleware/auth-middleware';
 const authenticationRoutesFactory = (dbPath: string) => {
 	const router: Router = Router();
-	const authenticationJWTControllers: AuthenticationJWTControllers = new AuthenticationJWTControllers(
-		drizzle(connectionGenerator(dbPath, dbProductionOptions)),
-	);
+	const authenticationJWTControllers: AuthenticationJWTControllers =
+		new AuthenticationJWTControllers(
+			drizzle(connectionGenerator(dbPath, dbProductionOptions)),
+		);
 	//Google Authentication Callback Route
 	router.get(
 		'/google',

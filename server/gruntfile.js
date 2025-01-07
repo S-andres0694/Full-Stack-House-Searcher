@@ -63,7 +63,7 @@ module.exports = function (grunt) {
 			},
 			test: {
 				command:
-					'echo "Running tests..." && npm run unit-tests && npm run integration-tests',
+					'echo "Running tests..." && npm run unit-tests && npm run integration-tests && npm run deployment-tests',
 			},
 			document: {
 				command: 'echo "Generating documentation..." && npm run doc',
@@ -75,8 +75,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-prettier');
 	grunt.loadNpmTasks('grunt-shell');
 	grunt.loadNpmTasks('grunt-contrib-watch');
-	grunt.registerTask('unitTest', ['shell:unitTest']);
-	grunt.registerTask('integrationTest', ['shell:integrationTest']);
 	grunt.registerTask('lint', ['eslint']);
 	grunt.registerTask('prettify', ['prettier']);
 	grunt.registerTask('dbGenerate', ['shell:dbGenerate']);
@@ -86,8 +84,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('default', [
 		'lint',
 		'prettify',
-		'unitTest',
-		'integrationTest',
+		'test',
 		'dbGenerate',
 		'migrate',
 		'build',

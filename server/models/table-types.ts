@@ -98,5 +98,5 @@ export type RegisterRequestBody = {
 	invitationToken: string;
 };
 
-export type InvitationToken = typeof invitationTokens.$inferSelect;	
+export type InvitationToken = typeof invitationTokens.$inferSelect;
 export type UsedInvitationToken = typeof usedInvitationTokens.$inferSelect;
