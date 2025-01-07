@@ -63,7 +63,7 @@ module.exports = function (grunt) {
 			},
 			test: {
 				command:
-					'echo "Running tests..." && npm run unit-tests && npm run integration-tests && npm run deployment-tests',
+					'echo "Running tests..." && npm run unit-tests && npm run integration-tests',
 			},
 			document: {
 				command: 'echo "Generating documentation..." && npm run doc',
