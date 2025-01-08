@@ -1,4 +1,9 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
+import axios, {
+	AxiosError,
+	AxiosInstance,
+	AxiosResponse,
+	InternalAxiosRequestConfig,
+} from 'axios';
 
 /**
  * Axios instance for making requests to the server
@@ -23,7 +28,7 @@ export const addAccessTokenInterceptorToInstance = async (
 	token: string,
 ): Promise<void> => {
 	instance.interceptors.request.use(
-		async (config) => {
+		async (config: InternalAxiosRequestConfig) => {
 			config.headers.Authorization = `Bearer ${token}`;
 			return config;
 		},
@@ -41,30 +46,28 @@ export const addAccessTokenInterceptorToInstance = async (
 export const addRefreshTokenInterceptorToInstance = async (
 	instance: AxiosInstance,
 ): Promise<void> => {
-	instance.interceptors.response.use(async (response) => {
+	instance.interceptors.response.use(async (response: AxiosResponse) => {
 		if (
 			response.status === 401 &&
 			response.data.message === 'Invalid or expired access token'
 		) {
-			window.location.href = '/auth/login';
-		}
-
-		try {
-			const refreshTokenRequest: Response = await fetch(
-				'http://localhost:3000/auth/refresh-token',
-				{
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
+			try {
+				const refreshTokenRequest: Response = await fetch(
+					'http://localhost:3000/auth/refresh-token',
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						credentials: 'include',
 					},
-					credentials: 'include',
-				},
-			);
-			const textResponse = await refreshTokenRequest.json();
-			const accessToken: string = textResponse.accessToken;
-			await addAccessTokenInterceptorToInstance(instance, accessToken);
-		} catch (error) {
-			window.location.href = '/auth/login';
+				);
+				const textResponse = await refreshTokenRequest.json();
+				const accessToken: string = textResponse.accessToken;
+				await addAccessTokenInterceptorToInstance(instance, accessToken);
+			} catch (error) {
+				window.location.href = '/auth/login';
+			}
 		}
 		return response;
 	});
