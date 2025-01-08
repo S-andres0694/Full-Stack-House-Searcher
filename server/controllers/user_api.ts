@@ -342,6 +342,38 @@ export class UserApi {
 			}
 		}
 	};
+
+	/**
+	 * Gets a user's data from the server if the user is logged in through Google OAuth2.
+	 * @param {Request} request - The request object containing the user ID
+	 * @param {Response} response - The response object to send the user data
+	 */
+
+	getUserFromGoogleOAuth2 = async (request: Request, response: Response): Promise<void> => {
+		if(!request.user) {
+			response.status(403).json({ error: 'Unauthorized' });
+			return;
+		}
+
+		const userID = (request.user as User).id;
+
+		const user: User | undefined = await this.usersModel.getUserById(userID);
+
+		if (!user) {
+			response.status(404).json({ error: 'User not found' });
+			return;
+		}
+
+		response.status(200).json({
+			user: {
+				id: user.id,
+				username: user.username,
+				email: user.email,
+				name: user.name,
+				role: user.role,
+			},
+		});
+	}
 }
 
 export default function userApiFactory(db: Database): UserApi {

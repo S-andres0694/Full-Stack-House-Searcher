@@ -22,6 +22,15 @@ export default function userRoutesFactory(dbPath: string): Router {
 		testApi,
 	);
 
+	//Gets a user's data from the server if the user is logged in through Google OAuth2
+	router.get(
+		'/google/whoami',
+		isUserLoggedInThroughGoogle,
+		isUserLoggedInThroughJWT,
+		requiresRoleOf(['admin', 'user']),
+		userApi.getUserFromGoogleOAuth2,
+	);
+
 	//Gets a user by id
 	router.get(
 		'/:id',
@@ -123,3 +132,4 @@ export default function userRoutesFactory(dbPath: string): Router {
 
 	return router;
 }
+

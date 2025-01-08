@@ -1,4 +1,3 @@
-import app from '../app';
 import { Router } from 'express';
 import { passportObj } from '../authentication/google-auth.config';
 import { AuthenticationJWTControllers } from '../authentication/authentication-JWT-controllers';
@@ -10,12 +9,14 @@ import {
 	isUserLoggedInThroughJWT,
 	requiresRoleOf,
 } from '../middleware/auth-middleware';
+
 const authenticationRoutesFactory = (dbPath: string) => {
 	const router: Router = Router();
 	const authenticationJWTControllers: AuthenticationJWTControllers =
 		new AuthenticationJWTControllers(
 			drizzle(connectionGenerator(dbPath, dbProductionOptions)),
 		);
+	
 	//Google Authentication Callback Route
 	router.get(
 		'/google',

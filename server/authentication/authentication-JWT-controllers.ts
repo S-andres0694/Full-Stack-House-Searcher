@@ -65,12 +65,18 @@ export class AuthenticationJWTControllers {
 		const accessToken: string = generateAccessToken({
 			id: user.id.toString(),
 			role: user.role,
+			email: user.email,
+			name: user.name,
+			username: user.username,
 		});
 
 		//Generate a refresh token for the user.
 		const refreshToken: string = generateRefreshToken({
 			id: user.id.toString(),
 			role: user.role,
+			email: user.email,
+			name: user.name,
+			username: user.username,
 		});
 
 		//Attach the refresh token to the cookie of the user.
@@ -79,6 +85,12 @@ export class AuthenticationJWTControllers {
 			secure: process.env.NODE_ENV === 'production',
 			maxAge: 24 * 60 * 60 * 1000, // 1 day
 		});
+
+		//Stores the user in the session.
+		req.user = {
+			id: user.id.toString(),
+			role: user.role,
+		};
 
 		//If the password is correct, return the access token.
 		res.status(200).json({ accessToken });
@@ -194,7 +206,9 @@ export class AuthenticationJWTControllers {
 
 		//If the refresh token is not present, return an error.
 		if (!refreshToken) {
-			return res.status(401).json({ message: 'Invalid or expired refresh token.' });
+			return res
+				.status(401)
+				.json({ message: 'Invalid or expired refresh token.' });
 		}
 
 		try {

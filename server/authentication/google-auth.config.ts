@@ -11,8 +11,8 @@ import connectionGenerator, {
 	databasePath,
 	dbProductionOptions,
 } from '../database/init-db';
-import { generateFromEmail, generateUsername } from 'unique-username-generator';
-
+import { generateFromEmail } from 'unique-username-generator';
+import bcrypt from 'bcrypt';
 //Google Client ID and Client Secret to enable the OAuth2 authentication strategy.
 const GOOGLE_CLIENT_ID: string = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET: string = process.env.GOOGLE_CLIENT_SECRET || '';
@@ -51,7 +51,7 @@ passportObj.use(
 			if (!user) {
 				await usersModel.createUser({
 					email: userEmail,
-					password: '',
+					password: bcrypt.hashSync('password', 10),
 					name: profile.displayName,
 					username: generateFromEmail(userEmail, 4),
 					role: 'user',
@@ -60,9 +60,21 @@ passportObj.use(
 				//Get the new user.
 				const newUser: User = (await usersModel.getUserByEmail(userEmail))!;
 
+				//Store the user in the session.
+				req.user = {
+					id: newUser.id.toString(),
+					role: newUser.role,
+				};
+
 				//Return the new user.
 				return done(null, newUser);
 			}
+
+			//Store the user in the session.
+			req.user = {
+				id: user.id.toString(),
+				role: user.role,
+			};
 
 			//If the user exists, return the user.
 			return done(null, user);

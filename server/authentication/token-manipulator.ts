@@ -16,6 +16,9 @@ const REFRESH_JWT_SECRET: string = process.env.REFRESH_JWT_SECRET || '';
 export type UserTokenPayload = {
 	id: string;
 	role: string;
+	email: string;
+	name: string;
+	username: string;
 };
 
 /**

@@ -22,13 +22,14 @@ export function isUserLoggedInThroughGoogle(
 	next: NextFunction,
 ) {
 	if (!req.cookies['connect.sid'] || req.get('X-Auth-Method') === 'JWT') {
-		return next();
+		return next(); //If the user is logged in through JWT, skip the Google OAuth2 check.
 	}
 
 	console.log(req.cookies['connect.sid'], req.get('X-Auth-Method'));
 
-	const user: User = req.user as User;
-	console.log(`User ${user.username} is logged in through Google OAuth2.`);
+	const user = req.user as User;
+	console.log(user);
+	console.log(`User ${user?.email} is logged in through Google OAuth2.`);
 	res.setHeader('X-Auth-Method', 'Google OAuth2');
 	next();
 }
@@ -46,8 +47,8 @@ export function isUserLoggedInThroughJWT(
 	res: Response,
 	next: NextFunction,
 ) {
-	if (req.get('X-Auth-Method') === 'Google OAuth2') {
-		next(); //If the user is logged in through Google OAuth2, skip the JWT check.
+	if (req.cookies['connect.sid'] || req.get('X-Auth-Method') === 'Google OAuth2') {
+		return next(); //If the user is logged in through Google OAuth2, skip the JWT check.
 	}
 
 	const authHeader: string | undefined = req.headers['authorization'];
@@ -59,9 +60,9 @@ export function isUserLoggedInThroughJWT(
 
 	try {
 		const payload: JwtPayload = verifyAccessToken(token);
-		req.user = payload; 
+		req.user = payload;
 		res.setHeader('X-Auth-Method', 'JWT');
-		console.log(`User is logged in through JWT.`);
+		console.log(`User ${payload.email} is logged in through JWT.`);
 		next();
 	} catch (err) {
 		return res.status(401).json({ message: 'Invalid or expired access token' });
