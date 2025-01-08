@@ -1,16 +1,89 @@
+import { AxiosResponse } from 'axios';
 import axiosInstance from './axios-instance';
+import {
+	LogoutResponse,
+	LoginResponse,
+	RegisterRequest,
+	LoginWithJWTRequest,
+} from '../types/authentication-types';
+import { addAccessTokenInterceptorToInstance } from '../utils/authentication-utilities';
 
 /**
  * This file contains the authentication services for the application.
  */
 
 /**
- * This function is used to login the user through the Google OAuth2 Strategy.
- * @param code - The code received from the Google OAuth2 Strategy.
- * @returns A promise that resolves to the user's data.
+ * Makes a request to the server to login the user through the Google OAuth2 Strategy.
  */
 
-export const loginWithGoogleOAuth2 = async () => {
-	const response = await axiosInstance.get('/auth/google');
-	return response.data;
+export const loginWithGoogleOAuth2 = async (): Promise<void> => {
+	try {
+		window.location.href = `${axiosInstance.defaults.baseURL}/auth/google`;
+	} catch (error) {
+		throw new Error('Failed to login with Google OAuth2');
+	}
+};
+
+/**
+ * Makes a request to the server to logout the user.
+ * @returns A promise that resolves to the logout response.
+ */
+
+export const logout = async (): Promise<LogoutResponse> => {
+	try {
+		const response: AxiosResponse = await axiosInstance.get('/auth/logout');
+		if (response.status === 200) {
+			const logoutResponse: LogoutResponse = response.data;
+			return logoutResponse;
+		} else {
+			throw new Error('Failed to logout');
+		}
+	} catch (error) {
+		throw new Error('Failed to logout');
+	}
+};
+
+/**
+ * Makes a request to the server to register a new user.
+ * @param registerRequest - The request to register a new user.
+ */
+
+export const register = async (
+	registerRequest: RegisterRequest,
+): Promise<void> => {
+	const response: AxiosResponse = await axiosInstance.post(
+		'/auth/register',
+		registerRequest,
+	);
+	if (
+		response.status === 200 &&
+		response.data.message === 'User created successfully.'
+	) {
+		window.location.href = '/login';
+	} else {
+		throw new Error(response.data.message);
+	}
+};
+
+/**
+ * Makes a request to the server to login through the JWT Strategy.
+ * @param loginRequest - The request to login.
+ * @returns A promise that resolves to the access token.
+ */
+
+export const login = async (
+	loginRequest: LoginWithJWTRequest,
+): Promise<string> => {
+	const response: AxiosResponse = await axiosInstance.post(
+		'/auth/login',
+		loginRequest,
+	);
+	if (response.status === 200) {
+		const loginResponse: LoginResponse = response.data;
+		const accessToken: string = loginResponse.accessToken;
+		await addAccessTokenInterceptorToInstance(axiosInstance, accessToken);
+		return accessToken;
+	} else {
+		throw new Error(response.data.message);
+	}
 };

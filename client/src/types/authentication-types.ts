@@ -43,3 +43,21 @@ export type User = {
 	name: string;
 	username: string;
 };
+
+/**
+ * This type represents the response from the server when logging out.
+ * @property message - The message from the server.
+ */
+
+export type LogoutResponse = {
+	message: string;
+};
+
+/**
+ * This type represents the response body for the login with JWT strategy.
+ * @property message - The message from the server.
+ */
+
+export type LoginResponse = {
+	accessToken: string;
+};
