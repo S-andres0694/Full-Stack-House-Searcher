@@ -59,7 +59,7 @@ export function isUserLoggedInThroughJWT(
 
 	try {
 		const payload: JwtPayload = verifyAccessToken(token);
-		req.user = payload; // Attach user data to the request object
+		req.user = payload; 
 		res.setHeader('X-Auth-Method', 'JWT');
 		console.log(`User is logged in through JWT.`);
 		next();

@@ -37,6 +37,9 @@ const authenticationRoutesFactory = (dbPath: string) => {
 	//Register Route
 	router.post('/register', authenticationJWTControllers.registerController);
 
+	//Refresh Token Route
+	router.post('/refresh-token', authenticationJWTControllers.refreshTokenController);
+
 	//Logout Route
 	router.get(
 		'/logout',

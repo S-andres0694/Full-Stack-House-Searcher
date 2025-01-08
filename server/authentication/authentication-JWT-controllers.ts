@@ -194,7 +194,7 @@ export class AuthenticationJWTControllers {
 
 		//If the refresh token is not present, return an error.
 		if (!refreshToken) {
-			return res.status(401).redirect('/auth/login');
+			return res.status(401).json({ message: 'Invalid or expired refresh token.' });
 		}
 
 		try {
@@ -207,14 +207,9 @@ export class AuthenticationJWTControllers {
 
 			console.log(`Token has been refreshed for ${userDetails.id}`);
 
-			//Attach the access token to the cookie of the user.
-			res.cookie('accessToken', accessToken, {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === 'production',
-			});
-
-			//Return a success message.
-			res.status(200).json({ message: 'Token refreshed successfully.' });
+			res
+				.status(200)
+				.json({ message: 'Token refreshed successfully.', accessToken });
 		} catch (error) {
 			res.clearCookie('refreshToken');
 			return res.redirect('/auth/login');
