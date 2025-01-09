@@ -6,7 +6,7 @@ import {
 	RegisterRequest,
 	LoginWithJWTRequest,
 } from '../types/authentication-types';
-import { addAccessTokenInterceptorToInstance } from '../utils/authentication-utilities';
+import { addAccessTokenInterceptorToInstance, addRefreshTokenInterceptorToInstance } from '../utils/authentication-utilities';
 
 /**
  * This file contains the authentication services for the application.
@@ -71,7 +71,7 @@ export const register = async (
  * @returns A promise that resolves to the access token.
  */
 
-export const login = async (
+export const loginThroughJWT = async (
 	loginRequest: LoginWithJWTRequest,
 ): Promise<string> => {
 	const response: AxiosResponse = await axiosInstance.post(
@@ -81,7 +81,9 @@ export const login = async (
 	if (response.status === 200) {
 		const loginResponse: LoginResponse = response.data;
 		const accessToken: string = loginResponse.accessToken;
+		//Once the user is logged in, add the interceptors to automatically attach the token and to make requests to refresh the token when necessary.
 		await addAccessTokenInterceptorToInstance(axiosInstance, accessToken);
+		await addRefreshTokenInterceptorToInstance(axiosInstance)
 		return accessToken;
 	} else {
 		throw new Error(response.data.message);
