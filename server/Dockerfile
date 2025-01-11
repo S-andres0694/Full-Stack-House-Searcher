@@ -10,7 +10,7 @@ RUN ls -la
 RUN echo 'All files have been copied. Downloading Linux Dependencies...'
 
 # Install Node.js and npm
-RUN apt-get update && apt-get install -y nodejs=20.* npm
+RUN apt-get update && apt-get install -y nodejs npm
 
 # Logging
 RUN echo 'Linux Dependencies installed. Installing project dependencies...'
