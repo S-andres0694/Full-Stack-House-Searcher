@@ -31,8 +31,20 @@ RUN ls -la
 
 RUN echo 'All files have been copied. Downloading Linux Dependencies...'
 
-# Install Node.js and npm
-RUN apt-get update && apt-get install -y nodejs npm
+# Update the package list and install dependencies
+RUN apt-get update -y && \
+    apt-get install -y \
+    curl \
+    gnupg2 \
+    lsb-release \
+    ca-certificates \
+    apt-transport-https
+
+# Add NodeSource APT repository for Node.js version 23.x (or another version)
+RUN curl -fsSL https://deb.nodesource.com/setup_23.x | bash -
+
+# Install Node.js
+RUN apt-get install -y nodejs
 
 # Logging
 RUN echo 'Linux Dependencies installed. Installing project dependencies...'
