@@ -1,7 +1,7 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { properties } from '../database/schema';
-import { NewProperty, Property } from './table-types';
+import { NewProperty, Property } from '../types/table-types';
 
 /**
  * Class representing a model for property operations in the database.

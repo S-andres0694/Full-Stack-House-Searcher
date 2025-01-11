@@ -5,7 +5,7 @@ import {
 	LoginRequestBody,
 	RegisterRequestBody,
 	User,
-} from '../models/table-types';
+} from '../types/table-types';
 import usersModelFactory, { UsersModel } from '../models/users';
 import { dbProductionOptions } from '../database/init-db';
 import connectionGenerator from '../database/init-db';

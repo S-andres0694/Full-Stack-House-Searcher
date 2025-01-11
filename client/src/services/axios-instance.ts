@@ -1,13 +1,11 @@
-import axios, {
-	AxiosInstance,
-} from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 /**
  * Axios instance for making requests to the server
  */
 
 const instance: AxiosInstance = axios.create({
-	baseURL: 'http://localhost:3000',
+	baseURL: process.env.SERVER_URL,
 	headers: {
 		'Content-Type': 'application/json',
 	},

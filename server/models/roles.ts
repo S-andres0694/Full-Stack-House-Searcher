@@ -1,6 +1,6 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { roles } from '../database/schema';
-import { Role } from './table-types';
+import { Role } from '../types/table-types';
 import { eq } from 'drizzle-orm';
 
 /**

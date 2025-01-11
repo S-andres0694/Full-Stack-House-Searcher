@@ -21,7 +21,7 @@ import {
 	NewProperty,
 	Property,
 	RightmoveProperty,
-} from '../../models/table-types';
+} from '../../types/table-types';
 import { property } from '../../tests/constants';
 import authenticationRoutesFactory from '../../routes/authentication-routes';
 import { passportObj } from '../../authentication/google-auth.config';
@@ -212,9 +212,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getPropertyById endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/${insertedPropertyID}`,
 		);
@@ -236,9 +235,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests the getPropertyByIdentifier endpoint', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/by-identifier/1234567890`,
 		);
@@ -265,9 +263,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getBedrooms endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/bedrooms/${insertedPropertyID}`,
 		);
@@ -289,9 +286,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getMonthlyRent endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/monthly-rent/${insertedPropertyID}`,
 		);
@@ -317,9 +313,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getAddress endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/address/${insertedPropertyID}`,
 		);
@@ -341,9 +336,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getSummary endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/summary/${insertedPropertyID}`,
 		);
@@ -365,9 +359,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getUrl endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/url/${insertedPropertyID}`,
 		);
@@ -391,9 +384,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getContactPhone endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/contact-phone/${insertedPropertyID}`,
 		);
@@ -419,9 +411,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getIdentifier endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).get(
 			`/properties/identifier/${insertedPropertyID}`,
 		);
@@ -447,9 +438,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the updateProperty endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app)
 			.put(`/properties/${insertedPropertyID}`)
 			.send({
@@ -476,9 +466,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the updateProperty endpoint returns a 400 error if the request body is missing required fields', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).put(
 			`/properties/${insertedPropertyID}`,
 		);
@@ -487,9 +476,8 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the deleteProperty endpoint works', async () => {
-		const insertedPropertyID: number = await propertiesModel.createProperty(
-			testProperty,
-		);
+		const insertedPropertyID: number =
+			await propertiesModel.createProperty(testProperty);
 		const response = await request(app).delete(
 			`/properties/${insertedPropertyID}`,
 		);

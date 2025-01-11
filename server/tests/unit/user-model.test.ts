@@ -1,5 +1,5 @@
 import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
-import { NewUser } from '../../models/table-types';
+import { NewUser } from '../../types/table-types';
 import usersModelFactory, { UsersModel } from '../../models/users';
 import connectionGenerator, {
 	dbTestOptions,
@@ -185,9 +185,8 @@ describe('Users Model Unit Tests', () => {
 	//Test 21
 	it('tests that it returns the correct error message when trying to add a user with the same username', async () => {
 		//Try to create a user with the same username
-		const validationResult = await usersModel.validateUniqueUsernameAndEmail(
-			user,
-		);
+		const validationResult =
+			await usersModel.validateUniqueUsernameAndEmail(user);
 		expect(validationResult).toBe('Username already exists');
 	});
 
@@ -201,9 +200,8 @@ describe('Users Model Unit Tests', () => {
 			role: 'user',
 			name: 'testuser3',
 		};
-		const validationResult = await usersModel.validateUniqueUsernameAndEmail(
-			userWithSameEmail,
-		);
+		const validationResult =
+			await usersModel.validateUniqueUsernameAndEmail(userWithSameEmail);
 		expect(validationResult).toBe('Email already exists');
 	});
 
@@ -218,9 +216,8 @@ describe('Users Model Unit Tests', () => {
 			name: 'testuser3',
 		};
 		//Try to create a user with unique username and email
-		const validationResult = await usersModel.validateUniqueUsernameAndEmail(
-			userWithUniqueEmail,
-		);
+		const validationResult =
+			await usersModel.validateUniqueUsernameAndEmail(userWithUniqueEmail);
 		expect(validationResult).toBe(true);
 	});
 

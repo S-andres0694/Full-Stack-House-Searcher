@@ -8,7 +8,7 @@ import * as schema from './schema';
 import rolesModelFactory from '../models/roles';
 import usersModelFactory from '../models/users';
 import { RolesModel } from '../models/roles';
-import { User } from '../models/table-types';
+import { User } from '../types/table-types';
 
 export const databasePath: string = __dirname + '/database.sqlite';
 

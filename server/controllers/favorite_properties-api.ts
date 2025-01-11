@@ -5,7 +5,7 @@ import { FavoritePropertiesModel } from '../models/favorite_properties';
 import favoritePropertiesModelFactory from '../models/favorite_properties';
 import usersModelFactory, { UsersModel } from '../models/users';
 import propertiesModelFactory, { PropertiesModel } from '../models/properties';
-import { Favorite, NewFavorite, User } from '../models/table-types';
+import { Favorite, NewFavorite, User } from '../types/table-types';
 /**
  * Test API to make sure that the endpoint is working.
  * @param {Request} request - The request object

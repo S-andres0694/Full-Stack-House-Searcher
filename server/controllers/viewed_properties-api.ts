@@ -5,10 +5,10 @@ import viewedPropertiesModelFactory, {
 } from '../models/viewed_properties';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { NewViewedProperty, Property, User } from '../models/table-types';
+import { NewViewedProperty, Property, User } from '../types/table-types';
 import usersModelFactory from '../models/users';
 import { UsersModel } from '../models/users';
-import { ViewedProperty } from '../models/table-types';
+import { ViewedProperty } from '../types/table-types';
 import propertiesModelFactory, { PropertiesModel } from '../models/properties';
 import { properties } from '../database/schema';
 import { UserTokenPayload } from '../authentication/token-manipulator';
@@ -69,8 +69,8 @@ export class ViewedPropertiesApi {
 			}
 
 			if (
-				(request.user as UserTokenPayload).role !== 'admin' &&
-				parseInt((request.user as UserTokenPayload).id) !== userID
+				(request.user as User).role !== 'admin' &&
+				(request.user as User).id !== userID
 			) {
 				response.status(403).json({ error: 'Unauthorized' });
 				return;

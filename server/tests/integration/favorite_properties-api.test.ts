@@ -25,7 +25,7 @@ import morgan from 'morgan';
 import favoritePropertiesRoutesFactory from '../../routes/favorite_properties-routes';
 import { property, property2, user } from '../constants';
 import { Response } from 'supertest';
-import { Favorite } from '../../models/table-types';
+import { Favorite } from '../../types/table-types';
 import authenticationRoutesFactory from '../../routes/authentication-routes';
 import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
 import { isUserLoggedInThroughGoogle } from '../../middleware/auth-middleware';

@@ -22,7 +22,7 @@ import morgan from 'morgan';
 import request from 'supertest';
 import { user, property, property2 } from '../constants';
 import { Response as SupertestResponse } from 'supertest';
-import { ViewedProperty } from '../../models/table-types';
+import { ViewedProperty } from '../../types/table-types';
 import authenticationRoutesFactory from '../../routes/authentication-routes';
 import { passportObj } from '../../authentication/google-auth.config';
 import cookieParser from 'cookie-parser';

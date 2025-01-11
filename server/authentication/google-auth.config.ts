@@ -4,7 +4,7 @@ import {
 	VerifyCallback,
 } from 'passport-google-oauth2';
 import { UsersModel } from '../models/users';
-import { User } from '../models/table-types';
+import { User } from '../types/table-types';
 import { Request } from 'express';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import connectionGenerator, {

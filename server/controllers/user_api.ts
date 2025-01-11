@@ -4,7 +4,7 @@ import connectionGenerator from '../database/init-db';
 import usersModelFactory, { UsersModel } from '../models/users';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
-import { User, NewUser } from '../models/table-types';
+import { User, NewUser, userInfoAdminDashboard } from '../types/table-types';
 import { Request, response, Response } from 'express';
 import rolesModelFactory, { RolesModel } from '../models/roles';
 
@@ -67,9 +67,8 @@ export class UserApi {
 	): Promise<void> => {
 		try {
 			const email: string = request.params.email;
-			const user: User | undefined = await this.usersModel.getUserByEmail(
-				email,
-			);
+			const user: User | undefined =
+				await this.usersModel.getUserByEmail(email);
 			if (!user) {
 				response.status(404).json({ error: 'User not found' });
 				return;
@@ -88,7 +87,8 @@ export class UserApi {
 
 	getAllUsers = async (request: Request, response: Response): Promise<void> => {
 		try {
-			const users: User[] = await this.usersModel.getAllUsers();
+			const users: userInfoAdminDashboard[] =
+				await this.usersModel.getAllUsers();
 			if (users.length === 0) {
 				response.status(404).json({ error: 'No users found' });
 				return;
@@ -349,8 +349,11 @@ export class UserApi {
 	 * @param {Response} response - The response object to send the user data
 	 */
 
-	getUserFromGoogleOAuth2 = async (request: Request, response: Response): Promise<void> => {
-		if(!request.user) {
+	getUserFromGoogleOAuth2 = async (
+		request: Request,
+		response: Response,
+	): Promise<void> => {
+		if (!request.user) {
 			response.status(403).json({ error: 'Unauthorized' });
 			return;
 		}
@@ -373,7 +376,7 @@ export class UserApi {
 				role: user.role,
 			},
 		});
-	}
+	};
 }
 
 export default function userApiFactory(db: Database): UserApi {

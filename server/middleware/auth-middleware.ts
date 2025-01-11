@@ -1,6 +1,6 @@
 import { NextFunction } from 'express';
 import { Request, Response } from 'express';
-import { User } from '../models/table-types';
+import { User } from '../types/table-types';
 import {
 	parseAccessToken,
 	UserTokenPayload,
@@ -47,7 +47,10 @@ export function isUserLoggedInThroughJWT(
 	res: Response,
 	next: NextFunction,
 ) {
-	if (req.cookies['connect.sid'] || req.get('X-Auth-Method') === 'Google OAuth2') {
+	if (
+		req.cookies['connect.sid'] ||
+		req.get('X-Auth-Method') === 'Google OAuth2'
+	) {
 		return next(); //If the user is logged in through Google OAuth2, skip the JWT check.
 	}
 

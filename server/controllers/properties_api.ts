@@ -8,7 +8,7 @@ import {
 	Property,
 	RightmoveProperty,
 	RightmoveRequestBody,
-} from '../models/table-types';
+} from '../types/table-types';
 import axios, { AxiosResponse } from 'axios';
 import { properties } from '../database/schema';
 
@@ -320,9 +320,8 @@ export class PropertiesApi {
 				return;
 			}
 
-			const address: string | undefined = await this.propertiesModel.getAddress(
-				id,
-			);
+			const address: string | undefined =
+				await this.propertiesModel.getAddress(id);
 
 			if (!address) {
 				response.status(404).json({ error: 'Property not found' });
@@ -382,9 +381,8 @@ export class PropertiesApi {
 				return;
 			}
 
-			const summary: string | undefined = await this.propertiesModel.getSummary(
-				id,
-			);
+			const summary: string | undefined =
+				await this.propertiesModel.getSummary(id);
 
 			if (!summary) {
 				response.status(404).json({ error: 'Property not found' });

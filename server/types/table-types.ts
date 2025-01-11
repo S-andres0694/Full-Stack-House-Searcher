@@ -30,6 +30,14 @@ export type NewFavorite = typeof favorites.$inferInsert;
 export type ViewedProperty = typeof viewedProperties.$inferSelect;
 export type NewViewedProperty = typeof viewedProperties.$inferInsert;
 
+export type userInfoAdminDashboard = {
+	role: string;
+	username: string;
+	email: string;
+	createdAt: Date;
+	id: number;
+};
+
 export type RightmoveRequestBody = {
 	identifier: string;
 	sort: string;

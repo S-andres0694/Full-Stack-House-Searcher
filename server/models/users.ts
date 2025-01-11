@@ -11,7 +11,13 @@ import {
 	usedInvitationTokens,
 	users,
 } from '../database/schema';
-import { InvitationToken, NewUser, Role, User } from './table-types';
+import {
+	InvitationToken,
+	NewUser,
+	Role,
+	User,
+	userInfoAdminDashboard,
+} from '../types/table-types';
 import { hash } from 'bcrypt';
 
 /**
@@ -113,9 +119,17 @@ export class UsersModel {
 	 * Retrieves all users from the database.
 	 * @returns {Promise<User[]>} Array of all user objects
 	 */
-	async getAllUsers(): Promise<User[]> {
+	async getAllUsers(): Promise<userInfoAdminDashboard[]> {
 		//Select all users from the database.
-		const userRecords: User[] = await this.db.select().from(users);
+		const userRecords: userInfoAdminDashboard[] = await this.db
+			.select({
+				id: users.id,
+				role: users.role,
+				username: users.username,
+				email: users.email,
+				createdAt: users.createdAt,
+			})
+			.from(users);
 		return userRecords;
 	}
 

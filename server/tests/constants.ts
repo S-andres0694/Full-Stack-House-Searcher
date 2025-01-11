@@ -1,4 +1,4 @@
-import { NewProperty, NewUser } from '../models/table-types';
+import { NewProperty, NewUser } from '../types/table-types';
 
 export const property: NewProperty = {
 	url: 'https://www.example.com',

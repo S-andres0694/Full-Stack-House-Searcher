@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { invitationTokens, usedInvitationTokens } from '../database/schema';
-import { InvitationToken, UsedInvitationToken } from './table-types';
+import { InvitationToken, UsedInvitationToken } from '../types/table-types';
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 
 export class InvitationTokenModel {

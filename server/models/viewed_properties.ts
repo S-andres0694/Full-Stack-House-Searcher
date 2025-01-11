@@ -1,6 +1,10 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { viewedProperties } from '../database/schema';
-import { NewViewedProperty, Property, ViewedProperty } from './table-types';
+import {
+	NewViewedProperty,
+	Property,
+	ViewedProperty,
+} from '../types/table-types';
 import { eq, sql, desc, and } from 'drizzle-orm';
 import { users, properties } from '../database/schema';
 /**

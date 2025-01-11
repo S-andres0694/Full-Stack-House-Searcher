@@ -15,7 +15,7 @@ import usersModelFactory, { UsersModel } from '../../models/users';
 import { testDbPath } from '../jest.setup';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { property, property2, user, user2 } from '../constants';
-import { ViewedProperty } from '../../models/table-types';
+import { ViewedProperty } from '../../types/table-types';
 
 let usersModel: UsersModel;
 let propertiesModel: PropertiesModel;
@@ -101,9 +101,8 @@ describe('Viewed Properties Model Unit Tests', () => {
 
 	it('should be able to get the count of viewed properties for a user', async () => {
 		await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
-		const count: number = await viewedPropertiesModel.getViewedPropertiesCount(
-			userId,
-		);
+		const count: number =
+			await viewedPropertiesModel.getViewedPropertiesCount(userId);
 		expect(count).toBe(1);
 	});
 

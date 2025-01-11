@@ -6,7 +6,10 @@ import {
 	RegisterRequest,
 	LoginWithJWTRequest,
 } from '../types/authentication-types';
-import { addAccessTokenInterceptorToInstance, addRefreshTokenInterceptorToInstance } from '../utils/authentication-utilities';
+import {
+	addAccessTokenInterceptorToInstance,
+	addRefreshTokenInterceptorToInstance,
+} from '../utils/authentication-utilities';
 
 /**
  * This file contains the authentication services for the application.
@@ -83,7 +86,7 @@ export const loginThroughJWT = async (
 		const accessToken: string = loginResponse.accessToken;
 		//Once the user is logged in, add the interceptors to automatically attach the token and to make requests to refresh the token when necessary.
 		await addAccessTokenInterceptorToInstance(axiosInstance, accessToken);
-		await addRefreshTokenInterceptorToInstance(axiosInstance)
+		await addRefreshTokenInterceptorToInstance(axiosInstance);
 		return accessToken;
 	} else {
 		throw new Error(response.data.message);

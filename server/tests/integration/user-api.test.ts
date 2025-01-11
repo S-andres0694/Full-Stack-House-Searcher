@@ -17,7 +17,7 @@ import {
 	user2,
 	userSameEmailAsUser,
 } from '../constants';
-import { User } from '../../models/table-types';
+import { User, userInfoAdminDashboard } from '../../types/table-types';
 import { Server } from 'http';
 import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import usersModelFactory from '../../models/users';
@@ -197,7 +197,7 @@ describe('User API Testing', () => {
 		const userId: number = (await userModel.getUserId(user.username))!;
 		const response = await request(app).delete(`/users/${userId}`);
 		expect(response.status).toBe(204);
-		const users: User[] = await userModel.getAllUsers();
+		const users: userInfoAdminDashboard[] = await userModel.getAllUsers();
 		expect(users).toHaveLength(1); //Accounts for the admin user
 	});
 

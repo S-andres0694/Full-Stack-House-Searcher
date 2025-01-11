@@ -16,10 +16,10 @@ import usersModelFactory, { UsersModel } from '../../models/users';
 import morgan from 'morgan';
 import authenticationRoutesFactory from '../../routes/authentication-routes';
 import { user, independentUser } from '../../tests/constants';
-import { InvitationToken, RegisterRequestBody } from '../../models/table-types';
+import { InvitationToken, RegisterRequestBody } from '../../types/table-types';
 import { invitationTokens } from '../../database/schema';
 import { eq } from 'drizzle-orm';
-import { User } from '../../models/table-types';
+import { User } from '../../types/table-types';
 
 let app: Application;
 let dbConnection: Database;

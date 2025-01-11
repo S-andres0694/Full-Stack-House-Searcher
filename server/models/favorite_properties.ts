@@ -1,6 +1,6 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { favorites } from '../database/schema';
-import { Favorite, NewFavorite } from './table-types';
+import { Favorite, NewFavorite } from '../types/table-types';
 import { and, eq, sql } from 'drizzle-orm';
 
 /**
