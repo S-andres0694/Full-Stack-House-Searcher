@@ -60,6 +60,7 @@ jobs:
           heroku_app_name: "backend-house-searcher" #Must be unique in Heroku
           heroku_email: "sebasandres0694@gmail.com"
           procfile: "web: npm run start"
+          branch: "main"
         env:
             HD_API_KEY: ${{ secrets.API_KEY }}
             HD_ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
