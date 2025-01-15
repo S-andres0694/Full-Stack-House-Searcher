@@ -31,7 +31,7 @@ passportObj.use(
 		{
 			clientID: GOOGLE_CLIENT_ID,
 			clientSecret: GOOGLE_CLIENT_SECRET,
-			callbackURL: 'http://localhost:3000/auth/google/callback', //TODO: Change to the URL to actually initialize the password to enable JWT authentication.
+			callbackURL: 'google/callback', //TODO: Change to the URL to actually initialize the password to enable JWT authentication.
 			passReqToCallback: true,
 		},
 		async (
