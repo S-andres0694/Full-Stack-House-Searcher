@@ -1,13 +1,14 @@
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { favorites } from '../database/schema';
 import { Favorite, NewFavorite } from '../types/table-types';
 import { and, eq, sql } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 
 /**
  * Class representing a model for favorite properties operations in the database.
  */
 export class FavoritePropertiesModel {
-	constructor(private db: BetterSQLite3Database) {}
+	constructor(private db: NodePgDatabase<typeof schema>) {}
 
 	/**
 	 * Retrieves all favorite properties for a specific user from the database.
@@ -27,7 +28,7 @@ export class FavoritePropertiesModel {
 	 */
 	async addFavoriteProperty(favorite: NewFavorite): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.insert(favorites).values(favorite);
 			});
 		} catch (error) {
@@ -46,7 +47,7 @@ export class FavoritePropertiesModel {
 		userID: number,
 	): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.delete(favorites)
 					.where(
@@ -68,7 +69,7 @@ export class FavoritePropertiesModel {
 	 */
 	async clearFavoriteProperties(userId: number): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.delete(favorites).where(eq(favorites.userId, userId));
 			});
 		} catch (error) {
@@ -81,17 +82,17 @@ export class FavoritePropertiesModel {
 	 * @param {number} userId - The ID of the user whose favorite properties count to retrieve
 	 * @returns {Promise<number>} The count of favorite properties for the user
 	 */
-	async getFavoritePropertiesCount(userId: number): Promise<number> {
-		const [count] = await this.db
+	async getFavoritePropertiesCount(userId: number): Promise<string> {
+		const count: { count: number }[] = await this.db
 			.select({ count: sql<number>`count(${favorites.id})` })
 			.from(favorites)
 			.where(eq(favorites.userId, userId));
-		return count.count;
+		return count[0].count.toString();
 	}
 }
 
 export default function favoritePropertiesModelFactory(
-	db: BetterSQLite3Database,
+	db: NodePgDatabase<typeof schema>,
 ): FavoritePropertiesModel {
 	return new FavoritePropertiesModel(db);
 }

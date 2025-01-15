@@ -1,17 +1,15 @@
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { viewedProperties } from '../database/schema';
-import {
-	NewViewedProperty,
-	Property,
-	ViewedProperty,
-} from '../types/table-types';
+import { NewViewedProperty, ViewedProperty } from '../types/table-types';
 import { eq, sql, desc, and } from 'drizzle-orm';
 import { users, properties } from '../database/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
+
 /**
  * Class representing a model for viewed properties operations in the database.
  */
 export class ViewedPropertiesModel {
-	constructor(private db: BetterSQLite3Database) {}
+	constructor(private db: NodePgDatabase<typeof schema>) {}
 
 	/**
 	 * Retrieves all viewed properties for a specific user from the database.
@@ -35,7 +33,7 @@ export class ViewedPropertiesModel {
 	 */
 	async addPropertyAsViewed(viewedProperty: NewViewedProperty): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.insert(viewedProperties).values(viewedProperty);
 			});
 		} catch (error) {
@@ -50,7 +48,7 @@ export class ViewedPropertiesModel {
 	 */
 	async deleteViewedProperty(viewedProperty: NewViewedProperty): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.delete(viewedProperties)
 					.where(
@@ -72,7 +70,7 @@ export class ViewedPropertiesModel {
 	 */
 	async clearViewedProperties(userId: number): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.delete(viewedProperties)
 					.where(eq(viewedProperties.userId, userId));
@@ -87,12 +85,12 @@ export class ViewedPropertiesModel {
 	 * @param {number} userId - The ID of the user whose viewed properties count to retrieve
 	 * @returns {Promise<number>} The count of viewed properties for the user
 	 */
-	async getViewedPropertiesCount(userId: number): Promise<number> {
-		const [count] = await this.db
+	async getViewedPropertiesCount(userId: number): Promise<string> {
+		const count: { count: number }[] = await this.db
 			.select({ count: sql<number>`count(${viewedProperties.id})` })
 			.from(viewedProperties)
 			.where(eq(viewedProperties.userId, userId));
-		return count.count;
+		return count[0].count.toString();
 	}
 
 	/**
@@ -159,7 +157,7 @@ export class ViewedPropertiesModel {
 }
 
 export default function viewedPropertiesModelFactory(
-	db: BetterSQLite3Database,
+	db: NodePgDatabase<typeof schema>,
 ): ViewedPropertiesModel {
 	return new ViewedPropertiesModel(db);
 }

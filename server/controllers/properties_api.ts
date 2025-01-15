@@ -10,7 +10,8 @@ import {
 	RightmoveRequestBody,
 } from '../types/table-types';
 import axios, { AxiosResponse } from 'axios';
-import { properties } from '../database/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 
 /**
  * Test API to make sure that the endpoint is working.
@@ -30,8 +31,6 @@ export const testApi = async (
  */
 
 export class PropertiesApi {
-	//Database Connection Instance
-	private drizzle: BetterSQLite3Database;
 	//Properties Model Instance
 	private propertiesModel: PropertiesModel;
 	//API Key to make calls to the Rightmove API
@@ -39,9 +38,8 @@ export class PropertiesApi {
 	//API Host to make calls to the Rightmove API
 	private apiHost: string;
 
-	constructor(private db: Database) {
-		this.drizzle = drizzle(db);
-		this.propertiesModel = propertiesModelFactory(this.drizzle);
+	constructor(private db: NodePgDatabase<typeof schema>) {
+		this.propertiesModel = propertiesModelFactory(this.db);
 		this.apiKey = process.env.API_KEY || '';
 		this.apiHost = process.env.API_HOST || '';
 	}
@@ -320,8 +318,9 @@ export class PropertiesApi {
 				return;
 			}
 
-			const address: string | undefined =
-				await this.propertiesModel.getAddress(id);
+			const address: string | undefined = await this.propertiesModel.getAddress(
+				id,
+			);
 
 			if (!address) {
 				response.status(404).json({ error: 'Property not found' });
@@ -381,8 +380,9 @@ export class PropertiesApi {
 				return;
 			}
 
-			const summary: string | undefined =
-				await this.propertiesModel.getSummary(id);
+			const summary: string | undefined = await this.propertiesModel.getSummary(
+				id,
+			);
 
 			if (!summary) {
 				response.status(404).json({ error: 'Property not found' });
@@ -391,6 +391,7 @@ export class PropertiesApi {
 
 			response.status(200).json({ summary: summary });
 		} catch (error) {
+			console.error(`Error retrieving summary: ${error}`);
 			response.status(500).json({ error: 'Error retrieving summary' });
 			return;
 		}
@@ -588,6 +589,8 @@ export class PropertiesApi {
  * @returns {PropertiesApi} The PropertiesApi instance
  */
 
-export default function propertiesApiFactory(db: Database): PropertiesApi {
+export default function propertiesApiFactory(
+	db: NodePgDatabase<typeof schema>,
+): PropertiesApi {
 	return new PropertiesApi(db);
 }

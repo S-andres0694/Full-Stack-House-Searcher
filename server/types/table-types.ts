@@ -1,9 +1,3 @@
-import { dbTestOptions } from '../database/init-db';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { Database } from 'better-sqlite3';
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { databasePath, dbProductionOptions } from '../database/init-db';
-import connectionGenerator from '../database/init-db';
 import {
 	roles,
 	properties,

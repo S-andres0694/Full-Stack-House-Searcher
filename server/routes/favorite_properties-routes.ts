@@ -1,22 +1,22 @@
 import { FavoritePropertiesApi } from '../controllers/favorite_properties-api';
-
-import { dbProductionOptions } from '../database/init-db';
 import favoritePropertiesApiFactory from '../controllers/favorite_properties-api';
 import { Database } from 'better-sqlite3';
 import { Router } from 'express';
 import { testApi } from '../controllers/favorite_properties-api';
-import connectionGenerator from '../database/init-db';
 import {
 	isUserLoggedInThroughGoogle,
 	isUserLoggedInThroughJWT,
 	requiresRoleOf,
 } from '../middleware/auth-middleware';
+import { PoolConfig } from 'pg';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import connectionGenerator from '../database/init-db.v2';
+import * as schema from '../database/schema';
 
 export default function favoritePropertiesRoutesFactory(
-	dbPath: string,
+	db: NodePgDatabase<typeof schema>,
 ): Router {
 	const router: Router = Router();
-	const db: Database = connectionGenerator(dbPath, dbProductionOptions);
 	const favoritePropertiesApi: FavoritePropertiesApi =
 		favoritePropertiesApiFactory(db);
 

@@ -6,13 +6,13 @@ import {
 import { UsersModel } from '../models/users';
 import { User } from '../types/table-types';
 import { Request } from 'express';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import connectionGenerator, {
-	databasePath,
-	dbProductionOptions,
-} from '../database/init-db';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 import { generateFromEmail } from 'unique-username-generator';
 import bcrypt from 'bcrypt';
+import connectionGenerator from '../database/init-db.v2';
+import { databaseConfiguration } from '../database/init-db.v2';
+
 //Google Client ID and Client Secret to enable the OAuth2 authentication strategy.
 const GOOGLE_CLIENT_ID: string = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET: string = process.env.GOOGLE_CLIENT_SECRET || '';
@@ -22,7 +22,7 @@ export const passportObj: passport.PassportStatic = passport;
 
 //The users model to use for the authentication strategy.
 const usersModel: UsersModel = new UsersModel(
-	drizzle(connectionGenerator(databasePath, dbProductionOptions)),
+	connectionGenerator(databaseConfiguration),
 );
 
 //Sets up the Google authentication strategy through the Passport.js library.

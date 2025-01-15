@@ -1,15 +1,16 @@
 import { Router } from 'express';
 import userApiFactory, { testApi, UserApi } from '../controllers/user_api';
-import { Database } from 'better-sqlite3';
-import connectionGenerator, { dbProductionOptions } from '../database/init-db';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 import {
 	isUserLoggedInThroughGoogle,
 	isUserLoggedInThroughJWT,
 	requiresRoleOf,
 } from '../middleware/auth-middleware';
 
-export default function userRoutesFactory(dbPath: string): Router {
-	const db: Database = connectionGenerator(dbPath, dbProductionOptions);
+export default function userRoutesFactory(
+	db: NodePgDatabase<typeof schema>,
+): Router {
 	const router: Router = Router();
 	const userApi: UserApi = userApiFactory(db);
 
@@ -132,4 +133,3 @@ export default function userRoutesFactory(dbPath: string): Router {
 
 	return router;
 }
-

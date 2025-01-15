@@ -1,22 +1,22 @@
 import { Router } from 'express';
 import { passportObj } from '../authentication/google-auth.config';
 import { AuthenticationJWTControllers } from '../authentication/authentication-JWT-controllers';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { dbProductionOptions } from '../database/init-db';
-import connectionGenerator from '../database/init-db';
+import connectionGenerator from '../database/init-db.v2';
 import {
 	isUserLoggedInThroughGoogle,
 	isUserLoggedInThroughJWT,
 	requiresRoleOf,
 } from '../middleware/auth-middleware';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 
-const authenticationRoutesFactory = (dbPath: string) => {
+const authenticationRoutesFactory = (
+	db: NodePgDatabase<typeof schema>,
+): Router => {
 	const router: Router = Router();
 	const authenticationJWTControllers: AuthenticationJWTControllers =
-		new AuthenticationJWTControllers(
-			drizzle(connectionGenerator(dbPath, dbProductionOptions)),
-		);
-	
+		new AuthenticationJWTControllers(db);
+
 	//Google Authentication Callback Route
 	router.get(
 		'/google',
@@ -39,7 +39,10 @@ const authenticationRoutesFactory = (dbPath: string) => {
 	router.post('/register', authenticationJWTControllers.registerController);
 
 	//Refresh Token Route
-	router.post('/refresh-token', authenticationJWTControllers.refreshTokenController);
+	router.post(
+		'/refresh-token',
+		authenticationJWTControllers.refreshTokenController,
+	);
 
 	//Logout Route
 	router.get(

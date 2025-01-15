@@ -1,33 +1,24 @@
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import rolesModelFactory, { RolesModel } from '../../models/roles';
 import connectionGenerator, {
-	dbTestOptions,
 	initialValues,
 	resetDatabase,
-} from '../../database/init-db';
-import { Database } from 'better-sqlite3';
-import { testDbPath } from '../jest.setup';
+	testDatabaseConfiguration,
+} from '../../database/init-db.v2';
+import * as schema from '../../database/schema';
+import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 let rolesModel: RolesModel;
-let drizzleORM: BetterSQLite3Database;
-let db: Database;
+let db: NodePgDatabase<typeof schema>;
 
 beforeAll(() => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	drizzleORM = drizzle(db);
-	rolesModel = rolesModelFactory(drizzleORM);
+	db = connectionGenerator(testDatabaseConfiguration);
+	rolesModel = rolesModelFactory(db);
 });
 
 beforeEach(async () => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	await resetDatabase(db, dbTestOptions);
+	db = connectionGenerator(testDatabaseConfiguration);
+	await resetDatabase(db);
 	await initialValues(db);
-});
-
-afterAll(() => {
-	if (db) {
-		db.close();
-	}
 });
 
 describe('Roles Model Unit Tests', () => {

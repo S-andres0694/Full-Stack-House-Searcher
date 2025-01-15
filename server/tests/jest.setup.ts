@@ -1,34 +1,30 @@
 import { existsSync, unlinkSync } from 'fs';
 import connectionGenerator, {
 	databaseCreator,
-	dbTestOptions,
 	initialValues,
 	resetDatabase,
 	runMigrations,
-} from '../database/init-db';
+	testDatabaseConfiguration,
+} from '../database/init-db.v2';
 import { beforeAll, afterAll } from '@jest/globals';
-import { Database } from 'better-sqlite3';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 
-//Test database Path
-export const testDbPath: string = __dirname + '/unit/test-database.sqlite';
+//Create a connection to the test database
+const connection: NodePgDatabase<typeof schema> = connectionGenerator(
+	testDatabaseConfiguration,
+);
 
 beforeAll(async () => {
-	if (existsSync(testDbPath)) {
-		unlinkSync(testDbPath);
-	}
-	//Create the test database
-	await databaseCreator(testDbPath, dbTestOptions);
-	//Create a connection to the test database
-	const connection: Database = connectionGenerator(testDbPath, dbTestOptions);
+	await resetDatabase(connection);
 	//Run the migrations
-	runMigrations(drizzle(connection), __dirname + '/../database/migrations');
+	runMigrations(connection, __dirname + '/../database/migrations');
 	//Populate the database with initial values
 	await initialValues(connection);
 });
 
-afterAll(() => {
-	if (existsSync(testDbPath)) {
-		unlinkSync(testDbPath);
-	}
+afterAll(async () => {
+	await resetDatabase(connection);
+	//Run the migrations
+	runMigrations(connection, __dirname + '/../database/migrations');
 });

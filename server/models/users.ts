@@ -1,24 +1,9 @@
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
-import { integer, sqliteTable, text, unique } from 'drizzle-orm/sqlite-core';
 import { eq } from 'drizzle-orm';
-import connectionGenerator, {
-	databasePath,
-	dbProductionOptions,
-} from '../database/init-db';
-import {
-	invitationTokens,
-	roles,
-	usedInvitationTokens,
-	users,
-} from '../database/schema';
-import {
-	InvitationToken,
-	NewUser,
-	Role,
-	User,
-	userInfoAdminDashboard,
-} from '../types/table-types';
+import { NewUser, User, userInfoAdminDashboard } from '../types/table-types';
 import { hash } from 'bcrypt';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
+import { users } from '../database/schema';
 
 /**
  * Class representing a model for user operations in the database.
@@ -26,9 +11,9 @@ import { hash } from 'bcrypt';
 export class UsersModel {
 	/**
 	 * Creates an instance of UsersModel.
-	 * @param {BetterSQLite3Database} db - The database connection instance
+	 * @param {NodePgDatabase<typeof schema>} db - The database connection instance
 	 */
-	constructor(private db: BetterSQLite3Database) {}
+	constructor(private db: NodePgDatabase<typeof schema>) {}
 
 	/**
 	 * Creates a new user in the database.
@@ -42,7 +27,7 @@ export class UsersModel {
 			user.password = await hash(user.password, 10);
 			//Insert the user into the database and return the id of the user.
 			try {
-				this.db.transaction(async (tx: BetterSQLite3Database) => {
+				await this.db.transaction(async (tx) => {
 					await tx.insert(users).values(user);
 				});
 			} catch (error) {
@@ -107,6 +92,10 @@ export class UsersModel {
 	 * @returns {Promise<User | undefined>} The user object if found, undefined otherwise
 	 */
 	async getUserById(id: number): Promise<User | undefined> {
+		if (isNaN(id)) {
+			return undefined;
+		}
+
 		//Select the user from the database.
 		const [userRecord]: User[] = await this.db
 			.select()
@@ -147,7 +136,7 @@ export class UsersModel {
 			if (await this.getUserByUsername(newUsername)) {
 				return false;
 			}
-			this.db.transaction(async (tx: BetterSQLite3Database) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.update(users)
 					.set({ username: newUsername })
@@ -173,7 +162,7 @@ export class UsersModel {
 			if (await this.getUserByEmail(newEmail)) {
 				return false;
 			}
-			this.db.transaction(async (tx: BetterSQLite3Database) => {
+			await this.db.transaction(async (tx) => {
 				await tx.update(users).set({ email: newEmail }).where(eq(users.id, id));
 			});
 			return true;
@@ -200,7 +189,7 @@ export class UsersModel {
 			//Hash the password.
 			newPassword = await hash(newPassword, 10);
 			//Update the user's password in the database.
-			this.db.transaction(async (tx: BetterSQLite3Database) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.update(users)
 					.set({ password: newPassword })
@@ -222,7 +211,7 @@ export class UsersModel {
 			if (!(await this.getUserById(id))) {
 				return false;
 			}
-			this.db.transaction(async (tx: BetterSQLite3Database) => {
+			await this.db.transaction(async (tx) => {
 				await tx.delete(users).where(eq(users.id, id));
 			});
 
@@ -299,11 +288,11 @@ export class UsersModel {
 
 /**
  * Factory function to create an instance of UsersModel.
- * @param {BetterSQLite3Database} db - The database connection instance
+ * @param {NodePgDatabase<typeof schema>} db - The database connection instance
  * @returns {UsersModel} An instance of UsersModel
  */
 export default function usersModelFactory(
-	db: BetterSQLite3Database,
+	db: NodePgDatabase<typeof schema>,
 ): UsersModel {
 	return new UsersModel(db);
 }

@@ -1,17 +1,9 @@
 import express from 'express';
 import { Application } from 'express';
-import { Database } from 'better-sqlite3';
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import { Server } from 'http';
-import connectionGenerator, {
-	dbTestOptions,
-	initialValues,
-	resetDatabase,
-} from '../../database/init-db';
 import invitationTokenModelFactory, {
 	InvitationTokenModel,
 } from '../../models/invitation-token';
-import { testDbPath } from '../jest.setup';
 import usersModelFactory, { UsersModel } from '../../models/users';
 import morgan from 'morgan';
 import authenticationRoutesFactory from '../../routes/authentication-routes';
@@ -20,19 +12,23 @@ import { InvitationToken, RegisterRequestBody } from '../../types/table-types';
 import { invitationTokens } from '../../database/schema';
 import { eq } from 'drizzle-orm';
 import { User } from '../../types/table-types';
+import connectionGenerator from '../../database/init-db.v2';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { initialValues } from '../../database/init-db.v2';
+import { resetDatabase } from '../../database/init-db.v2';
+import { testDatabaseConfiguration } from '../../database/init-db.v2';
+import * as schema from '../../database/schema';
 
 let app: Application;
-let dbConnection: Database;
+let db: NodePgDatabase<typeof schema>;
 const port: number = 4000;
 let server: Server;
 let invitationTokenModel: InvitationTokenModel;
-let db: BetterSQLite3Database;
 let usersModel: UsersModel;
 
 beforeAll(async () => {
 	app = express();
-	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
-	db = drizzle(dbConnection);
+	db = connectionGenerator(testDatabaseConfiguration);
 	invitationTokenModel = invitationTokenModelFactory(db);
 	usersModel = usersModelFactory(db);
 
@@ -42,7 +38,7 @@ beforeAll(async () => {
 	app.use(express.json());
 
 	//Add the authentication routes
-	app.use('/auth', authenticationRoutesFactory(testDbPath));
+	app.use('/auth', authenticationRoutesFactory(db));
 
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
@@ -50,8 +46,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await resetDatabase(dbConnection, dbTestOptions);
-	await initialValues(dbConnection);
+	await resetDatabase(db);
+	await initialValues(db);
 });
 
 describe('Tests that when registering as a new user, an invitation token is created', () => {

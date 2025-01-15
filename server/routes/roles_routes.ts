@@ -1,15 +1,17 @@
 import { Router } from 'express';
 import rolesApiFactory, { RolesApi } from '../controllers/roles_api';
-import { Database } from 'better-sqlite3';
-import connectionGenerator, { dbProductionOptions } from '../database/init-db';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 import { testApi } from '../controllers/roles_api';
 import { requiresRoleOf } from '../middleware/auth-middleware';
 import { isUserLoggedInThroughJWT } from '../middleware/auth-middleware';
 import { isUserLoggedInThroughGoogle } from '../middleware/auth-middleware';
+import { PoolConfig } from 'pg';
 
-export default function rolesRoutesFactory(dbPath: string): Router {
+export default function rolesRoutesFactory(
+	db: NodePgDatabase<typeof schema>,
+): Router {
 	const router: Router = Router();
-	const db: Database = connectionGenerator(dbPath, dbProductionOptions);
 	const rolesApi: RolesApi = rolesApiFactory(db);
 
 	//Tests that the route is alive

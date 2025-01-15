@@ -1,15 +1,10 @@
 import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { Application } from 'express';
 import connectionGenerator, {
-	dbProductionOptions,
 	initialValues,
 	resetDatabase,
-} from '../../database/init-db';
+} from '../../database/init-db.v2';
 import { Server } from 'http';
-import { dbTestOptions } from '../../database/init-db';
-import { testDbPath } from '../jest.setup';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { Database } from 'better-sqlite3';
 import express from 'express';
 import viewedPropertiesModelFactory from '../../models/viewed_properties';
 import { ViewedPropertiesModel } from '../../models/viewed_properties';
@@ -33,9 +28,12 @@ import {
 } from '../../middleware/auth-middleware';
 import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
 import { Response } from 'supertest';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../../database/schema';
+import { testDatabaseConfiguration } from '../../database/init-db.v2';
+
 let app: Application;
-let dbConnection: Database;
-let db: BetterSQLite3Database;
+let db: NodePgDatabase<typeof schema>;
 const port: number = 4000;
 let server: Server;
 let viewedPropertiesModel: ViewedPropertiesModel;
@@ -50,8 +48,7 @@ const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
 beforeAll(async () => {
 	app = express();
-	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
-	db = drizzle(dbConnection);
+	db = connectionGenerator(testDatabaseConfiguration);
 	viewedPropertiesModel = viewedPropertiesModelFactory(db);
 	usersModel = usersModelFactory(db);
 	propertiesModel = propertiesModelFactory(db);
@@ -62,7 +59,7 @@ beforeAll(async () => {
 	app.use(express.json());
 
 	//Authentication routes
-	app.use('/auth', authenticationRoutesFactory(testDbPath));
+	app.use('/auth', authenticationRoutesFactory(db));
 
 	//Start the server to obtain the access token
 	server = app.listen(port, () => {
@@ -99,7 +96,7 @@ beforeAll(async () => {
 	app.use(
 		'/viewed-properties',
 		addBearerToken(accessJwtToken),
-		viewedPropertiesRoutesFactory(testDbPath),
+		viewedPropertiesRoutesFactory(db),
 	);
 
 	//Start the server
@@ -109,8 +106,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await resetDatabase(dbConnection, dbProductionOptions);
-	await initialValues(dbConnection);
+	await resetDatabase(db);
+	await initialValues(db);
 	await usersModel.createUser(user);
 	userID = (await usersModel.getUserId(user.username))!;
 	propertyId = await propertiesModel.createProperty(property);
