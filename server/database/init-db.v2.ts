@@ -17,11 +17,7 @@ const adminPassword: string = process.env.ADMIN_PASSWORD || '';
 const adminUsername: string = process.env.ADMIN_USERNAME || '';
 const adminEmail: string = process.env.ADMIN_EMAIL || '';
 
-let certificateValue: string = process.env.CERTIFICATE_VALUE || '';
-
-if (certificateValue === '' && existsSync('./ca.pem')) {
-	certificateValue = readFileSync('./ca.pem').toString();
-}
+const certificateValue: string = process.env.CERTIFICATE_VALUE || '';
 
 /**
  * Aiven Cloud Database Configuration for PostgreSQL Database
@@ -35,7 +31,7 @@ export const databaseConfiguration: PoolConfig = {
 	database: 'defaultdb',
 	ssl: {
 		rejectUnauthorized: true,
-		ca: process.env.CERTIFICATE_VALUE,
+		ca: certificateValue,
 	},
 };
 
