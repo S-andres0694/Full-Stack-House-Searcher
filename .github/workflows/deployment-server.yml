@@ -40,6 +40,11 @@ jobs:
         with:
           node-version: 22.x
 
+      - name: Install the Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+          heroku --version
+
       - name: Download all dependencies
         run: |
           npm install
