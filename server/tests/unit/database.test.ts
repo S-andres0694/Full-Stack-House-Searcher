@@ -32,16 +32,18 @@ describe('Database Unit Tests', () => {
 			'CREATE TABLE IF NOT EXISTS test (id SERIAL PRIMARY KEY, name TEXT)',
 		);
 		const result = await db.execute('SELECT * FROM test');
-		expect(result).toEqual([]);
+		expect(result.rows).toEqual([]);
 	});
 
 	//Test 3:
 	it('should be able to load the schema', () => {
-		expect(db.select().from(schema.properties)).toBeUndefined();
-		expect(db.select().from(schema.viewedProperties)).toBeUndefined();
+		expect(db.select().from(schema.properties)).toBeDefined();
+		expect(db.select().from(schema.viewedProperties)).toBeDefined();
 		expect(db.select().from(schema.roles)).toBeDefined();
-		expect(db.select().from(schema.favorites)).toBeUndefined();
+		expect(db.select().from(schema.favorites)).toBeDefined();
 		expect(db.select().from(schema.users)).toBeDefined();
+		expect(db.select().from(schema.invitationTokens)).toBeDefined();
+		expect(db.select().from(schema.usedInvitationTokens)).toBeDefined();
 	});
 
 	//Test 4:
@@ -203,14 +205,14 @@ describe('Database Unit Tests', () => {
 	//Test 9:
 	it('the table actually gets wiped when calling the resetDatabase function', async () => {
 		let result = await db.execute('SELECT * FROM roles');
-		expect(result).toBeDefined();
+		expect(result.rows).toBeDefined();
 		result = await db.execute('SELECT * FROM users');
-		expect(result).toBeDefined();
+		expect(result.rows).toBeDefined();
 		await resetDatabase(db);
 		result = await db.execute('SELECT * FROM roles');
-		expect(result).toBeUndefined();
+		expect(result.rows).toEqual([]);
 		result = await db.execute('SELECT * FROM users');
-		expect(result).toBeUndefined();
+		expect(result.rows).toEqual([]);
 	});
 
 	//Test 10:

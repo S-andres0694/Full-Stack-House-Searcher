@@ -41,7 +41,7 @@ export class InvitationTokenModel {
 		invitationToken: InvitationToken,
 	): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.insert(usedInvitationTokens)
 					.values({ used_tokenID: invitationToken.id });

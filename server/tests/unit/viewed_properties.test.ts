@@ -14,6 +14,7 @@ import { property, property2, user } from '../constants';
 import { ViewedProperty } from '../../types/table-types';
 import * as schema from '../../database/schema';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { log } from 'console';
 
 let usersModel: UsersModel;
 let propertiesModel: PropertiesModel;
@@ -91,10 +92,8 @@ describe('Viewed Properties Model Unit Tests', () => {
 
 	it('should be able to get the count of viewed properties for a user', async () => {
 		await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
-		const count: number = await viewedPropertiesModel.getViewedPropertiesCount(
-			userId,
-		);
-		expect(count).toBe(1);
+		const count = await viewedPropertiesModel.getViewedPropertiesCount(userId);
+		expect(count).toBe('1');
 	});
 
 	it('should be able to get the last viewed property for a user', async () => {

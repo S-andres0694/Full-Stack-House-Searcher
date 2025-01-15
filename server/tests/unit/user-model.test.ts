@@ -1,4 +1,3 @@
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import { NewUser } from '../../types/table-types';
 import usersModelFactory, { UsersModel } from '../../models/users';
 import connectionGenerator, {

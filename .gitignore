@@ -19,3 +19,4 @@ docs
 server/my.secrets
 my.secrets
 server/ca.pem
+server/api/**/db/postgres-test-data

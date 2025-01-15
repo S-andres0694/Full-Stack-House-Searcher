@@ -616,8 +616,8 @@ describe('Authentication and Roles API Testing for the Roles API.', () => {
 		const adminResponse = await request(app)
 			.delete('/roles/1')
 			.set('Authorization', `Bearer ${adminAccessJwtToken}`);
-		expect(adminResponse.status).toBe(404);
-		expect(adminResponse.body.error).toBe('Role not found');
+		expect(adminResponse.status).toBe(200);
+		expect(adminResponse.body.message).toBe('Role deleted');
 	});
 });
 

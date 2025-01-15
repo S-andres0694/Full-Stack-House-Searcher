@@ -33,7 +33,7 @@ export class ViewedPropertiesModel {
 	 */
 	async addPropertyAsViewed(viewedProperty: NewViewedProperty): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.insert(viewedProperties).values(viewedProperty);
 			});
 		} catch (error) {
@@ -48,7 +48,7 @@ export class ViewedPropertiesModel {
 	 */
 	async deleteViewedProperty(viewedProperty: NewViewedProperty): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.delete(viewedProperties)
 					.where(
@@ -70,7 +70,7 @@ export class ViewedPropertiesModel {
 	 */
 	async clearViewedProperties(userId: number): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.delete(viewedProperties)
 					.where(eq(viewedProperties.userId, userId));
@@ -85,12 +85,12 @@ export class ViewedPropertiesModel {
 	 * @param {number} userId - The ID of the user whose viewed properties count to retrieve
 	 * @returns {Promise<number>} The count of viewed properties for the user
 	 */
-	async getViewedPropertiesCount(userId: number): Promise<number> {
-		const [count] = await this.db
+	async getViewedPropertiesCount(userId: number): Promise<string> {
+		const count: { count: number }[] = await this.db
 			.select({ count: sql<number>`count(${viewedProperties.id})` })
 			.from(viewedProperties)
 			.where(eq(viewedProperties.userId, userId));
-		return count.count;
+		return count[0].count.toString();
 	}
 
 	/**

@@ -16,7 +16,6 @@ const adminUsername: string = process.env.ADMIN_USERNAME || '';
 const adminEmail: string = process.env.ADMIN_EMAIL || '';
 
 const prodDatabaseName: string = 'defaultdb';
-const testDatabaseName: string = 'testing-database';
 
 /**
  * Aiven Cloud Database Configuration for PostgreSQL Database
@@ -39,15 +38,7 @@ export const databaseConfiguration: PoolConfig = {
  */
 
 export const testDatabaseConfiguration: PoolConfig = {
-	user: process.env.DATABASE_USER,
-	password: process.env.DATABASE_PASSWORD,
-	host: process.env.DATABASE_HOST,
-	port: Number(process.env.DATABASE_PORT),
-	database: testDatabaseName,
-	ssl: {
-		rejectUnauthorized: true,
-		ca: process.env.CERTIFICATE_VALUE || readFileSync('./ca.pem').toString(),
-	},
+	connectionString: 'postgresql://postgres:postgres@localhost:5438/postgres',
 };
 
 /**
@@ -167,20 +158,28 @@ export async function resetDatabase(
 	db: NodePgDatabase<typeof schema>,
 ): Promise<void> {
 	try {
-		// Use the actual table names instead of schema objects
-		await db.execute(`TRUNCATE TABLE "users" RESTART IDENTITY CASCADE`);
+		await db.execute(`DELETE FROM "used_invitation_tokens"`);
+		await db.execute(`DELETE FROM "invitation_tokens"`);
+		await db.execute(`DELETE FROM "viewed_properties"`);
+		await db.execute(`DELETE FROM "favorites"`);
+		await db.execute(`DELETE FROM "users"`);
+		await db.execute(`DELETE FROM "properties"`);
+		await db.execute(`DELETE FROM "roles"`);
+		await db.execute(`ALTER TABLE "users" ALTER COLUMN id RESTART WITH 1;`);
 		await db.execute(
-			`TRUNCATE TABLE "viewed_properties" RESTART IDENTITY CASCADE`,
+			`ALTER TABLE "properties" ALTER COLUMN id RESTART WITH 1;`,
 		);
-		await db.execute(`TRUNCATE TABLE "favorites" RESTART IDENTITY CASCADE`);
-		await db.execute(`TRUNCATE TABLE "properties" RESTART IDENTITY CASCADE`);
-		await db.execute(`TRUNCATE TABLE "roles" RESTART IDENTITY CASCADE`);
+		await db.execute(`ALTER TABLE "roles" ALTER COLUMN id RESTART WITH 1;`);
 		await db.execute(
-			`TRUNCATE TABLE "invitation_tokens" RESTART IDENTITY CASCADE`,
+			`ALTER TABLE "invitation_tokens" ALTER COLUMN id RESTART WITH 1;`,
 		);
 		await db.execute(
-			`TRUNCATE TABLE "used_invitation_tokens" RESTART IDENTITY CASCADE`,
+			`ALTER TABLE "used_invitation_tokens" ALTER COLUMN id RESTART WITH 1;`,
 		);
+		await db.execute(
+			`ALTER TABLE "viewed_properties" ALTER COLUMN id RESTART WITH 1;`,
+		);
+		await db.execute(`ALTER TABLE "favorites" ALTER COLUMN id RESTART WITH 1;`);
 	} catch (error: any) {
 		console.error(`Error resetting the database: ${error.stack}`);
 		throw error;

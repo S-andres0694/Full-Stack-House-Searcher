@@ -8,15 +8,6 @@ export default defineConfig({
 	out: './database/migrations',
 	verbose: true,
 	dbCredentials: {
-		url: (process.env.DATABASE_URL as string) + '?sslmode=require',
-		user: process.env.DATABASE_USER,
-		password: process.env.DATABASE_PASSWORD,
-		host: process.env.DATABASE_HOST,
-		port: Number(process.env.DATABASE_PORT),
-		database: 'testing-database',
-		ssl: {
-			rejectUnauthorized: true,
-			ca: readFileSync(process.env.CERTIFICATE_PATH || '').toString(),
-		},
+		url: 'postgresql://postgres:postgres@localhost:5438/postgres',
 	},
 });

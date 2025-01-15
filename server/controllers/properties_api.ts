@@ -391,6 +391,7 @@ export class PropertiesApi {
 
 			response.status(200).json({ summary: summary });
 		} catch (error) {
+			console.error(`Error retrieving summary: ${error}`);
 			response.status(500).json({ error: 'Error retrieving summary' });
 			return;
 		}

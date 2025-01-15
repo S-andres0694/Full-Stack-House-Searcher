@@ -1,7 +1,4 @@
 import { Application } from 'express';
-import { PropertiesApi } from '../../controllers/properties_api';
-import { Database } from 'better-sqlite3';
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import { Server } from 'http';
 import request from 'supertest';
 import express from 'express';
@@ -15,7 +12,6 @@ import propertiesModelFactory, {
 } from '../../models/properties';
 import morgan from 'morgan';
 import propertiesRoutesFactory from '../../routes/properties_routes';
-import { properties } from '../../database/schema';
 import {
 	NewProperty,
 	Property,
@@ -26,9 +22,7 @@ import authenticationRoutesFactory from '../../routes/authentication-routes';
 import { passportObj } from '../../authentication/google-auth.config';
 import cookieParser from 'cookie-parser';
 import sessionMiddleware from '../../middleware/express-session-config';
-import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
 import { addBearerToken } from '../../middleware/auth-middleware';
-import { isUserLoggedInThroughGoogle } from '../../middleware/auth-middleware';
 import { Response } from 'supertest';
 import usersModelFactory, { UsersModel } from '../../models/users';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
@@ -39,7 +33,6 @@ let db: NodePgDatabase<typeof schema>;
 const port: number = 4000;
 let server: Server;
 let propertiesModel: PropertiesModel;
-let usersModel: UsersModel;
 let accessJwtToken: string;
 const ADMIN_EMAIL: string = process.env.ADMIN_EMAIL!;
 const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
@@ -57,7 +50,6 @@ const testProperty: NewProperty = {
 beforeAll(async () => {
 	app = express();
 	db = connectionGenerator(testDatabaseConfiguration);
-	usersModel = usersModelFactory(db);
 	propertiesModel = propertiesModelFactory(db);
 	app.use(morgan('common'));
 	app.use(express.json());
@@ -223,7 +215,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getPropertyById endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get('/properties/9999999999');
+		const response = await request(app).get('/properties/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -249,7 +241,7 @@ describe('Properties API Testing', () => {
 
 	it('tests that the getPropertyByIdentifier endpoint returns a 404 error if the property is not found', async () => {
 		const response = await request(app).get(
-			'/properties/by-identifier/9999999999',
+			'/properties/by-identifier/999',
 		);
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
@@ -276,7 +268,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getBedrooms endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get('/properties/bedrooms/9999999999');
+		const response = await request(app).get('/properties/bedrooms/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -301,7 +293,7 @@ describe('Properties API Testing', () => {
 
 	it('tests that the getMonthlyRent endpoint returns a 404 error if the property is not found', async () => {
 		const response = await request(app).get(
-			'/properties/monthly-rent/9999999999',
+			'/properties/monthly-rent/999',
 		);
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
@@ -328,7 +320,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getAddress endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get('/properties/address/9999999999');
+		const response = await request(app).get('/properties/address/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -352,7 +344,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getSummary endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get('/properties/summary/9999999999');
+		const response = await request(app).get('/properties/summary/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -378,7 +370,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getUrl endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get('/properties/url/9999999999');
+		const response = await request(app).get('/properties/url/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -403,7 +395,7 @@ describe('Properties API Testing', () => {
 
 	it('tests that the getContactPhone endpoint returns a 404 error if the property is not found', async () => {
 		const response = await request(app).get(
-			'/properties/contact-phone/9999999999',
+			'/properties/contact-phone/999',
 		);
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
@@ -431,7 +423,7 @@ describe('Properties API Testing', () => {
 
 	it('tests that the getIdentifier endpoint returns a 404 error if the property is not found', async () => {
 		const response = await request(app).get(
-			'/properties/identifier/9999999999',
+			'/properties/identifier/999',
 		);
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
@@ -459,7 +451,7 @@ describe('Properties API Testing', () => {
 		expect(response.body.message).toBe('Property updated successfully');
 	});
 	it('tests that the updateProperty endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).put('/properties/9999999999').send({
+		const response = await request(app).put('/properties/999').send({
 			bedrooms: 4,
 		});
 		expect(response.status).toBe(404);
@@ -500,7 +492,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the deleteProperty endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).delete('/properties/9999999999');
+		const response = await request(app).delete('/properties/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -521,7 +513,7 @@ describe('Properties API Testing', () => {
 
 	it('tests that the getIdentifier endpoint returns a 404 error if the property is not found', async () => {
 		const response = await request(app).get(
-			'/properties/identifier/9999999999',
+			'/properties/identifier/999',
 		);
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');

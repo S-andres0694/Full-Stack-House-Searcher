@@ -11,6 +11,7 @@ const config: Config = {
 	roots: ['<rootDir>/tests'],
 	verbose: true,
 	bail: true,
+	setupFilesAfterEnv: ['<rootDir>/tests/jest.setup.ts']
 };
 
 export default config;

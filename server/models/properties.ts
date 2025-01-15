@@ -150,7 +150,7 @@ export class PropertiesModel {
 	 */
 	async deleteProperty(id: number): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.delete(properties).where(eq(properties.id, id));
 			});
 		} catch (error: any) {
@@ -166,7 +166,7 @@ export class PropertiesModel {
 	 */
 	async updateProperty(id: number, property: NewProperty): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.update(properties).set(property).where(eq(properties.id, id));
 			});
 		} catch (error: any) {
@@ -184,7 +184,7 @@ export class PropertiesModel {
 	async insertProperties(propertiesArray: NewProperty[]): Promise<number[]> {
 		const addedIDs: number[] = [];
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				propertiesArray.forEach(async (property) => {
 					const [propertyRecord] = await tx
 						.insert(properties)

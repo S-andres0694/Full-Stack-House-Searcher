@@ -28,7 +28,7 @@ export class FavoritePropertiesModel {
 	 */
 	async addFavoriteProperty(favorite: NewFavorite): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.insert(favorites).values(favorite);
 			});
 		} catch (error) {
@@ -47,7 +47,7 @@ export class FavoritePropertiesModel {
 		userID: number,
 	): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.delete(favorites)
 					.where(
@@ -69,7 +69,7 @@ export class FavoritePropertiesModel {
 	 */
 	async clearFavoriteProperties(userId: number): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.delete(favorites).where(eq(favorites.userId, userId));
 			});
 		} catch (error) {
@@ -82,12 +82,12 @@ export class FavoritePropertiesModel {
 	 * @param {number} userId - The ID of the user whose favorite properties count to retrieve
 	 * @returns {Promise<number>} The count of favorite properties for the user
 	 */
-	async getFavoritePropertiesCount(userId: number): Promise<number> {
-		const [count] = await this.db
+	async getFavoritePropertiesCount(userId: number): Promise<string> {
+		const count: { count: number }[] = await this.db
 			.select({ count: sql<number>`count(${favorites.id})` })
 			.from(favorites)
 			.where(eq(favorites.userId, userId));
-		return count.count;
+		return count[0].count.toString();
 	}
 }
 

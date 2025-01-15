@@ -72,7 +72,7 @@ describe('FavoritePropertiesModel', () => {
 		});
 		expect(
 			await favoritePropertiesModel.getFavoritePropertiesCount(userId),
-		).toBe(1);
+		).toBe('1');
 	});
 
 	it('should be able to clear favorite properties', async () => {
@@ -91,6 +91,6 @@ describe('FavoritePropertiesModel', () => {
 		await favoritePropertiesModel.clearFavoriteProperties(userId);
 		expect(
 			await favoritePropertiesModel.getFavoritePropertiesCount(userId),
-		).toBe(0);
+		).toBe('0');
 	});
 });

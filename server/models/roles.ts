@@ -16,7 +16,7 @@ export class RolesModel {
 	 */
 	async createRole(name: string, description: string): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.insert(roles)
 					.values({ roleName: name, description: description });
@@ -33,7 +33,7 @@ export class RolesModel {
 	 */
 	async deleteRole(roleId: number): Promise<void> {
 		try {
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.delete(roles).where(eq(roles.id, roleId));
 			});
 		} catch (error: any) {

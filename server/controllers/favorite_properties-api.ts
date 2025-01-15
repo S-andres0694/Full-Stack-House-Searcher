@@ -264,9 +264,9 @@ export class FavoritePropertiesApi {
 				(request.user as User).role === 'admin' ||
 				(request.user as User).id === userID
 			) {
-				const count: number =
+				const count: string =
 					await this.favoritePropertiesModel.getFavoritePropertiesCount(userID);
-				response.status(200).json({ count: count });
+				response.status(200).json({ count: parseInt(count) });
 			} else {
 				response.status(403).json({ message: 'Forbidden' });
 			}

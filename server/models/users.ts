@@ -27,7 +27,7 @@ export class UsersModel {
 			user.password = await hash(user.password, 10);
 			//Insert the user into the database and return the id of the user.
 			try {
-				this.db.transaction(async (tx) => {
+				await this.db.transaction(async (tx) => {
 					await tx.insert(users).values(user);
 				});
 			} catch (error) {
@@ -92,6 +92,10 @@ export class UsersModel {
 	 * @returns {Promise<User | undefined>} The user object if found, undefined otherwise
 	 */
 	async getUserById(id: number): Promise<User | undefined> {
+		if (isNaN(id)) {
+			return undefined;
+		}
+
 		//Select the user from the database.
 		const [userRecord]: User[] = await this.db
 			.select()
@@ -132,7 +136,7 @@ export class UsersModel {
 			if (await this.getUserByUsername(newUsername)) {
 				return false;
 			}
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.update(users)
 					.set({ username: newUsername })
@@ -158,7 +162,7 @@ export class UsersModel {
 			if (await this.getUserByEmail(newEmail)) {
 				return false;
 			}
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.update(users).set({ email: newEmail }).where(eq(users.id, id));
 			});
 			return true;
@@ -185,7 +189,7 @@ export class UsersModel {
 			//Hash the password.
 			newPassword = await hash(newPassword, 10);
 			//Update the user's password in the database.
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx
 					.update(users)
 					.set({ password: newPassword })
@@ -207,7 +211,7 @@ export class UsersModel {
 			if (!(await this.getUserById(id))) {
 				return false;
 			}
-			this.db.transaction(async (tx) => {
+			await this.db.transaction(async (tx) => {
 				await tx.delete(users).where(eq(users.id, id));
 			});
 
@@ -284,7 +288,7 @@ export class UsersModel {
 
 /**
  * Factory function to create an instance of UsersModel.
- * @param {BetterSQLite3Database} db - The database connection instance
+ * @param {NodePgDatabase<typeof schema>} db - The database connection instance
  * @returns {UsersModel} An instance of UsersModel
  */
 export default function usersModelFactory(
