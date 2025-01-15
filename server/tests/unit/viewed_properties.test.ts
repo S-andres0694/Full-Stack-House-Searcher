@@ -1,10 +1,3 @@
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
-import { Database } from 'better-sqlite3';
-import connectionGenerator, {
-	dbTestOptions,
-	initialValues,
-	resetDatabase,
-} from '../../database/init-db';
 import propertiesModelFactory, {
 	PropertiesModel,
 } from '../../models/properties';
@@ -12,30 +5,33 @@ import viewedPropertiesModelFactory, {
 	ViewedPropertiesModel,
 } from '../../models/viewed_properties';
 import usersModelFactory, { UsersModel } from '../../models/users';
-import { testDbPath } from '../jest.setup';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { property, property2, user, user2 } from '../constants';
+import connectionGenerator, {
+	initialValues,
+	resetDatabase,
+	testDatabaseConfiguration,
+} from '../../database/init-db.v2';
+import { property, property2, user } from '../constants';
 import { ViewedProperty } from '../../types/table-types';
+import * as schema from '../../database/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 let usersModel: UsersModel;
 let propertiesModel: PropertiesModel;
 let viewedPropertiesModel: ViewedPropertiesModel;
-let db: Database;
-let drizzleORM: BetterSQLite3Database;
+let db: NodePgDatabase<typeof schema>;
 let userId: number;
 let propertyId: number;
 let property2Id: number;
 
 beforeAll(async () => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	drizzleORM = drizzle(db);
-	usersModel = usersModelFactory(drizzleORM);
-	propertiesModel = propertiesModelFactory(drizzleORM);
-	viewedPropertiesModel = viewedPropertiesModelFactory(drizzleORM);
+	db = connectionGenerator(testDatabaseConfiguration);
+	usersModel = usersModelFactory(db);
+	propertiesModel = propertiesModelFactory(db);
+	viewedPropertiesModel = viewedPropertiesModelFactory(db);
 });
 
 beforeEach(async () => {
-	await resetDatabase(db, dbTestOptions);
+	await resetDatabase(db);
 	await initialValues(db);
 	await usersModel.createUser(user);
 	await propertiesModel.createProperty(property);
@@ -47,12 +43,6 @@ beforeEach(async () => {
 	property2Id = (await propertiesModel.getPropertyByIdentifier(
 		property2.identifier,
 	))!.id;
-});
-
-afterAll(() => {
-	if (db) {
-		db.close();
-	}
 });
 
 describe('Viewed Properties Model Unit Tests', () => {
@@ -101,8 +91,9 @@ describe('Viewed Properties Model Unit Tests', () => {
 
 	it('should be able to get the count of viewed properties for a user', async () => {
 		await viewedPropertiesModel.addPropertyAsViewed({ userId, propertyId });
-		const count: number =
-			await viewedPropertiesModel.getViewedPropertiesCount(userId);
+		const count: number = await viewedPropertiesModel.getViewedPropertiesCount(
+			userId,
+		);
 		expect(count).toBe(1);
 	});
 

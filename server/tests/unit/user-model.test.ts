@@ -2,38 +2,29 @@ import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import { NewUser } from '../../types/table-types';
 import usersModelFactory, { UsersModel } from '../../models/users';
 import connectionGenerator, {
-	dbTestOptions,
 	initialValues,
 	resetDatabase,
-} from '../../database/init-db';
-import { Database } from 'better-sqlite3';
+} from '../../database/init-db.v2';
 import { compare } from 'bcrypt';
-import { testDbPath } from '../jest.setup';
 import { user, user2 } from '../constants';
+import * as schema from '../../database/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { testDatabaseConfiguration } from '../../database/init-db.v2';
 
 let usersModel: UsersModel;
-let drizzleORM: BetterSQLite3Database;
-let db: Database;
+let db: NodePgDatabase<typeof schema>;
 let userId: number;
 
 beforeAll(() => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	drizzleORM = drizzle(db);
-	usersModel = usersModelFactory(drizzleORM);
+	db = connectionGenerator(testDatabaseConfiguration);
+	usersModel = usersModelFactory(db);
 });
 
 beforeEach(async () => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	await resetDatabase(db, dbTestOptions);
+	await resetDatabase(db);
 	await initialValues(db);
 	await usersModel.createUser(user);
 	userId = (await usersModel.getUserId(user.username)) as number;
-});
-
-afterAll(() => {
-	if (db) {
-		db.close();
-	}
 });
 
 describe('Users Model Unit Tests', () => {
@@ -185,8 +176,9 @@ describe('Users Model Unit Tests', () => {
 	//Test 21
 	it('tests that it returns the correct error message when trying to add a user with the same username', async () => {
 		//Try to create a user with the same username
-		const validationResult =
-			await usersModel.validateUniqueUsernameAndEmail(user);
+		const validationResult = await usersModel.validateUniqueUsernameAndEmail(
+			user,
+		);
 		expect(validationResult).toBe('Username already exists');
 	});
 
@@ -200,8 +192,9 @@ describe('Users Model Unit Tests', () => {
 			role: 'user',
 			name: 'testuser3',
 		};
-		const validationResult =
-			await usersModel.validateUniqueUsernameAndEmail(userWithSameEmail);
+		const validationResult = await usersModel.validateUniqueUsernameAndEmail(
+			userWithSameEmail,
+		);
 		expect(validationResult).toBe('Email already exists');
 	});
 
@@ -216,8 +209,9 @@ describe('Users Model Unit Tests', () => {
 			name: 'testuser3',
 		};
 		//Try to create a user with unique username and email
-		const validationResult =
-			await usersModel.validateUniqueUsernameAndEmail(userWithUniqueEmail);
+		const validationResult = await usersModel.validateUniqueUsernameAndEmail(
+			userWithUniqueEmail,
+		);
 		expect(validationResult).toBe(true);
 	});
 

@@ -1,13 +1,14 @@
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { favorites } from '../database/schema';
 import { Favorite, NewFavorite } from '../types/table-types';
 import { and, eq, sql } from 'drizzle-orm';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 
 /**
  * Class representing a model for favorite properties operations in the database.
  */
 export class FavoritePropertiesModel {
-	constructor(private db: BetterSQLite3Database) {}
+	constructor(private db: NodePgDatabase<typeof schema>) {}
 
 	/**
 	 * Retrieves all favorite properties for a specific user from the database.
@@ -91,7 +92,7 @@ export class FavoritePropertiesModel {
 }
 
 export default function favoritePropertiesModelFactory(
-	db: BetterSQLite3Database,
+	db: NodePgDatabase<typeof schema>,
 ): FavoritePropertiesModel {
 	return new FavoritePropertiesModel(db);
 }

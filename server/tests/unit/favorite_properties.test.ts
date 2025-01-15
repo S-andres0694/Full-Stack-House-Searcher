@@ -1,40 +1,39 @@
 import { describe, it, expect } from '@jest/globals';
-import { FavoritePropertiesModel } from '../../models/favorite_properties';
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
-import { testDbPath } from '../jest.setup';
+import favoritePropertiesModelFactory, {
+	FavoritePropertiesModel,
+} from '../../models/favorite_properties';
 import {
-	dbTestOptions,
 	initialValues,
 	resetDatabase,
-} from '../../database/init-db';
-import connectionGenerator from '../../database/init-db';
-import { Database } from 'better-sqlite3';
+	testDatabaseConfiguration,
+} from '../../database/init-db.v2';
+import connectionGenerator from '../../database/init-db.v2';
 import usersModelFactory, { UsersModel } from '../../models/users';
 import propertiesModelFactory, {
 	PropertiesModel,
 } from '../../models/properties';
 import { property, property2 } from '../constants';
 import { user } from '../constants';
+import * as schema from '../../database/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-let db: Database;
+let db: NodePgDatabase<typeof schema>;
 let favoritePropertiesModel: FavoritePropertiesModel;
-let drizzleORM: BetterSQLite3Database;
 let usersModel: UsersModel;
 let propertiesModel: PropertiesModel;
 let userId: number;
 let propertyId: number;
 
 beforeAll(async () => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	drizzleORM = drizzle(db);
-	favoritePropertiesModel = new FavoritePropertiesModel(drizzleORM);
-	usersModel = usersModelFactory(drizzleORM);
-	propertiesModel = propertiesModelFactory(drizzleORM);
+	db = connectionGenerator(testDatabaseConfiguration);
+	favoritePropertiesModel = favoritePropertiesModelFactory(db);
+	usersModel = usersModelFactory(db);
+	propertiesModel = propertiesModelFactory(db);
 });
 
 beforeEach(async () => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	await resetDatabase(db, dbTestOptions);
+	db = connectionGenerator(testDatabaseConfiguration);
+	await resetDatabase(db);
 	await initialValues(db);
 	await usersModel.createUser(user);
 	await propertiesModel.createProperty(property);
@@ -42,10 +41,6 @@ beforeEach(async () => {
 	propertyId = (await propertiesModel.getPropertyByIdentifier(
 		property.identifier,
 	))!.id;
-});
-
-afterAll(() => {
-	db.close();
 });
 
 describe('FavoritePropertiesModel', () => {

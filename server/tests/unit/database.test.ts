@@ -1,200 +1,229 @@
 import { describe, it, expect } from '@jest/globals';
 import connectionGenerator, {
-	dbTestOptions,
 	initialValues,
 	resetDatabase,
-	runMigrations,
-} from '../../database/init-db';
-import sqlite3, { Database } from 'better-sqlite3';
-import { testDbPath } from '../jest.setup';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+	testDatabaseConfiguration,
+} from '../../database/init-db.v2';
+import * as schema from '../../database/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { eq, and } from 'drizzle-orm';
 
-let db: Database;
+let db: NodePgDatabase<typeof schema>;
 
 //Creates a test database and provides a connection to it.
 beforeAll(() => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
+	db = connectionGenerator(testDatabaseConfiguration);
 });
 
 afterEach(async () => {
-	await resetDatabase(db, dbTestOptions);
+	await resetDatabase(db);
 	await initialValues(db);
 });
 
 describe('Database Unit Tests', () => {
 	//Test 1:
 	it('should be able to connect to the database', () => {
-		expect(db).toBeInstanceOf(sqlite3);
+		expect(db).toBeInstanceOf(NodePgDatabase);
 	});
 
 	//Test 2:
-	it('should be able to create a table', () => {
-		db.prepare(
-			'CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)',
-		).run();
-		expect(db.prepare('SELECT * FROM test').get()).toBe(undefined);
+	it('should be able to create a table', async () => {
+		await db.execute(
+			'CREATE TABLE IF NOT EXISTS test (id SERIAL PRIMARY KEY, name TEXT)',
+		);
+		const result = await db.execute('SELECT * FROM test');
+		expect(result).toEqual([]);
 	});
 
 	//Test 3:
 	it('should be able to load the schema', () => {
-		expect(db.prepare('SELECT * FROM properties').get()).toBeUndefined();
-		expect(db.prepare('SELECT * FROM viewed_properties').get()).toBeUndefined();
-		expect(db.prepare('SELECT * FROM roles').get()).toBeDefined();
-		expect(db.prepare('SELECT * FROM favorites').get()).toBeUndefined();
-		expect(db.prepare('SELECT * FROM users').get()).toBeDefined();
+		expect(db.select().from(schema.properties)).toBeUndefined();
+		expect(db.select().from(schema.viewedProperties)).toBeUndefined();
+		expect(db.select().from(schema.roles)).toBeDefined();
+		expect(db.select().from(schema.favorites)).toBeUndefined();
+		expect(db.select().from(schema.users)).toBeDefined();
 	});
 
 	//Test 4:
 	it('should be able to insert a user', () => {
-		db.prepare(
-			'INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)',
-		).run('testuser', 'testpassword', 'test@test.com', 'admin', 'Anon User');
+		db.insert(schema.users).values({
+			username: 'testuser',
+			password: 'testpassword',
+			email: 'test@test.com',
+			role: 'admin',
+			name: 'Anon User',
+		});
 		expect(
-			db.prepare("SELECT * FROM users WHERE username = 'testuser'").get(),
+			db
+				.select()
+				.from(schema.users)
+				.where(eq(schema.users.username, 'testuser')),
 		).toBeDefined();
 	});
 
 	//Test 5:
-	it('should be able to insert a property', () => {
-		db.prepare(
-			'INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url, identifier) VALUES (?, ?, ?, ?, ?, ?, ?)',
-		).run(
-			2,
-			'123 Main St, Anytown, USA',
-			'$1000',
-			'123-456-7890',
-			'This is a test property',
-			'https://test.com',
-			1234567890,
+	it('should be able to insert a property', async () => {
+		db.insert(schema.properties).values({
+			bedrooms: 2,
+			address: '123 Main St, Anytown, USA',
+			monthlyRent: '$1000',
+			contactPhone: '123-456-7890',
+			summary: 'This is a test property',
+			url: 'https://test.com',
+			identifier: 1234567890,
+		});
+		const result = await db.execute(
+			"SELECT * FROM properties WHERE address = '123 Main St, Anytown, USA'",
 		);
-		expect(
-			db
-				.prepare(
-					"SELECT * FROM properties WHERE address = '123 Main St, Anytown, USA'",
-				)
-				.get(),
-		).toBeDefined();
+		expect(result).toBeDefined();
 	});
 
 	//Test 6:
-	it('should be able to insert a role', () => {
-		db.prepare('INSERT INTO roles (role_name, description) VALUES (?, ?)').run(
-			'test',
-			'This is a test role',
+	it('should be able to insert a role', async () => {
+		await db.insert(schema.roles).values({
+			roleName: 'test',
+			description: 'This is a test role',
+		});
+		const result = await db.execute(
+			"SELECT * FROM roles WHERE role_name = 'test'",
 		);
-		expect(
-			db.prepare("SELECT * FROM roles WHERE role_name = 'test'").get(),
-		).toBeDefined();
+		expect(result).toBeDefined();
 	});
 
 	//Test 7:
-	it('should be able to insert a viewed property', () => {
+	it('should be able to insert a viewed property', async () => {
 		// Insert user
-		db.prepare(
-			'INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)',
-		).run('testuser', 'testpassword', 'test@test.com', 'user', 'Anon User');
+		await db.insert(schema.users).values({
+			username: 'testuser',
+			password: 'testpassword',
+			email: 'test@test.com',
+			role: 'user',
+			name: 'Anon User',
+		});
 
 		// Then insert property
-		db.prepare(
-			'INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url, identifier) VALUES (?,?, ?, ?, ?, ?, ?)',
-		).run(
-			3,
-			'456 Oak Ave, Somewhere, USA',
-			'$1500',
-			'555-123-4567',
-			'A test property for viewing',
-			'https://example.com',
-			1234567890,
-		);
+		await db.insert(schema.properties).values({
+			bedrooms: 3,
+			address: '456 Oak Ave, Somewhere, USA',
+			monthlyRent: '$1500',
+			contactPhone: '555-123-4567',
+			summary: 'A test property for viewing',
+			url: 'https://example.com',
+			identifier: 1234567890,
+		});
 
-		//Retrieve user id
-		const userId = db
-			.prepare('SELECT id FROM users WHERE username = ?')
-			.get('testuser') as { id: number };
+		// Retrieve user id
+		const userIdResult = await db
+			.select()
+			.from(schema.users)
+			.where(eq(schema.users.username, 'testuser'));
+		const userId = userIdResult[0].id;
 
-		//Retrieve property id
-		const propertyId = db
-			.prepare('SELECT id FROM properties WHERE address = ?')
-			.get('456 Oak Ave, Somewhere, USA') as { id: number };
+		// Retrieve property id
+		const propertyIdResult = await db
+			.select()
+			.from(schema.properties)
+			.where(eq(schema.properties.address, '456 Oak Ave, Somewhere, USA'));
+		const propertyId = propertyIdResult[0].id;
 
 		// Finally insert viewed property
-		db.prepare(
-			'INSERT INTO viewed_properties (user_id, property_id) VALUES (?, ?)',
-		).run(userId.id, propertyId.id);
+		await db.insert(schema.viewedProperties).values({
+			userId: userId,
+			propertyId: propertyId,
+		});
 
-		expect(
-			db
-				.prepare(
-					'SELECT * FROM viewed_properties WHERE user_id = ? AND property_id = ?',
-				)
-				.run(userId.id, propertyId.id),
-		).toBeDefined();
+		const result = await db
+			.select()
+			.from(schema.viewedProperties)
+			.where(
+				and(
+					eq(schema.viewedProperties.userId, userId),
+					eq(schema.viewedProperties.propertyId, propertyId),
+				),
+			);
+
+		expect(result).toBeDefined();
 	});
 
 	//Test 8:
-	it('should be able to insert a favorite property', () => {
+	it('should be able to insert a favorite property', async () => {
 		// Insert user
-		db.prepare(
-			'INSERT INTO users (username, password, email, role, name) VALUES (?, ?, ?, ?, ?)',
-		).run('testuser', 'testpassword', 'test@test.com', 'user', 'Anon User');
+		await db.insert(schema.users).values({
+			username: 'testuser',
+			password: 'testpassword',
+			email: 'test@test.com',
+			role: 'user',
+			name: 'Anon User',
+		});
 
 		// Then insert property
-		db.prepare(
-			'INSERT INTO properties (bedrooms, address, monthly_rent, contact_phone, summary, url, identifier) VALUES (?, ?, ?, ?, ?, ?, ?)',
-		).run(
-			3,
-			'456 Oak Ave, Somewhere, USA',
-			'$1500',
-			'555-123-4567',
-			'A test property for viewing',
-			'https://example.com',
-			1234567890,
-		);
+		await db.insert(schema.properties).values({
+			bedrooms: 3,
+			address: '456 Oak Ave, Somewhere, USA',
+			monthlyRent: '$1500',
+			contactPhone: '555-123-4567',
+			summary: 'A test property for viewing',
+			url: 'https://example.com',
+			identifier: 1234567890,
+		});
 
-		//Retrieve user id
-		const userId = db
-			.prepare('SELECT id FROM users WHERE username = ?')
-			.get('testuser') as { id: number };
+		// Retrieve user id
+		const userIdResult = await db
+			.select()
+			.from(schema.users)
+			.where(eq(schema.users.username, 'testuser'));
 
-		//Retrieve property id
-		const propertyId = db
-			.prepare('SELECT id FROM properties WHERE address = ?')
-			.get('456 Oak Ave, Somewhere, USA') as { id: number };
+		const userId = userIdResult[0].id;
+
+		// Retrieve property id
+		const propertyIdResult = await db
+			.select()
+			.from(schema.properties)
+			.where(eq(schema.properties.address, '456 Oak Ave, Somewhere, USA'));
+		const propertyId = propertyIdResult[0].id;
 
 		// Finally insert favorite
-		db.prepare(
-			'INSERT INTO favorites (user_id, property_id) VALUES (?, ?)',
-		).run(userId.id, propertyId.id);
+		await db.insert(schema.favorites).values({
+			userId: userId,
+			propertyId: propertyId,
+		});
 
-		expect(
-			db
-				.prepare(
-					'SELECT * FROM favorites WHERE user_id = ? AND property_id = ?',
-				)
-				.run(userId.id, propertyId.id),
-		).toBeDefined();
+		const result = await db
+			.select()
+			.from(schema.favorites)
+			.where(
+				and(
+					eq(schema.favorites.userId, userId),
+					eq(schema.favorites.propertyId, propertyId),
+				),
+			);
+		expect(result).toBeDefined();
 	});
 
 	//Test 9:
 	it('the table actually gets wiped when calling the resetDatabase function', async () => {
-		expect(db.prepare('SELECT * FROM roles').get()).toBeDefined();
-		expect(db.prepare('SELECT * FROM users').get()).toBeDefined();
-		await resetDatabase(db, dbTestOptions);
-		expect(db.prepare('SELECT * FROM roles').get()).toBeUndefined();
-		expect(db.prepare('SELECT * FROM users').get()).toBeUndefined();
+		let result = await db.execute('SELECT * FROM roles');
+		expect(result).toBeDefined();
+		result = await db.execute('SELECT * FROM users');
+		expect(result).toBeDefined();
+		await resetDatabase(db);
+		result = await db.execute('SELECT * FROM roles');
+		expect(result).toBeUndefined();
+		result = await db.execute('SELECT * FROM users');
+		expect(result).toBeUndefined();
 	});
 
 	//Test 10:
 	it('tests that the initial values are inserted correctly', async () => {
-		await resetDatabase(db, dbTestOptions);
+		await resetDatabase(db);
 		await initialValues(db);
-		expect(db.prepare('SELECT * FROM roles').get()).toBeDefined();
-		expect(db.prepare('SELECT * FROM users').get()).toBeDefined();
-		expect(
-			db.prepare("SELECT * FROM roles WHERE role_name = 'admin'").get(),
-		).toBeDefined();
-		expect(
-			db.prepare("SELECT * FROM roles WHERE role_name = 'user'").get(),
-		).toBeDefined();
+		let result = await db.execute('SELECT * FROM roles');
+		expect(result).toBeDefined();
+		result = await db.execute('SELECT * FROM users');
+		expect(result).toBeDefined();
+		result = await db.execute("SELECT * FROM roles WHERE role_name = 'admin'");
+		expect(result).toBeDefined();
+		result = await db.execute("SELECT * FROM roles WHERE role_name = 'user'");
+		expect(result).toBeDefined();
 	});
 });

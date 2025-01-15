@@ -7,12 +7,7 @@ import {
 	User,
 } from '../types/table-types';
 import usersModelFactory, { UsersModel } from '../models/users';
-import { dbProductionOptions } from '../database/init-db';
-import connectionGenerator from '../database/init-db';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { databasePath } from '../database/init-db';
 import bcrypt from 'bcrypt';
-import { invitationTokens } from '../database/schema';
 import {
 	generateAccessToken,
 	generateRefreshToken,
@@ -22,14 +17,15 @@ import {
 import invitationTokenModelFactory, {
 	InvitationTokenModel,
 } from '../models/invitation-token';
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 //Defines the router for the authentication controllers.
 const router: Router = Router();
 
 export class AuthenticationJWTControllers {
 	usersModel: UsersModel;
 	invitationTokenModel: InvitationTokenModel;
-	constructor(private db: BetterSQLite3Database) {
+	constructor(private db: NodePgDatabase<typeof schema>) {
 		//Defines the users model.
 		this.usersModel = usersModelFactory(this.db);
 

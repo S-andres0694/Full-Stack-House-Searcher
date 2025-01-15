@@ -14,12 +14,11 @@ import propertiesModelFactory, {
 import { Server } from 'http';
 import request from 'supertest';
 import express from 'express';
-import { testDbPath } from '../jest.setup';
 import connectionGenerator, {
-	dbTestOptions,
 	initialValues,
 	resetDatabase,
-} from '../../database/init-db';
+	testDatabaseConfiguration,
+} from '../../database/init-db.v2';
 import { testApi } from '../../controllers/favorite_properties-api';
 import morgan from 'morgan';
 import favoritePropertiesRoutesFactory from '../../routes/favorite_properties-routes';
@@ -33,10 +32,11 @@ import sessionMiddleware from '../../middleware/express-session-config';
 import { passportObj } from '../../authentication/google-auth.config';
 import cookieParser from 'cookie-parser';
 import { addBearerToken } from '../../middleware/auth-middleware';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../../database/schema';
 
 let app: Application;
-let dbConnection: Database;
-let db: BetterSQLite3Database;
+let db: NodePgDatabase<typeof schema>;
 const port: number = 4000;
 let server: Server;
 let favoritePropertiesModel: FavoritePropertiesModel;
@@ -51,12 +51,11 @@ const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
 beforeAll(async () => {
 	app = express();
-	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
-	db = drizzle(dbConnection);
+	db = connectionGenerator(testDatabaseConfiguration);
 	app.use(morgan('common'));
 	app.use(express.json());
 	//Authentication routes
-	app.use('/auth', authenticationRoutesFactory(testDbPath));
+	app.use('/auth', authenticationRoutesFactory(db));
 
 	//Start the server
 	server = app.listen(port, () => {
@@ -91,7 +90,7 @@ beforeAll(async () => {
 	app.use(
 		'/favorite_properties',
 		addBearerToken(accessJwtToken),
-		favoritePropertiesRoutesFactory(testDbPath),
+		favoritePropertiesRoutesFactory(db),
 	);
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
@@ -102,8 +101,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await resetDatabase(dbConnection, dbTestOptions);
-	await initialValues(dbConnection);
+	await resetDatabase(db);
+	await initialValues(db);
 	propertyId = await propertiesModel.createProperty(property);
 	propertyId2 = await propertiesModel.createProperty(property2);
 	await usersModel.createUser(user);

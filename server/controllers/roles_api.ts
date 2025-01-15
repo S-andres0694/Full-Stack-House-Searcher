@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import rolesModelFactory from '../models/roles';
 import { RolesModel } from '../models/roles';
-import { Database } from 'better-sqlite3';
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import usersModelFactory, { UsersModel } from '../models/users';
-import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
+
 /**
  * Test API to make sure that the endpoint is working.
  * @param {Request} request - The request object
@@ -19,17 +19,14 @@ export const testApi = async (
 };
 
 export class RolesApi {
-	//Database Connection Instance
-	private drizzle: BetterSQLite3Database;
 	//Roles Model Instance
 	private rolesModel: RolesModel;
 	//Users Model Instance
 	private usersModel: UsersModel;
 
-	constructor(private db: Database) {
-		this.drizzle = drizzle(db);
-		this.rolesModel = rolesModelFactory(this.drizzle);
-		this.usersModel = usersModelFactory(this.drizzle);
+	constructor(private db: NodePgDatabase<typeof schema>) {
+		this.rolesModel = rolesModelFactory(this.db);
+		this.usersModel = usersModelFactory(this.db);
 	}
 
 	/**
@@ -150,6 +147,8 @@ export class RolesApi {
  * @param {Database} db - The database instance
  * @returns {RolesApi} The RolesApi instance
  */
-export default function rolesApiFactory(db: Database): RolesApi {
+export default function rolesApiFactory(
+	db: NodePgDatabase<typeof schema>,
+): RolesApi {
 	return new RolesApi(db);
 }

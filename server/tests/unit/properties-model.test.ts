@@ -1,38 +1,28 @@
 import { describe, it, expect } from '@jest/globals';
-import { testDbPath } from '../jest.setup';
 import connectionGenerator, {
-	dbTestOptions,
 	initialValues,
 	resetDatabase,
-} from '../../database/init-db';
+} from '../../database/init-db.v2';
 import propertiesModelFactory, {
 	PropertiesModel,
 } from '../../models/properties';
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
-import { Database } from 'better-sqlite3';
-import { NewProperty, Property } from '../../types/table-types';
 import { property, property2 } from '../constants';
+import * as schema from '../../database/schema';
+import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { testDatabaseConfiguration } from '../../database/init-db.v2';
 
-let db: Database;
+let db: NodePgDatabase<typeof schema>;
 let propertiesModel: PropertiesModel;
-let drizzleORM: BetterSQLite3Database;
 
 beforeAll(() => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	drizzleORM = drizzle(db);
-	propertiesModel = propertiesModelFactory(drizzleORM);
+	db = connectionGenerator(testDatabaseConfiguration);
+	propertiesModel = propertiesModelFactory(db);
 });
 
 beforeEach(async () => {
-	db = connectionGenerator(testDbPath, dbTestOptions);
-	await resetDatabase(db, dbTestOptions);
+	db = connectionGenerator(testDatabaseConfiguration);
+	await resetDatabase(db);
 	await initialValues(db);
-});
-
-afterAll(() => {
-	if (db) {
-		db.close();
-	}
 });
 
 describe('Properties Model Unit Tests', () => {

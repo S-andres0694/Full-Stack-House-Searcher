@@ -18,3 +18,4 @@ coverage
 docs
 server/my.secrets
 my.secrets
+server/ca.pem

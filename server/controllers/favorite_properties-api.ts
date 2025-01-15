@@ -6,6 +6,9 @@ import favoritePropertiesModelFactory from '../models/favorite_properties';
 import usersModelFactory, { UsersModel } from '../models/users';
 import propertiesModelFactory, { PropertiesModel } from '../models/properties';
 import { Favorite, NewFavorite, User } from '../types/table-types';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
+
 /**
  * Test API to make sure that the endpoint is working.
  * @param {Request} request - The request object
@@ -24,8 +27,6 @@ export const testApi = async (
  */
 
 export class FavoritePropertiesApi {
-	//Database Connection Instance
-	private drizzle: BetterSQLite3Database;
 	//Favorite Properties Model Instance
 	private favoritePropertiesModel: FavoritePropertiesModel;
 	//Users Model Instance
@@ -33,11 +34,10 @@ export class FavoritePropertiesApi {
 	//Properties Model Instance
 	private propertiesModel: PropertiesModel;
 
-	constructor(private db: Database) {
-		this.drizzle = drizzle(db);
-		this.favoritePropertiesModel = favoritePropertiesModelFactory(this.drizzle);
-		this.usersModel = usersModelFactory(this.drizzle);
-		this.propertiesModel = propertiesModelFactory(this.drizzle);
+	constructor(private db: NodePgDatabase<typeof schema>) {
+		this.favoritePropertiesModel = favoritePropertiesModelFactory(this.db);
+		this.usersModel = usersModelFactory(this.db);
+		this.propertiesModel = propertiesModelFactory(this.db);
 	}
 
 	/**
@@ -286,7 +286,7 @@ export class FavoritePropertiesApi {
  */
 
 export default function favoritePropertiesApiFactory(
-	db: Database,
+	db: NodePgDatabase<typeof schema>,
 ): FavoritePropertiesApi {
 	return new FavoritePropertiesApi(db);
 }

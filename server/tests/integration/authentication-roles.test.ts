@@ -1,15 +1,7 @@
-import { Database } from 'better-sqlite3';
 import { Application } from 'express';
 import usersModelFactory, { UsersModel } from '../../models/users';
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
+import { drizzle, NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Server } from 'http';
-import {
-	dbTestOptions,
-	initialValues,
-	resetDatabase,
-} from '../../database/init-db';
-import connectionGenerator from '../../database/init-db';
-import { testDbPath } from '../jest.setup';
 import express from 'express';
 import morgan from 'morgan';
 import authenticationRoutesFactory from '../../routes/authentication-routes';
@@ -23,10 +15,15 @@ import favoritePropertiesRoutesFactory from '../../routes/favorite_properties-ro
 import propertiesRoutesFactory from '../../routes/properties_routes';
 import rolesRoutesFactory from '../../routes/roles_routes';
 import viewedPropertiesRoutesFactory from '../../routes/viewed_properties-routes';
+import connectionGenerator, {
+	initialValues,
+	resetDatabase,
+	testDatabaseConfiguration,
+} from '../../database/init-db.v2';
+import * as schema from '../../database/schema';
 
 let app: Application;
-let dbConnection: Database;
-let db: BetterSQLite3Database;
+let db: NodePgDatabase<typeof schema>;
 const port: number = 4000;
 let server: Server;
 let adminAccessJwtToken: string;
@@ -40,8 +37,7 @@ const ADMIN_USERNAME: string = process.env.ADMIN_USERNAME!;
 
 beforeAll(async () => {
 	app = express();
-	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
-	db = drizzle(dbConnection);
+	db = connectionGenerator(testDatabaseConfiguration);
 	userModel = usersModelFactory(db);
 
 	await userModel.createUser({
@@ -58,7 +54,7 @@ beforeAll(async () => {
 	app.use(express.json());
 
 	//Authentication routes
-	app.use('/auth', authenticationRoutesFactory(testDbPath));
+	app.use('/auth', authenticationRoutesFactory(db));
 
 	//Start the server
 	server = app.listen(port, () => {
@@ -103,11 +99,11 @@ beforeAll(async () => {
 	app.use(passportObj.initialize());
 	app.use(passportObj.session());
 
-	app.use('/users', userRoutesFactory(testDbPath));
-	app.use('/favorite_properties', favoritePropertiesRoutesFactory(testDbPath));
-	app.use('/properties', propertiesRoutesFactory(testDbPath));
-	app.use('/roles', rolesRoutesFactory(testDbPath));
-	app.use('/viewed_properties', viewedPropertiesRoutesFactory(testDbPath));
+	app.use('/users', userRoutesFactory(db));
+	app.use('/favorite_properties', favoritePropertiesRoutesFactory(db));
+	app.use('/properties', propertiesRoutesFactory(db));
+	app.use('/roles', rolesRoutesFactory(db));
+	app.use('/viewed_properties', viewedPropertiesRoutesFactory(db));
 
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
@@ -115,8 +111,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await resetDatabase(dbConnection, dbTestOptions);
-	await initialValues(dbConnection);
+	await resetDatabase(db);
+	await initialValues(db);
 });
 
 afterAll(() => {

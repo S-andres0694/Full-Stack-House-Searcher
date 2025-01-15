@@ -1,13 +1,11 @@
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { Database } from 'better-sqlite3';
-import connectionGenerator from '../database/init-db';
 import usersModelFactory, { UsersModel } from '../models/users';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { eq } from 'drizzle-orm';
 import { User, NewUser, userInfoAdminDashboard } from '../types/table-types';
-import { Request, response, Response } from 'express';
+import { Request, Response } from 'express';
 import rolesModelFactory, { RolesModel } from '../models/roles';
-
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 /**
  * Test API to make sure that the server is running.
  * @param {Request} request - The request object
@@ -22,17 +20,14 @@ export const testApi = async (
 };
 
 export class UserApi {
-	//Database Connection Instance
-	private drizzle: BetterSQLite3Database;
 	//Users Model Instance
 	private usersModel: UsersModel;
 	//Roles Model Instance
 	private rolesModel: RolesModel;
 
-	constructor(private db: Database) {
-		this.drizzle = drizzle(db);
-		this.usersModel = usersModelFactory(this.drizzle);
-		this.rolesModel = rolesModelFactory(this.drizzle);
+	constructor(private db: NodePgDatabase<typeof schema>) {
+		this.usersModel = usersModelFactory(this.db);
+		this.rolesModel = rolesModelFactory(this.db);
 	}
 
 	/**
@@ -67,8 +62,9 @@ export class UserApi {
 	): Promise<void> => {
 		try {
 			const email: string = request.params.email;
-			const user: User | undefined =
-				await this.usersModel.getUserByEmail(email);
+			const user: User | undefined = await this.usersModel.getUserByEmail(
+				email,
+			);
 			if (!user) {
 				response.status(404).json({ error: 'User not found' });
 				return;
@@ -379,6 +375,14 @@ export class UserApi {
 	};
 }
 
-export default function userApiFactory(db: Database): UserApi {
+/**
+ * Creates a new UserApi instance.
+ * @param {NodePgDatabase<typeof schema>} db - The database instance
+ * @returns {UserApi} The UserApi instance
+ */
+
+export default function userApiFactory(
+	db: NodePgDatabase<typeof schema>,
+): UserApi {
 	return new UserApi(db);
 }

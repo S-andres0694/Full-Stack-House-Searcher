@@ -1,20 +1,20 @@
-import { Database } from 'better-sqlite3';
 import { Router } from 'express';
 import viewedPropertiesApiFactory, {
 	ViewedPropertiesApi,
 	testApi,
 } from '../controllers/viewed_properties-api';
-import { dbProductionOptions } from '../database/init-db';
-import connectionGenerator from '../database/init-db';
 import {
 	isUserLoggedInThroughGoogle,
 	isUserLoggedInThroughJWT,
 	requiresRoleOf,
 } from '../middleware/auth-middleware';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 
-export default function viewedPropertiesRoutesFactory(dbPath: string): Router {
+export default function viewedPropertiesRoutesFactory(
+	db: NodePgDatabase<typeof schema>,
+): Router {
 	const router: Router = Router();
-	const db: Database = connectionGenerator(dbPath, dbProductionOptions);
 	const viewedPropertiesApi: ViewedPropertiesApi =
 		viewedPropertiesApiFactory(db);
 

@@ -1,10 +1,11 @@
 import { eq } from 'drizzle-orm';
 import { invitationTokens, usedInvitationTokens } from '../database/schema';
 import { InvitationToken, UsedInvitationToken } from '../types/table-types';
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 
 export class InvitationTokenModel {
-	constructor(private db: BetterSQLite3Database) {}
+	constructor(private db: NodePgDatabase<typeof schema>) {}
 
 	/**
 	 * Checks if an invitation token is valid.
@@ -40,7 +41,7 @@ export class InvitationTokenModel {
 		invitationToken: InvitationToken,
 	): Promise<void> {
 		try {
-			this.db.transaction(async (tx: BetterSQLite3Database) => {
+			this.db.transaction(async (tx) => {
 				await tx
 					.insert(usedInvitationTokens)
 					.values({ used_tokenID: invitationToken.id });
@@ -87,14 +88,12 @@ export class InvitationTokenModel {
 		invitationToken: string,
 	): Promise<InvitationToken | undefined> {
 		try {
-			const result = await this.db.transaction(
-				async (tx: BetterSQLite3Database) => {
-					return await tx
-						.insert(invitationTokens)
-						.values({ token: invitationToken })
-						.returning();
-				},
-			);
+			const result = await this.db.transaction(async (tx) => {
+				return await tx
+					.insert(invitationTokens)
+					.values({ token: invitationToken })
+					.returning();
+			});
 			return result[0];
 		} catch (error) {
 			console.error('Failed to create invitation token:', error);
@@ -110,7 +109,7 @@ export class InvitationTokenModel {
  */
 
 export default function invitationTokenModelFactory(
-	db: BetterSQLite3Database,
+	db: NodePgDatabase<typeof schema>,
 ): InvitationTokenModel {
 	return new InvitationTokenModel(db);
 }

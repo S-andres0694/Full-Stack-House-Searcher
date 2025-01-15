@@ -1,13 +1,12 @@
 import request from 'supertest';
 import { Application } from 'express';
 import express from 'express';
-import { testDbPath } from '../jest.setup';
 import {
-	dbTestOptions,
 	initialValues,
 	resetDatabase,
-} from '../../database/init-db';
-import connectionGenerator from '../../database/init-db';
+	testDatabaseConfiguration,
+} from '../../database/init-db.v2';
+import connectionGenerator from '../../database/init-db.v2';
 import { Database } from 'better-sqlite3';
 import morgan from 'morgan';
 import userRoutesFactory from '../../routes/user_routes';
@@ -32,10 +31,11 @@ import sessionMiddleware from '../../middleware/express-session-config';
 import cookieParser from 'cookie-parser';
 import { passportObj } from '../../authentication/google-auth.config';
 import { Response } from 'supertest';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../../database/schema';
 
 let app: Application;
-let dbConnection: Database;
-let db: BetterSQLite3Database;
+let db: NodePgDatabase<typeof schema>;
 const port: number = 4000;
 let server: Server;
 let userModel: UsersModel;
@@ -45,8 +45,7 @@ const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
 beforeAll(async () => {
 	app = express();
-	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
-	db = drizzle(dbConnection);
+	db = connectionGenerator(testDatabaseConfiguration);
 	userModel = usersModelFactory(db);
 
 	//Logging middleware
@@ -55,7 +54,7 @@ beforeAll(async () => {
 	app.use(express.json());
 
 	//Authentication routes
-	app.use('/auth', authenticationRoutesFactory(testDbPath));
+	app.use('/auth', authenticationRoutesFactory(db));
 
 	//Start the server
 	server = app.listen(port, () => {
@@ -89,11 +88,7 @@ beforeAll(async () => {
 	app.use(passportObj.session());
 
 	//Routes
-	app.use(
-		'/users',
-		addBearerToken(accessJwtToken),
-		userRoutesFactory(testDbPath),
-	);
+	app.use('/users', addBearerToken(accessJwtToken), userRoutesFactory(db));
 
 	server = app.listen(port, () => {
 		console.log(`Server is running on port ${port}`);
@@ -101,8 +96,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await resetDatabase(dbConnection, dbTestOptions);
-	await initialValues(dbConnection);
+	await resetDatabase(db);
+	await initialValues(db);
 });
 
 describe('User API Testing', () => {

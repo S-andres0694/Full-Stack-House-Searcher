@@ -1,17 +1,15 @@
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { viewedProperties } from '../database/schema';
-import {
-	NewViewedProperty,
-	Property,
-	ViewedProperty,
-} from '../types/table-types';
+import { NewViewedProperty, ViewedProperty } from '../types/table-types';
 import { eq, sql, desc, and } from 'drizzle-orm';
 import { users, properties } from '../database/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
+
 /**
  * Class representing a model for viewed properties operations in the database.
  */
 export class ViewedPropertiesModel {
-	constructor(private db: BetterSQLite3Database) {}
+	constructor(private db: NodePgDatabase<typeof schema>) {}
 
 	/**
 	 * Retrieves all viewed properties for a specific user from the database.
@@ -159,7 +157,7 @@ export class ViewedPropertiesModel {
 }
 
 export default function viewedPropertiesModelFactory(
-	db: BetterSQLite3Database,
+	db: NodePgDatabase<typeof schema>,
 ): ViewedPropertiesModel {
 	return new ViewedPropertiesModel(db);
 }

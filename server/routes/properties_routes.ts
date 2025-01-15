@@ -3,18 +3,20 @@ import propertiesApiFactory, {
 	PropertiesApi,
 	testApi,
 } from '../controllers/properties_api';
-import connectionGenerator from '../database/init-db';
-import { dbProductionOptions } from '../database/init-db';
-import { Database } from 'better-sqlite3';
+import { PoolConfig } from 'pg';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
+import connectionGenerator from '../database/init-db.v2';
 import {
 	isUserLoggedInThroughGoogle,
 	isUserLoggedInThroughJWT,
 	requiresRoleOf,
 } from '../middleware/auth-middleware';
 
-export default function propertiesRoutesFactory(dbPath: string): Router {
+export default function propertiesRoutesFactory(
+	db: NodePgDatabase<typeof schema>,
+): Router {
 	const router: Router = Router();
-	const db: Database = connectionGenerator(dbPath, dbProductionOptions);
 	const propertiesApi: PropertiesApi = propertiesApiFactory(db);
 
 	//Tests that the route is alive

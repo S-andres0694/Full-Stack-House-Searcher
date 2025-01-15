@@ -1,15 +1,15 @@
 import request from 'supertest';
 import { Application, response } from 'express';
-import { testDbPath } from '../jest.setup';
 import { RolesModel } from '../../models/roles';
 import {
-	dbTestOptions,
 	resetDatabase,
 	initialValues,
-} from '../../database/init-db';
-import { Database } from 'better-sqlite3';
+	testDatabaseConfiguration,
+} from '../../database/init-db.v2';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../../database/schema';
 import rolesModelFactory from '../../models/roles';
-import connectionGenerator from '../../database/init-db';
+import connectionGenerator from '../../database/init-db.v2';
 import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import express from 'express';
 import { Server } from 'http';
@@ -25,8 +25,7 @@ import { isUserLoggedInThroughJWT } from '../../middleware/auth-middleware';
 import { Response } from 'supertest';
 
 let app: Application;
-let dbConnection: Database;
-let db: BetterSQLite3Database;
+let db: NodePgDatabase<typeof schema>;
 let rolesModel: RolesModel;
 const port: number = 4000;
 let server: Server;
@@ -36,8 +35,7 @@ const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD!;
 
 beforeAll(async () => {
 	app = express();
-	dbConnection = connectionGenerator(testDbPath, dbTestOptions);
-	db = drizzle(dbConnection);
+	db = connectionGenerator(testDatabaseConfiguration);
 	rolesModel = rolesModelFactory(db);
 	//Logging middleware
 	app.use(morgan('common'));
@@ -45,7 +43,7 @@ beforeAll(async () => {
 	app.use(express.json());
 
 	//Authentication routes
-	app.use('/auth', authenticationRoutesFactory(testDbPath));
+	app.use('/auth', authenticationRoutesFactory(db));
 
 	//Start the server
 	server = app.listen(port, () => {
@@ -79,11 +77,7 @@ beforeAll(async () => {
 	app.use(passportObj.session());
 
 	//Routes
-	app.use(
-		'/roles',
-		addBearerToken(accessJwtToken),
-		rolesRoutesFactory(testDbPath),
-	);
+	app.use('/roles', addBearerToken(accessJwtToken), rolesRoutesFactory(db));
 
 	//Start the server
 	server = app.listen(port, () => {
@@ -92,8 +86,8 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
-	await resetDatabase(dbConnection, dbTestOptions);
-	await initialValues(dbConnection);
+	await resetDatabase(db);
+	await initialValues(db);
 });
 
 describe('Roles API Testing', () => {

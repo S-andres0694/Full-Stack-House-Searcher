@@ -28,7 +28,6 @@ export function isUserLoggedInThroughGoogle(
 	console.log(req.cookies['connect.sid'], req.get('X-Auth-Method'));
 
 	const user = req.user as User;
-	console.log(user);
 	console.log(`User ${user?.email} is logged in through Google OAuth2.`);
 	res.setHeader('X-Auth-Method', 'Google OAuth2');
 	next();

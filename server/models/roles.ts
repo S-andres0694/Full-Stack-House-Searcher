@@ -1,13 +1,13 @@
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { roles } from '../database/schema';
 import { Role } from '../types/table-types';
 import { eq } from 'drizzle-orm';
-
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 /**
  * Class representing a model for role operations in the database.
  */
 export class RolesModel {
-	constructor(private db: BetterSQLite3Database) {}
+	constructor(private db: NodePgDatabase<typeof schema>) {}
 
 	/**
 	 * Creates a new role in the database.
@@ -89,7 +89,7 @@ export class RolesModel {
 }
 
 export default function rolesModelFactory(
-	db: BetterSQLite3Database,
+	db: NodePgDatabase<typeof schema>,
 ): RolesModel {
 	return new RolesModel(db);
 }

@@ -1,13 +1,14 @@
-import { BetterSQLite3Database } from 'drizzle-orm/better-sqlite3';
 import { eq } from 'drizzle-orm';
 import { properties } from '../database/schema';
 import { NewProperty, Property } from '../types/table-types';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
 
 /**
  * Class representing a model for property operations in the database.
  */
 export class PropertiesModel {
-	constructor(private db: BetterSQLite3Database) {}
+	constructor(private db: NodePgDatabase<typeof schema>) {}
 
 	/**
 	 * Retrieves all properties from the database.
@@ -234,7 +235,7 @@ export class PropertiesModel {
  * @returns {PropertiesModel} An instance of PropertiesModel
  */
 export default function propertiesModelFactory(
-	db: BetterSQLite3Database,
+	db: NodePgDatabase<typeof schema>,
 ): PropertiesModel {
 	return new PropertiesModel(db);
 }

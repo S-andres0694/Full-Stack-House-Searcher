@@ -10,8 +10,10 @@ import usersModelFactory from '../models/users';
 import { UsersModel } from '../models/users';
 import { ViewedProperty } from '../types/table-types';
 import propertiesModelFactory, { PropertiesModel } from '../models/properties';
-import { properties } from '../database/schema';
 import { UserTokenPayload } from '../authentication/token-manipulator';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../database/schema';
+
 /**
  * Test API to make sure that the endpoint is working.
  * @param {Request} request - The request object
@@ -30,8 +32,6 @@ export const testApi = async (
  */
 
 export class ViewedPropertiesApi {
-	//Database Connection Instance
-	private drizzle: BetterSQLite3Database;
 	//Viewed Properties Model Instance
 	private viewedPropertiesModel: ViewedPropertiesModel;
 	//Users Model Instance
@@ -39,11 +39,10 @@ export class ViewedPropertiesApi {
 	//Properties Model Instance
 	private propertiesModel: PropertiesModel;
 
-	constructor(private db: Database) {
-		this.drizzle = drizzle(db);
-		this.viewedPropertiesModel = viewedPropertiesModelFactory(this.drizzle);
-		this.usersModel = usersModelFactory(this.drizzle);
-		this.propertiesModel = propertiesModelFactory(this.drizzle);
+	constructor(private db: NodePgDatabase<typeof schema>) {
+		this.viewedPropertiesModel = viewedPropertiesModelFactory(this.db);
+		this.usersModel = usersModelFactory(this.db);
+		this.propertiesModel = propertiesModelFactory(this.db);
 	}
 
 	/**
@@ -374,7 +373,7 @@ export class ViewedPropertiesApi {
  */
 
 export default function viewedPropertiesApiFactory(
-	db: Database,
+	db: NodePgDatabase<typeof schema>,
 ): ViewedPropertiesApi {
 	return new ViewedPropertiesApi(db);
 }
