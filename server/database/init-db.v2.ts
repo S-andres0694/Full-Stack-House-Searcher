@@ -8,6 +8,8 @@ import rolesModelFactory from '../models/roles';
 import { RolesModel } from '../models/roles';
 import usersModelFactory from '../models/users';
 import { User } from '../types/table-types';
+import { existsSync } from 'fs';
+
 dotenv.config();
 
 //Admin values
@@ -15,7 +17,11 @@ const adminPassword: string = process.env.ADMIN_PASSWORD || '';
 const adminUsername: string = process.env.ADMIN_USERNAME || '';
 const adminEmail: string = process.env.ADMIN_EMAIL || '';
 
-const prodDatabaseName: string = 'defaultdb';
+let certificateValue: string = process.env.CERTIFICATE_VALUE || '';
+
+if (certificateValue === '' && existsSync('./ca.pem')) {
+	certificateValue = readFileSync('./ca.pem').toString();
+}
 
 /**
  * Aiven Cloud Database Configuration for PostgreSQL Database
@@ -26,10 +32,10 @@ export const databaseConfiguration: PoolConfig = {
 	password: process.env.DATABASE_PASSWORD,
 	host: process.env.DATABASE_HOST,
 	port: Number(process.env.DATABASE_PORT),
-	database: prodDatabaseName,
+	database: 'defaultdb',
 	ssl: {
 		rejectUnauthorized: true,
-		ca: process.env.CERTIFICATE_VALUE || readFileSync('./ca.pem').toString(),
+		ca: process.env.CERTIFICATE_VALUE,
 	},
 };
 
