@@ -31,7 +31,8 @@ passportObj.use(
 		{
 			clientID: GOOGLE_CLIENT_ID,
 			clientSecret: GOOGLE_CLIENT_SECRET,
-			callbackURL: 'google/callback', //TODO: Change to the URL to actually initialize the password to enable JWT authentication.
+			callbackURL:
+				'https://shrouded-reaches-06600-fd636073d150.herokuapp.com/auth/google/callback',
 			passReqToCallback: true,
 		},
 		async (
