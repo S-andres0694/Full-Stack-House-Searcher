@@ -2,9 +2,9 @@ name: NodeJS with Grunt
 
 on:
   push:
-    branches: [ "main", "APIandAuthBranch" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "APIandAuthBranch" ]
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -15,7 +15,6 @@ jobs:
         ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
         ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
         API_HOST: ${{ secrets.API_HOST }}
-        DB_PATH: ${{ vars.DB_PATH }}
         MIGRATIONS_PATH: ${{ vars.MIGRATIONS_PATH }}
         SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
         REFRESH_JWT_SECRET: ${{ secrets.REFRESH_JWT_SECRET }}
