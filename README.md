@@ -86,6 +86,11 @@ Full-Stack House Searcher is a web application that allows users to search for h
 - Heroku
 - Grunt
 
+### Testing
+- Jest
+- Supertest
+- Axios
+
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request.
 
