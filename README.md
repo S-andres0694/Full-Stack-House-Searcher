@@ -1,10 +1,5 @@
 # Current App State:
-
-[![Application Build State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/npm-grunt.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/npm-grunt.yml)
-
-[![Server Deployment State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/docker-container-deployment-heroku.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/docker-container-deployment-heroku.yml)
-
-[![Internal Tests State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/jest-tests.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/jest-tests.yml)
+[![Application Build State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/npm-grunt.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/npm-grunt.yml) [![Server Deployment State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/docker-container-deployment-heroku.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/docker-container-deployment-heroku.yml) [![Internal Tests State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/jest-tests.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/jest-tests.yml)
 
 # Full-Stack House Searcher
 
@@ -18,7 +13,7 @@ Full-Stack House Searcher is a web application that allows users to search for h
 - [Contributing](#contributing)
 - [License](#license)
 
-## Installation
+## Local Usage
 
 ### Client
 1. Navigate to the `client` directory:
@@ -29,6 +24,10 @@ Full-Stack House Searcher is a web application that allows users to search for h
     ```bash
     npm install
     ```
+3. Check out the website in your local server!
+    ```bash
+    npm run preview
+    ```    
 
 ### Server
 1. Navigate to the `server` directory:
@@ -39,20 +38,11 @@ Full-Stack House Searcher is a web application that allows users to search for h
     ```bash
     npm install
     ```
-
-## Usage
-
-### Client
-1. Start the development server:
-    ```bash
-    npm run dev
-    ```
-
-### Server
-1. Start the development server:
-    ```bash
-    npm run dev
-    ```
+3. Run the development server locally:
+   ```bash
+   npm run dev
+   ```
+   __This will use the production database__
 
 ## Scripts
 
@@ -63,16 +53,16 @@ Full-Stack House Searcher is a web application that allows users to search for h
 
 ### Server
 - `npm run dev`: Starts the development server with nodemon.
-- `npm run generate-prod`: Generates the production configuration.
-- `npm run generate-test`: Generates the test configuration.
+- `npm run generate-prod`: Generates the migration files for the production database.
+- `npm run generate-test`: Generates the migration files for the test database on the PostgreSQL Docker instance.
 - `npm run parcel-build`: Builds the server using Parcel.
 - `npm run unit-tests`: Runs the unit tests.
 - `npm run integration-tests`: Runs the integration tests.
 - `npm run migrate-prod`: Runs the production migrations.
 - `npm run migrate-test`: Runs the test migrations.
-- `npm run doc`: Generates the API documentation.
+- `npm run doc`: Generates the API and overall server automatic documentation. You can check it out by running a local web server through the `docs` folder
 - `npm run deployment-tests`: Runs the deployment tests.
-- `npm run start`: Starts the server from the built files.
+- `npm run start`: Starts the server from the built files.  
 
 ## Technologies
 
@@ -82,13 +72,19 @@ Full-Stack House Searcher is a web application that allows users to search for h
 - Chakra UI
 - Redux Toolkit
 - Vite
+- Tailwind
 
 ### Server
 - Express
 - TypeScript
 - Drizzle ORM
 - PostgreSQL
-- Docker
+- Docker & Docker Compose
+
+### CI/CD and Automation
+- Github Actions
+- Heroku
+- Grunt
 
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request.
