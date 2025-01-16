@@ -1,3 +1,11 @@
+# Current App State:
+
+[![Application Build State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/npm-grunt.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/npm-grunt.yml)
+
+[![Server Deployment State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/docker-container-deployment-heroku.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/docker-container-deployment-heroku.yml)
+
+[![Internal Tests State](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/jest-tests.yml/badge.svg)](https://github.com/S-andres0694/Full-Stack-House-Searcher/actions/workflows/jest-tests.yml)
+
 # Full-Stack House Searcher
 
 Full-Stack House Searcher is a web application that allows users to search for houses. It includes both a client-side application built with React and a server-side application built with Express.
