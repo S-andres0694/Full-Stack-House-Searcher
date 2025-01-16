@@ -33,7 +33,7 @@ const db: NodePgDatabase<typeof schema> = connectionGenerator(
 app.use(morgan('common'));
 
 //Static file serving
-app.use(express.static(path.join(__dirname, 'dist/public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 //Extra middleware
 app.use(express.json());
@@ -56,6 +56,16 @@ app.use('/viewed-properties', viewedPropertiesRoutesFactory(db));
 
 //Authentication routes
 app.use('/auth', authenticationRoutesFactory(db));
+
+//Default route
+app.get('/', (req, res) => {
+	res.sendFile(path.join(__dirname, '/public/pages/index.html'));
+});
+
+//Route for the Favicon
+app.get('/favicon.ico', (req, res) => {
+	res.sendFile(path.join(__dirname, '/public/icons/favicon.ico'));
+});
 
 //Start the database in the server.
 (async () => {
