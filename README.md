@@ -90,6 +90,7 @@ Full-Stack House Searcher is a web application that allows users to search for h
 - Jest
 - Supertest
 - Axios
+- act
 
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request.
