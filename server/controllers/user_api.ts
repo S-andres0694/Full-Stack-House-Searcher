@@ -373,6 +373,22 @@ export class UserApi {
 			},
 		});
 	};
+
+	/**
+	 * Checks if an email exists in the database.
+	 * @param {Request} request - The request object containing the email
+	 * @param {Response} response - The response object to send the user data
+	 */
+
+	checkEmailExists = async (request: Request, response: Response): Promise<void> => {
+		try {
+			const email: string = request.query.email as string;
+			const result: boolean = await this.usersModel.checkEmailExists(email);
+			response.json({ exists: result });
+		} catch (error) {
+			response.status(500).json({ error: 'Failed to check email exists' });
+		}
+	};
 }
 
 /**

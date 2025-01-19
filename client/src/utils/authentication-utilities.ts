@@ -20,7 +20,9 @@ import {
 
 export const getUserFromJWTToken = (token: string): User => {
 	try {
-		const decodedToken = jwt.decode(token) as User;
+		const base64Url: string = token.split('.')[1];
+		const base64: string = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+		const decodedToken: User = JSON.parse(window.atob(base64)) as User;
 		if (
 			decodedToken &&
 			decodedToken.id &&

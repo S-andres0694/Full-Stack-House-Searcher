@@ -76,7 +76,7 @@ export const register = async (
 
 export const loginThroughJWT = async (
 	loginRequest: LoginWithJWTRequest,
-): Promise<string> => {
+): Promise<void> => {
 	const response: AxiosResponse = await axiosInstance.post(
 		'/auth/login',
 		loginRequest,
@@ -87,8 +87,24 @@ export const loginThroughJWT = async (
 		//Once the user is logged in, add the interceptors to automatically attach the token and to make requests to refresh the token when necessary.
 		await addAccessTokenInterceptorToInstance(axiosInstance, accessToken);
 		await addRefreshTokenInterceptorToInstance(axiosInstance);
-		return accessToken;
 	} else {
 		throw new Error(response.data.message);
+	}
+};
+
+/**
+ * Checks if an email exists in the database.
+ * @param email - The email to check.
+ * @returns A promise that resolves to a boolean.
+ */
+
+export const checkEmailExists = async (email: string): Promise<boolean> => {
+	const response: AxiosResponse = await axiosInstance.get(
+		`/users/check-email?email=${email}`,
+	);
+	if (response.status === 200) {
+		return response.data.exists;
+	} else {
+		throw new Error(response.data.error);
 	}
 };
