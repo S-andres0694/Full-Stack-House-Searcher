@@ -1,3 +1,5 @@
+import { useSpring, animated, AnimatedComponent } from '@react-spring/web';
+
 /**
  * Divider component that inserts text between two horizontal lines
  * @param {string} text - The text to insert between the two horizontal lines
@@ -9,11 +11,28 @@ export const Divider: React.FunctionComponent<{ text: string }> = ({
 }: {
 	text: string;
 }): React.ReactNode => {
+	const [spring] = useSpring(() => ({
+		from: {
+			transform: 'scaleX(0%)',
+		},
+		to: {
+			transform: 'scaleX(100%)',
+		},
+		config: {
+			duration: 200,
+		},
+	}));
 	return (
 		<div className="flex items-center">
-			<hr className="w-44 border-t border border-gray-300 dark:border-gray-700" />
+			<animated.hr
+				style={spring}
+				className="w-44 border-t border border-gray-300 dark:border-gray-700"
+			/>
 			<span className="px-3 text-gray-500">{text}</span>
-			<hr className="w-44 border-t border border-gray-300 dark:border-gray-700" />
+			<animated.hr
+				style={spring}
+				className="w-44 border-t border border-gray-300 dark:border-gray-700"
+			/>
 		</div>
 	);
 };

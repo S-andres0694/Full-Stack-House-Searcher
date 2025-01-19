@@ -15,6 +15,7 @@ import {
 	easings,
 	to,
 	useSpring,
+	useSprings,
 } from '@react-spring/web';
 
 /**
@@ -25,6 +26,18 @@ import {
 export const LoginForm: React.FunctionComponent<{}> = () => {
 	//Hook for the navigation to other pages
 	const navigate: NavigateFunction = useNavigate();
+
+	//This is used to animate the sign in button when the user hovers over it
+	const [signInButtonHoverStyles, signInButtonHoverAnimations] = useSpring(
+		() => ({
+			from: {
+				scale: 1,
+			},
+			config: {
+				duration: 50,
+			},
+		}),
+	);
 
 	//Hook for the form
 	const {
@@ -45,6 +58,24 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 			console.error(error);
 		}
 	};
+
+	//This function is used to animate the sign in button when the user hovers over it
+	const hoverAnimationsHandler = (): void => {
+		signInButtonHoverAnimations.start({
+			scale: 0.95,
+		});
+	};
+
+	//This function is used to animate the sign in button when the user hovers out of it
+	const hoverAnimationsLeaveHandler = (): void => {
+		signInButtonHoverAnimations.start({
+			scale: 1,
+		});
+	};
+
+	//Modify the Button to use the hover animations
+	const ButtonWithHoverAnimations: AnimatedComponent<typeof Button> =
+		animated(Button);
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)}>
@@ -104,18 +135,21 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 						} rounded-full`}
 					/>
 				</Field>
-				<Button
+				<ButtonWithHoverAnimations
+					onMouseEnter={hoverAnimationsHandler}
+					onMouseLeave={hoverAnimationsLeaveHandler}
 					colorPalette="accent"
 					className="dark:bg-slate-50 dark:text-black bg-slate-800 text-white px-4 py-2 text-lg mt-5"
-					css={{
+					style={{
 						width: '80%',
+						...signInButtonHoverStyles,
 					}}
 					variant="solid"
 					type="submit"
 					rounded="full"
 				>
 					Sign In
-				</Button>
+				</ButtonWithHoverAnimations>
 			</Stack>
 		</form>
 	);

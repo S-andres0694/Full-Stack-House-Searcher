@@ -2,14 +2,42 @@ import { loginWithGoogleOAuth2 } from '../../services/authentication-services';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
 import { IconButton } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc';
-
+import { AnimatedComponent, useSpring } from '@react-spring/web';
+import { animated } from '@react-spring/web';
 /**
  * This component is used to login the user with Google OAuth2.
  * @returns A button that, when clicked, will login the user with Google OAuth2.
  */
 
 export const LoginWithGoogleButton: React.FunctionComponent<{}> = () => {
+	//This is used to navigate the user to the login page
 	const navigate: NavigateFunction = useNavigate();
+
+	//This is used to animate the sign in button when the user hovers over it
+	const [signInButtonHoverState, hoverAnimations] = useSpring(() => ({
+		from: {
+			scale: 1,
+		},
+		config: {
+			duration: 50,
+		},
+	}));
+
+	//This function is used to animate the sign in button when the user hovers over it
+	const hoverAnimationsHandler = (): void => {
+		hoverAnimations.start({
+			scale: 0.95,
+		});
+	};
+
+	//This function is used to animate the sign in button when the user hovers out of it
+	const hoverAnimationsLeaveHandler = (): void => {
+		hoverAnimations.start({
+			scale: 1,
+		});
+	};
+
+	//This function is used to handle the login with Google OAuth2
 	const handleLoginWithGoogleOAuth2 = async (): Promise<void> => {
 		try {
 			await loginWithGoogleOAuth2();
@@ -18,13 +46,20 @@ export const LoginWithGoogleButton: React.FunctionComponent<{}> = () => {
 			navigate('/login');
 		}
 	};
+
+	//Modify the IconButton to use the hover animations
+	const IconButtonWithHoverAnimations = animated(IconButton);
+
 	return (
-		<IconButton
+		<IconButtonWithHoverAnimations
 			onClick={handleLoginWithGoogleOAuth2}
+			onMouseEnter={hoverAnimationsHandler}
+			onMouseLeave={hoverAnimationsLeaveHandler}
 			aria-label="Login with Google"
 			rounded="full"
 			className="bg-slate-800 dark:bg-white p-4 text-white dark:text-black"
-			css={{
+			style={{
+				...signInButtonHoverState,
 				width: '80%',
 			}}
 		>
@@ -34,6 +69,6 @@ export const LoginWithGoogleButton: React.FunctionComponent<{}> = () => {
 					Sign in with Google
 				</p>
 			</div>
-		</IconButton>
+		</IconButtonWithHoverAnimations>
 	);
 };
