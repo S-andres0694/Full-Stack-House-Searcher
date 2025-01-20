@@ -1,11 +1,22 @@
-import { animated, useSprings } from '@react-spring/web';
-import { FC, FunctionComponent } from 'react';
+import { animated, SpringValue, useSprings } from '@react-spring/web';
+import { FunctionComponent } from 'react';
 
-const TypewriterHeader: FunctionComponent<{ text: string, delayPerLetter: number }> = ({ text, delayPerLetter }) => {
-    const textArray: string[] = text.split('');
+/**
+ * This is a component that animates the text in a typewriter effect.
+ * @param text - The text to animate.
+ * @param delayPerLetter - The delay between each letter.
+ * @returns A component that animates the text in a typewriter effect.
+ */
 
-	//This is used to animate the Log Into House Search text
-    const animatedTextStyles = useSprings(
+const TypewriterAnimatedHeader: FunctionComponent<{
+	text: string;
+	delayPerLetter: number;
+}> = ({ text, delayPerLetter }) => {
+	const textArray: string[] = text.split('');
+	const animatedTextStyles: {
+		opacity: SpringValue<number>;
+		transform: SpringValue<string>;
+	}[] = useSprings(
 		textArray.length,
 		textArray.map((_, i) => ({
 			from: { opacity: 0, transform: 'translateY(10px)' },
@@ -15,13 +26,16 @@ const TypewriterHeader: FunctionComponent<{ text: string, delayPerLetter: number
 	);
 	return (
 		<div>
-			{textArray.map((char, i) => (
-				<animated.span key={i} style={animatedTextStyles[i]}>
-					{char}
+			{textArray.map((letter: string, index: number) => (
+				<animated.span
+					key={`${letter}-${index}`}
+					style={animatedTextStyles[index]}
+				>
+					{letter}
 				</animated.span>
 			))}
 		</div>
 	);
 };
 
-export default TypewriterHeader;
+export default TypewriterAnimatedHeader;

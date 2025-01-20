@@ -1,7 +1,5 @@
-import { defineStyle, Input, Stack } from '@chakra-ui/react';
+import { Stack } from '@chakra-ui/react';
 import { Button } from '../../components/ui/button';
-import { Field } from '../../components/ui/field';
-import { PasswordInput } from '../../components/ui/password-input';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { LoginWithJWTRequest } from '../../types/authentication-types';
 import {
@@ -17,6 +15,8 @@ import {
 	useSpring,
 	useSprings,
 } from '@react-spring/web';
+import { InputField } from '../utilities/TextInputField';
+import { PasswordField } from '../utilities/PasswordField';
 
 /**
  * A form for logging in a user through JWT.
@@ -80,61 +80,29 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 	return (
 		<form onSubmit={handleSubmit(onSubmit)}>
 			<Stack gap="4" align="center" maxW="md" maxH="xs">
-				<Field
+				<InputField
 					label="Email"
-					invalid={!!errors.email}
-					errorText={errors.email?.message}
-					className={'text-black dark:text-white'}
-				>
-					<Input
-						variant="subtle"
-						type="email"
-						placeholder="Enter your email"
-						{...register('email', {
-							required: 'Email is required',
-							pattern: {
-								value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-								message: 'Invalid email address',
-							},
-							//Check that the email exists in the database
-							onChange: async (event: React.ChangeEvent<HTMLInputElement>) => {
-								if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value)) {
-									const email: string = event.target.value;
-									const emailExists: boolean = await checkEmailExists(email);
-									if (!emailExists) {
-										setError('email', {
-											message: 'No user with this email exists',
-										});
-									}
-								}
-							},
-						})}
-						className={`px-4 ${
-							!errors.email
-								? 'focus:border border-black dark:border-white'
-								: 'border border-red-500'
-						} rounded-full`}
-					/>
-				</Field>
-				<Field
-					label="Password"
-					invalid={!!errors.password}
-					errorText={errors.password?.message}
-					colorPalette="accent"
-				>
-					<PasswordInput
-						placeholder="Enter your password"
-						variant="subtle"
-						{...register('password', {
-							required: 'Password is required',
-						})}
-						className={`px-4 ${
-							!errors.password
-								? 'focus:border border-black dark:border-white'
-								: 'border border-red-500'
-						} rounded-full`}
-					/>
-				</Field>
+					name="email"
+					type="email"
+					placeholder="Enter your email"
+					regexPattern={/^[^\s@]+@[^\s@]+\.[^\s@]+$/}
+					register={register}
+					errors={errors}
+					setError={setError}
+					required={true}
+					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+						if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value)) {
+							const email: string = event.target.value;
+							const emailExists: boolean = await checkEmailExists(email);
+							if (!emailExists) {
+								setError('email', {
+									message: 'No user with this email exists',
+								});
+							}
+						}
+					}}
+				/>
+				<PasswordField errors={errors} register={register} />
 				<ButtonWithHoverAnimations
 					onMouseEnter={hoverAnimationsHandler}
 					onMouseLeave={hoverAnimationsLeaveHandler}
