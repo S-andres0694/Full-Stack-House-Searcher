@@ -9,7 +9,9 @@ import { animated } from '@react-spring/web';
  * @returns A button that, when clicked, will login the user with Google OAuth2.
  */
 
-export const LoginWithGoogleButton: React.FunctionComponent<{}> = () => {
+export const LoginWithGoogleButton: React.FunctionComponent<{
+	text?: string;
+}> = ({ text = 'Sign in with Google' }) => {
 	//This is used to navigate the user to the login page
 	const navigate: NavigateFunction = useNavigate();
 
@@ -65,9 +67,7 @@ export const LoginWithGoogleButton: React.FunctionComponent<{}> = () => {
 		>
 			<div className="flex justify-center items-center gap-2 w-full">
 				<FcGoogle style={{ width: '10%', height: '10%' }} />
-				<p className="text-white dark:text-black text-lg">
-					Sign in with Google
-				</p>
+				<p className="text-white dark:text-black text-lg">{text}</p>
 			</div>
 		</IconButtonWithHoverAnimations>
 	);

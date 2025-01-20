@@ -22,6 +22,7 @@ export type LoginWithJWTRequest = {
 export type RegisterRequest = {
 	email: string;
 	password: string;
+	confirmPassword: string;
 	name: string;
 	username: string;
 	invitationToken: string;

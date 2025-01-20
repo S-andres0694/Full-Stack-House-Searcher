@@ -21,6 +21,7 @@ type InputFieldProps<T extends FieldValues> = {
 	errors: FormState<T>['errors'];
 	setError: UseFormSetError<T>;
 	required: boolean;
+	requiredLabel: boolean;
 };
 
 /**
@@ -37,7 +38,9 @@ type InputFieldProps<T extends FieldValues> = {
  * @returns A component that creates an input field with a label.
  */
 
-export const InputField: FunctionComponent<InputFieldProps<any>> = <T extends FieldValues>({
+export const InputField: FunctionComponent<InputFieldProps<any>> = <
+	T extends FieldValues,
+>({
 	label,
 	name,
 	type,
@@ -47,6 +50,7 @@ export const InputField: FunctionComponent<InputFieldProps<any>> = <T extends Fi
 	required,
 	register,
 	errors,
+	requiredLabel,
 }: InputFieldProps<T>) => {
 	return (
 		<Field
@@ -54,6 +58,7 @@ export const InputField: FunctionComponent<InputFieldProps<any>> = <T extends Fi
 			invalid={!!errors[name]}
 			errorText={errors[name]?.message?.toString()}
 			className={'text-black dark:text-white'}
+			required={requiredLabel}
 		>
 			<Input
 				variant="subtle"
@@ -68,7 +73,7 @@ export const InputField: FunctionComponent<InputFieldProps<any>> = <T extends Fi
 					onChange, // Optional chaining to pass onChange if provided
 				})}
 				className={`px-4 ${
-					!errors[name]
+					!errors[name]?.type
 						? 'focus:border border-black dark:border-white'
 						: 'border border-red-500'
 				} rounded-full`}

@@ -1,13 +1,37 @@
-export const PatternBackground = ({
-	children,
-}: {
+import { useSpring, animated } from '@react-spring/web';
+import { FunctionComponent } from 'react';
+
+/**
+ * A component that creates a pattern background for the page
+ * @param children - The children to be rendered inside the pattern background
+ * @returns A component that creates a pattern background for the page
+ */
+
+export const PatternBackground: FunctionComponent<{
 	children: React.ReactNode;
-}) => {
+}> = ({ children }: { children: React.ReactNode }) => {
+	const [springs] = useSpring(() => ({
+		from: { backgroundPosition: '0px 0px' },
+		to: [
+			{ backgroundPosition: '1000px 500px' },
+			{ backgroundPosition: '0px 0px' },
+		],
+		loop: true,
+		config: {
+			duration: 10000, // 10 seconds per keyframe
+		},
+	}));
+
 	return (
-		<div
-			className={`bg-repeat bg-white dark:bg-slate-950 w-full h-full min-h-screen heropattern-overlappingcircles-slate-950 dark:heropattern-deathstar-slate-700 flex items-center justify-center`}
+		<animated.div
+			style={
+				window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+					? springs
+					: {}
+			}
+			className={`bg-repeat bg-white dark:bg-slate-950 w-full h-full min-h-screen heropattern-overlappingcircles-slate-950 dark:heropattern-overlappingcircles-slate-700 flex items-center justify-center`}
 		>
 			{children}
-		</div>
+		</animated.div>
 	);
 };

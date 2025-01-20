@@ -108,3 +108,22 @@ export const checkEmailExists = async (email: string): Promise<boolean> => {
 		throw new Error(response.data.error);
 	}
 };
+
+/**
+ * Checks if a username exists in the database.
+ * @param username - The username to check.
+ * @returns A promise that resolves to a boolean.
+ */
+
+export const checkUsernameExists = async (
+	username: string,
+): Promise<boolean> => {
+	const response: AxiosResponse = await axiosInstance.get(
+		`/users/check-username?username=${username}`,
+	);
+	if (response.status === 200) {
+		return response.data.exists;
+	} else {
+		throw new Error(response.data.error);
+	}
+};

@@ -11,12 +11,15 @@ import {
 	animated,
 	AnimatedComponent,
 	easings,
+	SpringValue,
 	to,
 	useSpring,
 	useSprings,
 } from '@react-spring/web';
 import { InputField } from '../utilities/TextInputField';
 import { PasswordField } from '../utilities/PasswordField';
+import { ButtonWithHoverAnimations } from '../utilities/ButtonWithHoverAnimations';
+import { CSSProperties } from 'react';
 
 /**
  * A form for logging in a user through JWT.
@@ -27,23 +30,12 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 	//Hook for the navigation to other pages
 	const navigate: NavigateFunction = useNavigate();
 
-	//This is used to animate the sign in button when the user hovers over it
-	const [signInButtonHoverStyles, signInButtonHoverAnimations] = useSpring(
-		() => ({
-			from: {
-				scale: 1,
-			},
-			config: {
-				duration: 50,
-			},
-		}),
-	);
-
 	//Hook for the form
 	const {
 		register,
 		handleSubmit,
 		setError,
+		clearErrors,
 		formState: { errors },
 	} = useForm<LoginWithJWTRequest>();
 
@@ -59,27 +51,9 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 		}
 	};
 
-	//This function is used to animate the sign in button when the user hovers over it
-	const hoverAnimationsHandler = (): void => {
-		signInButtonHoverAnimations.start({
-			scale: 0.95,
-		});
-	};
-
-	//This function is used to animate the sign in button when the user hovers out of it
-	const hoverAnimationsLeaveHandler = (): void => {
-		signInButtonHoverAnimations.start({
-			scale: 1,
-		});
-	};
-
-	//Modify the Button to use the hover animations
-	const ButtonWithHoverAnimations: AnimatedComponent<typeof Button> =
-		animated(Button);
-
 	return (
 		<form onSubmit={handleSubmit(onSubmit)}>
-			<Stack gap="4" align="center" maxW="md" maxH="xs">
+			<Stack gap="4" align="center">
 				<InputField
 					label="Email"
 					name="email"
@@ -90,8 +64,10 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 					errors={errors}
 					setError={setError}
 					required={true}
+					requiredLabel={false}
 					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
 						if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value)) {
+							clearErrors('email');
 							const email: string = event.target.value;
 							const emailExists: boolean = await checkEmailExists(email);
 							if (!emailExists) {
@@ -99,25 +75,26 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 									message: 'No user with this email exists',
 								});
 							}
+						} else if (event.target.value === '') {
+							clearErrors('email');
+						} else {
+							setError('email', {
+								message: 'Invalid email',
+							});
 						}
 					}}
 				/>
-				<PasswordField errors={errors} register={register} />
+				<PasswordField
+					errors={errors}
+					register={register}
+					required={true}
+					requiredLabel={false}
+				/>
 				<ButtonWithHoverAnimations
-					onMouseEnter={hoverAnimationsHandler}
-					onMouseLeave={hoverAnimationsLeaveHandler}
-					colorPalette="accent"
-					className="dark:bg-slate-50 dark:text-black bg-slate-800 text-white px-4 py-2 text-lg mt-5"
-					style={{
-						width: '80%',
-						...signInButtonHoverStyles,
-					}}
-					variant="solid"
 					type="submit"
-					rounded="full"
-				>
-					Sign In
-				</ButtonWithHoverAnimations>
+					onClick={() => {}}
+					text="Sign In"
+				/>
 			</Stack>
 		</form>
 	);

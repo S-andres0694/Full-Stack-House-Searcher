@@ -1,12 +1,15 @@
-import { FieldErrors, FormState, UseFormRegister } from "react-hook-form";
-import { Field } from "../ui/field";
-import { PasswordInput } from "../ui/password-input";
-import { FunctionComponent } from "react";
+import { FieldErrors, FormState, UseFormRegister } from 'react-hook-form';
+import { Field } from '../ui/field';
+import { PasswordInput } from '../ui/password-input';
+import { FunctionComponent } from 'react';
 
 type PasswordFieldProps = {
-    errors: FormState<any>['errors'],
-    register: UseFormRegister<any>,
-}
+	errors: FormState<any>['errors'];
+	register: UseFormRegister<any>;
+	onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	required: boolean;
+	requiredLabel: boolean;
+};
 
 /**
  * A password input field with a label, error message, and validation
@@ -15,28 +18,35 @@ type PasswordFieldProps = {
  * @returns A password input field with a label, error message, and validation
  */
 
-export const PasswordField: FunctionComponent<PasswordFieldProps>    = ({
-    errors,
-    register,
+export const PasswordField: FunctionComponent<PasswordFieldProps> = ({
+	errors,
+	register,
+	onChange,
+	required,
+	requiredLabel,
 }: PasswordFieldProps) => {
-    return (
-        <Field
-            label="Password"
-            invalid={!!errors.password}
-            errorText={errors.password?.message?.toString()}
-            colorPalette="accent"
-        >
-            <PasswordInput
-                placeholder="Enter your password"
-                variant="subtle"
-                {...register('password', {
-                    required: 'Password is required',
-                })}
-                className={`px-4 ${!errors.password
-                        ? 'focus:border border-black dark:border-white'
-                        : 'border border-red-500'
-                    } rounded-full`}
-            />
-        </Field>
-    );
-}
+	return (
+		<Field
+			label="Password"
+			invalid={!!errors.password}
+			errorText={errors.password?.message?.toString()}
+			colorPalette="accent"
+			required={requiredLabel}
+		>
+			<PasswordInput
+				required={required}
+				placeholder="Enter your password"
+				variant="subtle"
+				{...register('password', {
+					required: 'Password is required',
+				})}
+				onChange={onChange}
+				className={`px-4 ${
+					!errors.password
+						? 'focus:border border-black dark:border-white'
+						: 'border border-red-500'
+				} rounded-full`}
+			/>
+		</Field>
+	);
+};

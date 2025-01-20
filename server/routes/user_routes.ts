@@ -137,6 +137,12 @@ export default function userRoutesFactory(
 		userApi.checkEmailExists,
 	);
 
+	//Checks if a username exists
+	router.get(
+		'/check-username/:username',
+		userApi.checkUsernameExists,
+	);
+
 	return router;
 }
 
