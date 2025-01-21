@@ -382,7 +382,7 @@ export class UserApi {
 
 	checkEmailExists = async (request: Request, response: Response): Promise<void> => {
 		try {
-			const email: string = request.query.email as string;
+			const email: string = request.params.email as string;
 			const result: boolean = await this.usersModel.checkEmailExists(email);
 			response.json({ exists: result });
 		} catch (error) {
@@ -398,7 +398,7 @@ export class UserApi {
 
 	checkUsernameExists = async (request: Request, response: Response): Promise<void> => {
 		try {
-			const username: string = request.query.username as string;
+			const username: string = request.params.username as string;
 			const result: boolean = await this.usersModel.usernameExists(username);
 			response.json({ exists: result });
 		} catch (error) {

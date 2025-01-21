@@ -18,7 +18,8 @@ const TypewriterAnimatedHeader: FunctionComponent<{
 		transform: SpringValue<string>;
 	}[] = useSprings(
 		textArray.length,
-		textArray.map((_, i) => ({
+		textArray.map((_, i: number) => ({
+			//Underscore means we don't care about the value of the letter itself.
 			from: { opacity: 0, transform: 'translateY(10px)' },
 			to: { opacity: 1, transform: 'translateY(0px)' },
 			delay: i * delayPerLetter, // Delay each character

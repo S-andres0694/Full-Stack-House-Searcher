@@ -131,18 +131,6 @@ export default function userRoutesFactory(
 		userApi.getEmail,
 	);
 
-	//Checks if an email exists
-	router.get(
-		'/check-email/:email',
-		userApi.checkEmailExists,
-	);
-
-	//Checks if a username exists
-	router.get(
-		'/check-username/:username',
-		userApi.checkUsernameExists,
-	);
-
 	return router;
 }
 

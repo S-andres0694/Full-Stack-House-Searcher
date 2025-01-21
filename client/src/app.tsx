@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { LoginPage } from './pages/Login-Page';
 import { Provider } from './components/ui/provider';
-import { RegisterPage } from './pages/Register-Page';
 import { AccessPage } from './pages/Access-Page';
 
 /**

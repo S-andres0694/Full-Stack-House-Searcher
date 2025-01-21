@@ -9,6 +9,8 @@ import { RegisterForm } from '../components/auth/RegisterForm';
 import { useState, Dispatch, SetStateAction } from 'react';
 import { FunctionComponent } from 'react';
 import { animated, useSpring } from '@react-spring/web';
+import { ToastContainer, toast } from 'react-toastify';
+
 /**
  * Access Page
  * @returns Access Page
@@ -68,6 +70,9 @@ export const AccessPage: FunctionComponent = (): JSX.Element => {
 
 	return (
 		<PatternBackground>
+			<div>
+				<ToastContainer className='bg-transparent' newestOnTop={true} />
+			</div>
 			<div className={`${selectedForm === 'Register' ? 'py-4' : ''}`}>
 				<div
 					className={`max-w-xs md:max-w-sm lg:max-w-md space-y-4 p-8 bg-white dark:bg-slate-800 rounded-lg shadow`}

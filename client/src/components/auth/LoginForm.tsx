@@ -19,7 +19,8 @@ import {
 import { InputField } from '../utilities/TextInputField';
 import { PasswordField } from '../utilities/PasswordField';
 import { ButtonWithHoverAnimations } from '../utilities/ButtonWithHoverAnimations';
-import { CSSProperties } from 'react';
+import { notify, PopupNotification } from '../utilities/popup-notification';
+import { emailRegex } from '../utilities/Regexes';
 
 /**
  * A form for logging in a user through JWT.
@@ -46,12 +47,23 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 		try {
 			await loginThroughJWT(data);
 			navigate('/dashboard'); //TODO:Redirect to the dashboard
-		} catch (error) {
-			console.error(error);
+		} catch (error: any) {
+			if (error.response?.status === 401) {
+				notify('Invalid password', 'Invalid password. Please try again.', 'error');
+				return;
+			}
+
+			if (error.response?.status === 500) {
+				notify('Unable to sign in', 'An unknown error occurred in the server. Please try again.', 'error');
+				return;
+			}
+
+			notify('Unable to sign in', 'An unknown error occurred. Please try again.', 'error');
+			return;
 		}
 	};
 
-	return (
+	return (<>
 		<form onSubmit={handleSubmit(onSubmit)}>
 			<Stack gap="4" align="center">
 				<InputField
@@ -59,14 +71,14 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 					name="email"
 					type="email"
 					placeholder="Enter your email"
-					regexPattern={/^[^\s@]+@[^\s@]+\.[^\s@]+$/}
+					regexPattern={emailRegex}
 					register={register}
 					errors={errors}
 					setError={setError}
 					required={true}
 					requiredLabel={false}
 					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
-						if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value)) {
+						if (emailRegex.test(event.target.value)) {
 							clearErrors('email');
 							const email: string = event.target.value;
 							const emailExists: boolean = await checkEmailExists(email);
@@ -91,11 +103,13 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 					requiredLabel={false}
 				/>
 				<ButtonWithHoverAnimations
+					disabled={Object.keys(errors).length > 0}
 					type="submit"
-					onClick={() => {}}
+					onClick={() => { }}
 					text="Sign In"
 				/>
 			</Stack>
 		</form>
+	</>
 	);
 };

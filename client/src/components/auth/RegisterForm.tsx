@@ -15,6 +15,8 @@ import { InputField } from '../utilities/TextInputField';
 import { PasswordField } from '../utilities/PasswordField';
 import { ButtonWithHoverAnimations } from '../utilities/ButtonWithHoverAnimations';
 import { PasswordInput } from '../ui/password-input';
+import { notify } from '../utilities/popup-notification';
+import { emailRegex, usernameRegex, passwordRegex } from '../utilities/Regexes';
 export const RegisterForm: FunctionComponent = () => {
 	//Hook for the navigation to other pages
 	const navigate: NavigateFunction = useNavigate();
@@ -37,7 +39,13 @@ export const RegisterForm: FunctionComponent = () => {
 			await registerUser(data);
 			navigate('/login');
 		} catch (error: any) {
-			setError('root.serverError', { message: error.message });
+			if(error.response?.status === 500) {
+				notify('Unable to register', 'An unknown error occurred in the server. Please try again.', 'error');
+				return;
+			}
+
+			notify('Unable to register', 'An unknown error occurred. Please try again.', 'error');
+			return;
 		}
 	};
 
@@ -73,14 +81,14 @@ export const RegisterForm: FunctionComponent = () => {
 					name="email"
 					type="email"
 					placeholder="Enter your email"
-					regexPattern={/^[^\s@]+@[^\s@]+\.[^\s@]+$/}
+					regexPattern={emailRegex}
 					register={register}
 					errors={errors}
 					setError={setError}
 					required={true}
 					requiredLabel={true}
 					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
-						if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(event.target.value)) {
+						if (emailRegex.test(event.target.value)) {
 							clearErrors('email');
 							const email: string = event.target.value;
 							const emailExists: boolean = await checkEmailExists(email);
@@ -103,14 +111,14 @@ export const RegisterForm: FunctionComponent = () => {
 					name="username"
 					type="text"
 					placeholder="Enter your username"
-					regexPattern={/^[a-zA-Z0-9]+$/}
+					regexPattern={usernameRegex}
 					register={register}
 					errors={errors}
 					setError={setError}
 					required={true}
 					requiredLabel={true}
 					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
-						if (/^[a-zA-Z0-9]+$/.test(event.target.value)) {
+						if (usernameRegex.test(event.target.value)) {
 							clearErrors('username');
 							const username: string = event.target.value;
 							const usernameExists: boolean = await checkUsernameExists(
@@ -130,17 +138,25 @@ export const RegisterForm: FunctionComponent = () => {
 						}
 					}}
 				/>
+				<InputField
+					label="Invitation Token"
+					name="invitationToken"
+					type="text"
+					placeholder="Enter your invitation token"
+					regexPattern={/^[\s\S]*$/}
+					register={register}
+					errors={errors}
+					setError={setError}
+					required={true}
+					requiredLabel={true}
+				/>
 				<PasswordField
 					errors={errors}
 					register={register}
 					required={true}
 					requiredLabel={true}
 					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
-						if (
-							/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/.test(
-								event.target.value,
-							)
-						) {
+						if (passwordRegex.test(event.target.value)) {
 							clearErrors('password');
 						} else if (event.target.value === '') {
 							clearErrors('password');
@@ -186,7 +202,8 @@ export const RegisterForm: FunctionComponent = () => {
 				<ButtonWithHoverAnimations
 					type="submit"
 					text="Register"
-					onClick={() => {}}
+					onClick={() => { }}
+					disabled={Object.keys(errors).length > 0}
 				/>
 			</Stack>
 		</form>

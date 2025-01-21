@@ -6,7 +6,8 @@ export const ButtonWithHoverAnimations: FunctionComponent<{
 	type: 'submit' | 'button';
 	onClick: () => void;
 	text: string;
-}> = ({ type, onClick, text }) => {
+	disabled?: boolean;
+}> = ({ type, onClick, text, disabled }) => {
 	//This is used to animate the sign in button when the user hovers over it
 	const [signInButtonHoverStyles, signInButtonHoverAnimations] = useSpring(
 		() => ({
@@ -51,6 +52,7 @@ export const ButtonWithHoverAnimations: FunctionComponent<{
 			variant="solid"
 			type={type}
 			rounded="full"
+			disabled={disabled}
 		>
 			{text}
 		</ButtonWithHoverAnimations>

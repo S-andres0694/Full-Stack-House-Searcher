@@ -17,6 +17,9 @@ import sessionMiddleware from './middleware/express-session-config';
 import { passportObj } from './authentication/google-auth.config';
 import cookieParser from 'cookie-parser';
 import { databaseConfiguration } from './database/init-db.v2';
+import cors from 'cors';
+import publicRoutesFactory from './routes/public_routes';
+
 //Express application
 const app: Application = express();
 
@@ -28,6 +31,8 @@ const migrationsPath: string =
 const db: NodePgDatabase<typeof schema> = connectionGenerator(
 	databaseConfiguration,
 );
+
+app.use(cors({ origin: 'http://localhost:5173', methods: ['GET', 'POST', 'PUT', 'DELETE'], credentials: true }));
 
 //Logging middleware
 app.use(morgan('common'));
@@ -56,6 +61,9 @@ app.use('/viewed-properties', viewedPropertiesRoutesFactory(db));
 
 //Authentication routes
 app.use('/auth', authenticationRoutesFactory(db));
+
+//Public routes
+app.use('/public', publicRoutesFactory(db));
 
 //Default route
 app.get('/', (req, res) => {

@@ -100,7 +100,7 @@ export const loginThroughJWT = async (
 
 export const checkEmailExists = async (email: string): Promise<boolean> => {
 	const response: AxiosResponse = await axiosInstance.get(
-		`/users/check-email?email=${email}`,
+		`/public/check-email/${email}`,
 	);
 	if (response.status === 200) {
 		return response.data.exists;
@@ -119,7 +119,7 @@ export const checkUsernameExists = async (
 	username: string,
 ): Promise<boolean> => {
 	const response: AxiosResponse = await axiosInstance.get(
-		`/users/check-username?username=${username}`,
+		`/public/check-username/${username}`,
 	);
 	if (response.status === 200) {
 		return response.data.exists;

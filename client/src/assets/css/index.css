@@ -2,3 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
+.Toastify__toast {
+	animation-duration: 200ms; /* Change to your desired speed, e.g., 1s or 500ms */
+}
