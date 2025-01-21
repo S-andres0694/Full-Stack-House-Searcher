@@ -145,7 +145,7 @@ export class AuthenticationJWTControllers {
 
 			//Consume the invitation token.
 			await this.invitationTokenModel.consumeInvitationToken(
-				isInvitationTokenValid,
+				isInvitationTokenValid.token,
 			);
 
 			//If the user does not exist, create a new user.

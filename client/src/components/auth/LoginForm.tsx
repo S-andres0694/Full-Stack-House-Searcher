@@ -16,7 +16,7 @@ import {
 	useSpring,
 	useSprings,
 } from '@react-spring/web';
-import { InputField } from '../utilities/TextInputField';
+import { InputField } from '../utilities/Text-Input-Field';
 import { PasswordField } from '../utilities/PasswordField';
 import { ButtonWithHoverAnimations } from '../utilities/ButtonWithHoverAnimations';
 import { notify, PopupNotification } from '../utilities/popup-notification';
@@ -49,67 +49,80 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 			navigate('/dashboard'); //TODO:Redirect to the dashboard
 		} catch (error: any) {
 			if (error.response?.status === 401) {
-				notify('Invalid password', 'Invalid password. Please try again.', 'error');
+				notify(
+					'Invalid password',
+					'Invalid password. Please try again.',
+					'error',
+				);
 				return;
 			}
 
 			if (error.response?.status === 500) {
-				notify('Unable to sign in', 'An unknown error occurred in the server. Please try again.', 'error');
+				notify(
+					'Unable to sign in',
+					'An unknown error occurred in the server. Please try again.',
+					'error',
+				);
 				return;
 			}
 
-			notify('Unable to sign in', 'An unknown error occurred. Please try again.', 'error');
+			notify(
+				'Unable to sign in',
+				'An unknown error occurred. Please try again.',
+				'error',
+			);
 			return;
 		}
 	};
 
-	return (<>
-		<form onSubmit={handleSubmit(onSubmit)}>
-			<Stack gap="4" align="center">
-				<InputField
-					label="Email"
-					name="email"
-					type="email"
-					placeholder="Enter your email"
-					regexPattern={emailRegex}
-					register={register}
-					errors={errors}
-					setError={setError}
-					required={true}
-					requiredLabel={false}
-					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
-						if (emailRegex.test(event.target.value)) {
-							clearErrors('email');
-							const email: string = event.target.value;
-							const emailExists: boolean = await checkEmailExists(email);
-							if (!emailExists) {
+	return (
+		<>
+			<form onSubmit={handleSubmit(onSubmit)}>
+				<Stack gap="4" align="center">
+					<InputField
+						label="Email"
+						name="email"
+						type="email"
+						placeholder="Enter your email"
+						regexPattern={emailRegex}
+						register={register}
+						errors={errors}
+						setError={setError}
+						required={true}
+						requiredLabel={false}
+						onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+							if (emailRegex.test(event.target.value)) {
+								clearErrors('email');
+								const email: string = event.target.value;
+								const emailExists: boolean = await checkEmailExists(email);
+								if (!emailExists) {
+									setError('email', {
+										message: 'No user with this email exists',
+									});
+								}
+							} else if (event.target.value === '') {
+								clearErrors('email');
+							} else {
 								setError('email', {
-									message: 'No user with this email exists',
+									message: 'Invalid email',
 								});
 							}
-						} else if (event.target.value === '') {
-							clearErrors('email');
-						} else {
-							setError('email', {
-								message: 'Invalid email',
-							});
-						}
-					}}
-				/>
-				<PasswordField
-					errors={errors}
-					register={register}
-					required={true}
-					requiredLabel={false}
-				/>
-				<ButtonWithHoverAnimations
-					disabled={Object.keys(errors).length > 0}
-					type="submit"
-					onClick={() => { }}
-					text="Sign In"
-				/>
-			</Stack>
-		</form>
-	</>
+						}}
+					/>
+					<PasswordField
+						errors={errors}
+						register={register}
+						required={true}
+						requiredLabel={false}
+					/>
+					<ButtonWithHoverAnimations
+						disabled={Object.keys(errors).length > 0}
+						type="submit"
+						onClick={() => { }}
+						text="Sign In"
+					/>
+				</Stack>
+			</form>
+		</>
 	);
 };

@@ -127,3 +127,20 @@ export const checkUsernameExists = async (
 		throw new Error(response.data.error);
 	}
 };
+
+/**
+ * Check if an invitation token is valid.
+ * @param token - The invitation token to check.
+ * @returns A promise that resolves to the status of the invitation token, which might be 'valid', 'used', or 'not found'.
+ */
+
+export const checkInvitationToken = async (token: string): Promise<string> => {
+	const response: AxiosResponse = await axiosInstance.get(
+		`/invitation-tokens/verify/${token}`,
+	);
+	if (response.status === 200) {
+		return response.data.status;
+	} else {
+		throw new Error(response.data.message);
+	}
+};

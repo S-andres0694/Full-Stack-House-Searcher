@@ -23,6 +23,8 @@ export type RegisterRequest = {
 	email: string;
 	password: string;
 	confirmPassword: string;
+	firstname: string;
+	lastname: string;
 	name: string;
 	username: string;
 	invitationToken: string;

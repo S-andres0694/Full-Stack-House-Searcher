@@ -71,7 +71,7 @@ export const AccessPage: FunctionComponent = (): JSX.Element => {
 	return (
 		<PatternBackground>
 			<div>
-				<ToastContainer className='bg-transparent' newestOnTop={true} />
+				<ToastContainer className="bg-transparent" newestOnTop={true} />
 			</div>
 			<div className={`${selectedForm === 'Register' ? 'py-4' : ''}`}>
 				<div

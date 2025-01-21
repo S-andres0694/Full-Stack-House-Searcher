@@ -1,4 +1,3 @@
-import { useSpring } from '@react-spring/web';
 import { FunctionComponent } from 'react';
 import { SubmitHandler, useForm, UseFormReturn } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -6,17 +5,24 @@ import { NavigateFunction } from 'react-router-dom';
 import { RegisterRequest } from '../../types/authentication-types';
 import {
 	checkEmailExists,
+	checkInvitationToken,
 	checkUsernameExists,
 	register as registerUser,
 } from '../../services/authentication-services';
 import { Stack } from '@chakra-ui/react';
 import { Field } from '../ui/field';
-import { InputField } from '../utilities/TextInputField';
+import { InputField } from '../utilities/Text-Input-Field';
 import { PasswordField } from '../utilities/PasswordField';
 import { ButtonWithHoverAnimations } from '../utilities/ButtonWithHoverAnimations';
 import { PasswordInput } from '../ui/password-input';
 import { notify } from '../utilities/popup-notification';
-import { emailRegex, usernameRegex, passwordRegex } from '../utilities/Regexes';
+import {
+	emailRegex,
+	usernameRegex,
+	passwordRegex,
+	firstNameRegex,
+	lastNameRegex,
+} from '../utilities/Regexes';
 export const RegisterForm: FunctionComponent = () => {
 	//Hook for the navigation to other pages
 	const navigate: NavigateFunction = useNavigate();
@@ -36,15 +42,26 @@ export const RegisterForm: FunctionComponent = () => {
 	) => {
 		try {
 			data.confirmPassword = undefined as any;
+			data.name = `${data.firstname} ${data.lastname}`;
+			data.firstname = undefined as any;
+			data.lastname = undefined as any;
 			await registerUser(data);
 			navigate('/login');
 		} catch (error: any) {
-			if(error.response?.status === 500) {
-				notify('Unable to register', 'An unknown error occurred in the server. Please try again.', 'error');
+			if (error.response?.status === 500) {
+				notify(
+					'Unable to register',
+					'An unknown error occurred in the server. Please try again.',
+					'error',
+				);
 				return;
 			}
 
-			notify('Unable to register', 'An unknown error occurred. Please try again.', 'error');
+			notify(
+				'Unable to register',
+				'An unknown error occurred. Please try again.',
+				'error',
+			);
 			return;
 		}
 	};
@@ -54,27 +71,55 @@ export const RegisterForm: FunctionComponent = () => {
 			<Stack gap="4" align="center">
 				<InputField
 					label="First Name"
-					name="name"
+					name="firstname"
 					type="text"
 					placeholder="Enter your first name"
-					regexPattern={/^[a-zA-Z]+([ -][a-zA-Z]+)*$/}
+					regexPattern={firstNameRegex}
 					register={register}
 					errors={errors}
 					setError={setError}
 					required={true}
 					requiredLabel={true}
+					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+						const firstName: string = event.target.value;
+						if (firstName === '' || firstNameRegex.test(firstName)) {
+							clearErrors('firstname');
+							return;
+						}
+
+						setError('firstname', {
+							message:
+								'Invalid first name. Only letters and spaces are allowed.',
+						});
+					}}
 				/>
 				<InputField
 					label="Last Name"
 					name="lastname"
 					type="text"
 					placeholder="Enter your last name"
-					regexPattern={/^[a-zA-Z]+$/}
+					regexPattern={lastNameRegex}
 					register={register}
 					errors={errors}
 					setError={setError}
 					required={true}
 					requiredLabel={true}
+					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+						const lastName: string = event.target.value;
+						if (lastNameRegex.test(lastName)) {
+							clearErrors('lastname');
+							return;
+						}
+						if (lastName === '') {
+							clearErrors('lastname');
+							return;
+						}
+
+						setError('lastname', {
+							message:
+								'Invalid last name. Only letters and spaces are allowed.',
+						});
+					}}
 				/>
 				<InputField
 					label="Email"
@@ -149,6 +194,38 @@ export const RegisterForm: FunctionComponent = () => {
 					setError={setError}
 					required={true}
 					requiredLabel={true}
+					onChange={async (event: React.ChangeEvent<HTMLInputElement>) => {
+						const token: string = event.target.value;
+						if (token === '') {
+							clearErrors('invitationToken');
+							return;
+						}
+
+						//Check if the invitation token is valid
+						const status: string = await checkInvitationToken(token);
+
+						//Check if the invitation token is used
+						if (status === 'used') {
+							setError('invitationToken', {
+								message: 'Invitation token already used',
+							});
+							return;
+						}
+
+						//Check if the invitation token does not exist
+						if (status === 'not found') {
+							setError('invitationToken', {
+								message: 'Invitation token does not exist',
+							});
+							return;
+						}
+
+						//Check if the invitation token is valid
+						if (status === 'valid') {
+							clearErrors('invitationToken');
+							return;
+						}
+					}}
 				/>
 				<PasswordField
 					errors={errors}
@@ -192,11 +269,10 @@ export const RegisterForm: FunctionComponent = () => {
 								});
 							}
 						}}
-						className={`px-4 ${
-							!errors.confirmPassword
-								? 'focus:border border-black dark:border-white'
-								: 'border border-red-500'
-						} rounded-full`}
+						className={`px-4 ${!errors.confirmPassword
+							? 'focus:border border-black dark:border-white'
+							: 'border border-red-500'
+							} rounded-full`}
 					/>
 				</Field>
 				<ButtonWithHoverAnimations

@@ -133,4 +133,3 @@ export default function userRoutesFactory(
 
 	return router;
 }
-
