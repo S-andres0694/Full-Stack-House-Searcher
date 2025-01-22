@@ -380,13 +380,35 @@ export class UserApi {
 	 * @param {Response} response - The response object to send the user data
 	 */
 
-	checkEmailExists = async (request: Request, response: Response): Promise<void> => {
+	checkEmailExists = async (
+		request: Request,
+		response: Response,
+	): Promise<void> => {
 		try {
-			const email: string = request.query.email as string;
+			const email: string = request.params.email as string;
 			const result: boolean = await this.usersModel.checkEmailExists(email);
 			response.json({ exists: result });
 		} catch (error) {
 			response.status(500).json({ error: 'Failed to check email exists' });
+		}
+	};
+
+	/**
+	 * Checks if a username exists in the database.
+	 * @param {Request} request - The request object containing the username
+	 * @param {Response} response - The response object to send the user data
+	 */
+
+	checkUsernameExists = async (
+		request: Request,
+		response: Response,
+	): Promise<void> => {
+		try {
+			const username: string = request.params.username as string;
+			const result: boolean = await this.usersModel.usernameExists(username);
+			response.json({ exists: result });
+		} catch (error) {
+			response.status(500).json({ error: 'Failed to check username exists' });
 		}
 	};
 }

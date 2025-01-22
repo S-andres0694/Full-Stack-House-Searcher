@@ -1,5 +1,3 @@
-import { Database } from 'better-sqlite3';
-import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import { Request, Response } from 'express';
 import propertiesModelFactory from '../models/properties';
 import { PropertiesModel } from '../models/properties';

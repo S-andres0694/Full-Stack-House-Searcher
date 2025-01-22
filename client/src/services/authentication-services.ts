@@ -100,11 +100,47 @@ export const loginThroughJWT = async (
 
 export const checkEmailExists = async (email: string): Promise<boolean> => {
 	const response: AxiosResponse = await axiosInstance.get(
-		`/users/check-email?email=${email}`,
+		`/public/check-email/${email}`,
 	);
 	if (response.status === 200) {
 		return response.data.exists;
 	} else {
 		throw new Error(response.data.error);
+	}
+};
+
+/**
+ * Checks if a username exists in the database.
+ * @param username - The username to check.
+ * @returns A promise that resolves to a boolean.
+ */
+
+export const checkUsernameExists = async (
+	username: string,
+): Promise<boolean> => {
+	const response: AxiosResponse = await axiosInstance.get(
+		`/public/check-username/${username}`,
+	);
+	if (response.status === 200) {
+		return response.data.exists;
+	} else {
+		throw new Error(response.data.error);
+	}
+};
+
+/**
+ * Check if an invitation token is valid.
+ * @param token - The invitation token to check.
+ * @returns A promise that resolves to the status of the invitation token, which might be 'valid', 'used', or 'not found'.
+ */
+
+export const checkInvitationToken = async (token: string): Promise<string> => {
+	const response: AxiosResponse = await axiosInstance.get(
+		`/invitation-tokens/verify/${token}`,
+	);
+	if (response.status === 200) {
+		return response.data.status;
+	} else {
+		throw new Error(response.data.message);
 	}
 };

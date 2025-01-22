@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { LoginPage } from './pages/Login-Page';
 import { Provider } from './components/ui/provider';
+import { AccessPage } from './pages/Access-Page';
 
 /**
  * The main component that renders the application.
@@ -12,7 +12,7 @@ function App() {
 		<Provider>
 			<BrowserRouter>
 				<Routes>
-					<Route path="/login" element={<LoginPage />} />
+					<Route path="/login" element={<AccessPage />} />
 				</Routes>
 			</BrowserRouter>
 		</Provider>

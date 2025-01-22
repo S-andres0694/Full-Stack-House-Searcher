@@ -7,6 +7,9 @@ import {
 	InternalAxiosRequestConfig,
 	AxiosError,
 } from 'axios';
+import { checkEmailExists } from '../services/authentication-services';
+import { UseFormSetError } from 'react-hook-form';
+import { UseFormClearErrors } from 'react-hook-form';
 
 /**
  * This file contains the utilities for the authentication services.

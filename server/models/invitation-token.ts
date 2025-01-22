@@ -37,18 +37,38 @@ export class InvitationTokenModel {
 	 * @returns {Promise<void>}
 	 */
 
-	async consumeInvitationToken(
-		invitationToken: InvitationToken,
-	): Promise<void> {
+	async consumeInvitationToken(invitationToken: string): Promise<void> {
 		try {
+			const invitationTokenID: number | undefined =
+				await this.getInvitationTokenID(invitationToken);
+			if (invitationTokenID === undefined) {
+				throw new Error('Invitation token ID not found');
+			}
 			await this.db.transaction(async (tx) => {
 				await tx
 					.insert(usedInvitationTokens)
-					.values({ used_tokenID: invitationToken.id });
+					.values({ used_tokenID: invitationTokenID });
 			});
 		} catch (error) {
 			throw new Error('Failed to consume invitation token');
 		}
+	}
+
+	/**
+	 * Gets the ID of an invitation token.
+	 * @param {string} invitationToken - The invitation token to get the ID of
+	 * @returns {Promise<number | undefined>} The ID of the invitation token, undefined if it does not exist
+	 */
+
+	private async getInvitationTokenID(
+		invitationToken: string,
+	): Promise<number | undefined> {
+		const invitationTokenRecord: InvitationToken[] | undefined = await this.db
+			.select()
+			.from(invitationTokens)
+			.where(eq(invitationTokens.token, invitationToken));
+
+		return invitationTokenRecord[0].id;
 	}
 
 	/**
@@ -104,7 +124,7 @@ export class InvitationTokenModel {
 
 /**
  * Factory function to create an instance of InvitationTokenModel.
- * @param {BetterSQLite3Database} db - The database connection instance
+ * @param {NodePgDatabase<typeof schema>} db - The database connection instance
  * @returns {InvitationTokenModel} An instance of InvitationTokenModel
  */
 

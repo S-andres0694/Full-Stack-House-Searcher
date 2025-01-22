@@ -6,10 +6,15 @@ import { useSpring, animated, AnimatedComponent } from '@react-spring/web';
  * @returns {React.ReactNode} a div with two horizontal lines and text in the middle
  */
 
-export const Divider: React.FunctionComponent<{ text: string }> = ({
+export const Divider: React.FunctionComponent<{
+	text: string;
+	widthTailwindClass: string;
+}> = ({
 	text,
+	widthTailwindClass,
 }: {
 	text: string;
+	widthTailwindClass: string;
 }): React.ReactNode => {
 	const [spring] = useSpring(() => ({
 		from: {
@@ -26,12 +31,12 @@ export const Divider: React.FunctionComponent<{ text: string }> = ({
 		<div className="flex items-center">
 			<animated.hr
 				style={spring}
-				className="w-44 border-t border border-gray-300 dark:border-gray-700"
+				className={`${widthTailwindClass} border-t border border-gray-300 dark:border-gray-700`}
 			/>
 			<span className="px-3 text-gray-500">{text}</span>
 			<animated.hr
 				style={spring}
-				className="w-44 border-t border border-gray-300 dark:border-gray-700"
+				className={`${widthTailwindClass} border-t border border-gray-300 dark:border-gray-700`}
 			/>
 		</div>
 	);
