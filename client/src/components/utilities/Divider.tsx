@@ -28,15 +28,15 @@ export const Divider: React.FunctionComponent<{
 		},
 	}));
 	return (
-		<div className="flex items-center">
+		<div className="w-full sm:w-3/4 md:w-3/4 lg:w-full flex items-center">
 			<animated.hr
 				style={spring}
-				className={`${widthTailwindClass} border-t border border-gray-300 dark:border-gray-700`}
+				className={`w-full border-t border border-gray-300 dark:border-gray-700`}
 			/>
 			<span className="px-3 text-gray-500">{text}</span>
 			<animated.hr
 				style={spring}
-				className={`${widthTailwindClass} border-t border border-gray-300 dark:border-gray-700`}
+				className={`w-full border-t border border-gray-300 dark:border-gray-700`}
 			/>
 		</div>
 	);
