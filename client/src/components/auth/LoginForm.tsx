@@ -118,7 +118,7 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 					<ButtonWithHoverAnimations
 						disabled={Object.keys(errors).length > 0}
 						type="submit"
-						onClick={() => { }}
+						onClick={() => {}}
 						text="Sign In"
 					/>
 				</Stack>

@@ -1,4 +1,4 @@
-import { useSpring, animated, AnimatedComponent } from '@react-spring/web';
+import { useSpring, animated } from '@react-spring/web';
 
 /**
  * Divider component that inserts text between two horizontal lines
@@ -8,14 +8,7 @@ import { useSpring, animated, AnimatedComponent } from '@react-spring/web';
 
 export const Divider: React.FunctionComponent<{
 	text: string;
-	widthTailwindClass: string;
-}> = ({
-	text,
-	widthTailwindClass,
-}: {
-	text: string;
-	widthTailwindClass: string;
-}): React.ReactNode => {
+}> = ({ text }: { text: string }): React.ReactNode => {
 	const [spring] = useSpring(() => ({
 		from: {
 			transform: 'scaleX(0%)',

@@ -24,7 +24,12 @@ export const PopupNotification: FunctionComponent<PopupNotificationProps> = ({
 	size = 'lg',
 }) => {
 	return (
-		<Alert size={size} title={errorTitle} status={type} className="shadow-lg rounded-lg">
+		<Alert
+			size={size}
+			title={errorTitle}
+			status={type}
+			className="shadow-lg rounded-lg"
+		>
 			{errorMessage}
 		</Alert>
 	);

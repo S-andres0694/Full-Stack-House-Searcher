@@ -9,7 +9,7 @@ import { RegisterForm } from '../components/auth/RegisterForm';
 import { useState, Dispatch, SetStateAction } from 'react';
 import { FunctionComponent } from 'react';
 import { animated, useSpring } from '@react-spring/web';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 /**
  * Access Page
@@ -109,7 +109,7 @@ export const AccessPage: FunctionComponent = (): JSX.Element => {
 							<animated.div style={formSwitchLoginStyles}>
 								<LoginForm />
 								<div className="flex flex-col items-center gap-4 mt-4">
-									<Divider text="OR" widthTailwindClass="w-28 md:w-44" />
+									<Divider text="OR" />
 									<LoginWithGoogleButton text={`Sign in with Google`} />
 								</div>
 							</animated.div>
@@ -119,7 +119,7 @@ export const AccessPage: FunctionComponent = (): JSX.Element => {
 							<animated.div style={formSwitchRegisterStyles}>
 								<RegisterForm />
 								<div className="flex flex-col items-center gap-4 mt-4">
-									<Divider text="OR" widthTailwindClass="w-28 md:w-44" />
+									<Divider text="OR" />
 									<LoginWithGoogleButton text={`Sign up with Google`} />
 								</div>
 							</animated.div>
