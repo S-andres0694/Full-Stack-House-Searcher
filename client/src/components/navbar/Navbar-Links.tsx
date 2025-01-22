@@ -15,6 +15,12 @@ interface NavbarLinksProps {
 	links: LinksProps[];
 }
 
+/**
+ * NavbarLinks component
+ * @param {NavbarLinksProps} props - The props for the NavbarLinks component
+ * @returns {React.ReactNode} a div with the navbar links
+ */
+
 export const NavbarLinks: FunctionComponent<NavbarLinksProps> = ({
 	links,
 }: NavbarLinksProps): React.ReactNode => {
