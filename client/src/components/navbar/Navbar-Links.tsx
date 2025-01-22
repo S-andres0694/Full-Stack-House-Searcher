@@ -5,13 +5,19 @@ import {
 	useEffect,
 	useState,
 } from 'react';
-import { Links } from './Links';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { IconButton } from '@chakra-ui/react';
 import { useTransition } from '@react-spring/web';
 import { animated } from '@react-spring/web';
+import { Links, LinksProps } from './Links';
 
-export const NavbarLinks: FunctionComponent = (): React.ReactNode => {
+interface NavbarLinksProps {
+	links: LinksProps[];
+}
+
+export const NavbarLinks: FunctionComponent<NavbarLinksProps> = ({
+	links,
+}: NavbarLinksProps): React.ReactNode => {
 	// States keeping track of viewport width and whether the menu is open
 	const [viewportWidth, setViewportWidth]: [
 		number,
@@ -65,22 +71,21 @@ export const NavbarLinks: FunctionComponent = (): React.ReactNode => {
 									style={style}
 									className="absolute bg-gray-100 rounded-lg dark:bg-slate-800 top-16 right-0 shadow-lg p-4 flex flex-col gap-2"
 								>
-									<Links label="Dashboard" to="/dashboard" />
-									<Links label="Dashboard" to="/dashboard" />
-									<Links label="Dashboard" to="/dashboard" />
-									<Links label="Dashboard" to="/dashboard" />
-									<Links label="Dashboard" to="/dashboard" />
+									{links.map((link) => (
+										<Links
+											key={link.label + link.to}
+											{...link}
+										/>
+									))}
 								</animated.div>
 							),
 					)}
 				</>
 			) : (
 				<div className="flex items-center gap-2">
-					<Links label="Dashboard" to="/dashboard" />
-					<Links label="Dashboard" to="/dashboard" />
-					<Links label="Dashboard" to="/dashboard" />
-					<Links label="Dashboard" to="/dashboard" />
-					<Links label="Dashboard" to="/dashboard" />
+					{links.map((link) => (
+						<Links key={link.label + link.to} {...link} />
+					))}
 				</div>
 			)}
 		</>

@@ -6,7 +6,8 @@ import { animated } from '@react-spring/web';
 import { AnimatedComponent } from '@react-spring/web';
 import { easings } from '@react-spring/web';
 import TypewriterAnimatedHeader from '../text/TypewriterHeaders';
-interface LinksProps {
+
+export interface LinksProps {
 	label: string;
 	to: string;
 	icon?: React.ReactNode;
