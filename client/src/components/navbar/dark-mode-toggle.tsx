@@ -61,7 +61,7 @@ export const DarkModeToggle: React.FunctionComponent = () => {
 			size="lg"
 			rounded="full"
 			variant="ghost"
-			className={`${colorMode === 'dark' ? 'bg-slate-950' : 'bg-white'}`}
+			className={`${colorMode === 'dark' ? 'bg-slate-800' : 'bg-gray-100'}`}
 			onClick={toggleColorMode}
 			style={springs}
 		>

@@ -29,7 +29,7 @@ export const PatternBackground: FunctionComponent<{
 					? springs
 					: {}
 			}
-			className={`bg-repeat bg-white dark:bg-slate-950 w-full h-full min-h-screen heropattern-overlappingcircles-slate-950 dark:heropattern-overlappingcircles-slate-700 flex items-center justify-center`}
+			className="bg-repeat bg-white dark:bg-slate-950 w-full flex-1 heropattern-overlappingcircles-slate-950 dark:heropattern-overlappingcircles-slate-700"
 		>
 			{children}
 		</animated.div>

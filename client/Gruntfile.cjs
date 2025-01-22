@@ -46,6 +46,19 @@ module.exports = function (grunt) {
 		'lint',
 		'prettify',
 	]);
-	grunt.registerTask('development', ['watch']);
+	
+	// Run tasks every 15 seconds
+	grunt.registerTask('development', 'Run tasks every 15 seconds', function() {
+		const done = this.async();
+		const runTasks = () => {
+			grunt.task.run(['lint', 'prettify']);
+		};
+		
+		// Run immediately on start
+		runTasks();
+		
+		// Then run every 15 seconds
+		setInterval(runTasks, 15000);
+	});
 };
 

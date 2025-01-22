@@ -1,6 +1,5 @@
 import { LoginForm } from '../components/auth/LoginForm';
 import { LoginWithGoogleButton } from '../components/auth/LoginWithGoogleButton';
-import DarkModeToggle from '../components/navbar/dark-mode-toggle';
 import TypewriterAnimatedHeader from '../components/text/TypewriterHeaders';
 import { Divider } from '../components/utilities/Divider';
 import { PatternBackground } from '../components/utilities/Pattern-Background';
@@ -10,6 +9,7 @@ import { useState, Dispatch, SetStateAction } from 'react';
 import { FunctionComponent } from 'react';
 import { animated, useSpring } from '@react-spring/web';
 import { ToastContainer } from 'react-toastify';
+import { Navbar } from '../components/navbar/Navbar';
 
 /**
  * Access Page
@@ -69,64 +69,72 @@ export const AccessPage: FunctionComponent = (): JSX.Element => {
 	);
 
 	return (
-		<PatternBackground>
-			<div>
-				<ToastContainer className="bg-transparent" newestOnTop={true} />
-			</div>
-			<div className={`${selectedForm === 'Register' ? 'py-4' : ''}`}>
-				<div
-					className={`max-w-xs md:max-w-sm lg:max-w-md space-y-4 p-8 bg-white dark:bg-slate-800 rounded-lg shadow`}
-				>
-					<div className="flex flex-col items-center gap-4">
-						<DarkModeToggle />
-						<SegmentedControl
-							items={['Login', 'Register']}
-							defaultValue={startForm}
-							size="lg"
-							className="mx-auto rounded-lg"
-							onChange={() =>
-								setSelectedForm(selectedForm === 'Login' ? 'Register' : 'Login')
-							}
-						/>
-						<h1 className="text-4xl font-bold text-center">
-							{selectedForm === 'Login' ? (
-								<TypewriterAnimatedHeader
-									text={`Log Into House Searcher`}
-									delayPerLetter={10}
-									key={selectedForm}
-								/>
-							) : (
-								<TypewriterAnimatedHeader
-									text={`Sign Up For House Searcher`}
-									delayPerLetter={10}
-									key={selectedForm}
-								/>
-							)}
-						</h1>
-					</div>
-					{selectedForm === 'Login' ? (
-						<>
-							<animated.div style={formSwitchLoginStyles}>
-								<LoginForm />
-								<div className="flex flex-col items-center gap-4 mt-4">
-									<Divider text="OR" />
-									<LoginWithGoogleButton text={`Sign in with Google`} />
-								</div>
-							</animated.div>
-						</>
-					) : (
-						<>
-							<animated.div style={formSwitchRegisterStyles}>
-								<RegisterForm />
-								<div className="flex flex-col items-center gap-4 mt-4">
-									<Divider text="OR" />
-									<LoginWithGoogleButton text={`Sign up with Google`} />
-								</div>
-							</animated.div>
-						</>
-					)}
+		<div className="min-h-screen flex flex-col">
+			<Navbar />
+			<PatternBackground>
+				<div>
+					<ToastContainer className="bg-transparent" newestOnTop={true} />
 				</div>
-			</div>
-		</PatternBackground>
+				<div
+					className={`${
+						selectedForm === 'Register' ? 'py-4' : ''
+					} flex justify-center items-center min-h-[calc(100vh-64px)]`}
+				>
+					<div
+						className={`max-w-xs md:max-w-sm lg:max-w-md space-y-4 p-8 bg-white dark:bg-slate-800 rounded-lg`}
+					>
+						<div className="flex flex-col items-center gap-4">
+							<SegmentedControl
+								items={['Login', 'Register']}
+								defaultValue={startForm}
+								size="lg"
+								className="mx-auto rounded-lg"
+								onChange={() =>
+									setSelectedForm(
+										selectedForm === 'Login' ? 'Register' : 'Login',
+									)
+								}
+							/>
+							<h1 className="text-4xl font-bold text-center">
+								{selectedForm === 'Login' ? (
+									<TypewriterAnimatedHeader
+										text={`Log Into House Searcher`}
+										delayPerLetter={10}
+										key={selectedForm}
+									/>
+								) : (
+									<TypewriterAnimatedHeader
+										text={`Sign Up For House Searcher`}
+										delayPerLetter={10}
+										key={selectedForm}
+									/>
+								)}
+							</h1>
+						</div>
+						{selectedForm === 'Login' ? (
+							<>
+								<animated.div style={formSwitchLoginStyles}>
+									<LoginForm />
+									<div className="flex flex-col items-center gap-4 mt-4">
+										<Divider text="OR" />
+										<LoginWithGoogleButton text={`Sign in with Google`} />
+									</div>
+								</animated.div>
+							</>
+						) : (
+							<>
+								<animated.div style={formSwitchRegisterStyles}>
+									<RegisterForm />
+									<div className="flex flex-col items-center gap-4 mt-4">
+										<Divider text="OR" />
+										<LoginWithGoogleButton text={`Sign up with Google`} />
+									</div>
+								</animated.div>
+							</>
+						)}
+					</div>
+				</div>
+			</PatternBackground>
+		</div>
 	);
 };
