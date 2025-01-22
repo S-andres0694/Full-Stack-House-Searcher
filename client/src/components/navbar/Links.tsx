@@ -1,7 +1,7 @@
 import { useSpring } from "@react-spring/web";
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, MouseEventHandler } from "react";
 import { Link } from "react-router-dom";
-import { useColorModeValue } from "../ui/color-mode";
+import { useColorMode } from "../ui/color-mode";
 import { animated } from "@react-spring/web";
 import { AnimatedComponent } from "@react-spring/web";
 import { easings } from "@react-spring/web";
@@ -17,41 +17,35 @@ interface LinksProps {
 
 export const Links: FunctionComponent<LinksProps> = ({ label, to }: LinksProps): React.ReactNode => {
     //This is used to get the current theme
-    const currentTheme: string = useColorModeValue('light', 'dark');
+    const { colorMode }: { colorMode: string } = useColorMode();
 
     //This is used to animate the link
     const [ linkState, linkStateAnimations ] = useSpring(() => ({
         from: {
-            backgroundColor: 'transparent',
+            background: 'transparent',
             transform: 'translateY(0)',
-            color: currentTheme === 'dark' ? '#e5e7eb' : '#1f2937',
             scale: 1,
         },
         config: {
-            duration: 50,
-            easing: easings.easeInOutCubic,
-            friction: 10,
-            precision: 0.0001,
-            clamp: true,
+            duration: 20,
+            easing: easings.easeInOutQuad,
         }   
     })); 
 
     //This is used to animate the link when the user hovers over it
-    const hoverAnimationsHandler = (): void => {
+    const hoverAnimationsHandler: MouseEventHandler<HTMLAnchorElement> = (): void => {
         linkStateAnimations.start({
-            backgroundColor: currentTheme === 'dark' ? '#e5e7eb' : '#1f2937',
-            transform: 'translateY(-5px)',
-            color: currentTheme === 'dark' ? '#1f2937' : '#e5e7eb',
-            scale: 1.05,
+            background: colorMode === 'dark' ? '#FAFAFA' : '#1E293C',
+            transform: 'translateY(-2.5px)',
+            scale: 1.08,
         });
     };
 
     //This is used to animate the link when the user hovers out of it
-    const hoverAnimationsLeaveHandler = (): void => {
+    const hoverAnimationsLeaveHandler: MouseEventHandler<HTMLAnchorElement> = (): void => {
         linkStateAnimations.start({
-            backgroundColor: 'transparent',
+            background: 'transparent',
             transform: 'translateY(0)',
-            color: currentTheme === 'dark' ? '#e5e7eb' : '#1f2937',
             scale: 1,
         });
     };
@@ -60,6 +54,6 @@ export const Links: FunctionComponent<LinksProps> = ({ label, to }: LinksProps):
     const AnimatedLink: AnimatedComponent<typeof Link> = animated(Link);
 
 	return (
-		<AnimatedLink style={linkState} className="p-2 px-4 rounded-full" to={to} onMouseEnter={hoverAnimationsHandler} onMouseLeave={hoverAnimationsLeaveHandler}>{label}</AnimatedLink>
+		<AnimatedLink style={linkState} className="p-2 px-4 rounded-full dark:hover:text-slate-800 hover:text-white hover:shadow-slate-800 dark:hover:shadow-white hover:shadow-2xl" to={to} onMouseEnter={hoverAnimationsHandler} onMouseLeave={hoverAnimationsLeaveHandler}>{label}</AnimatedLink>
 	);
 };
