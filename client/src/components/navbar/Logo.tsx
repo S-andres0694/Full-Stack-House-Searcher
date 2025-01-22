@@ -11,8 +11,13 @@ export const Logo: FunctionComponent = (): React.ReactNode => {
 	return (
 		<Box className="p-2">
 			<Text fontSize="lg" fontWeight="bold" className="flex items-center gap-2">
-				<FaHouseChimneyMedical size={24} className="bg-transparent text-slate-950 dark:text-white" />
-				<span className="bg-transparent text-slate-950 dark:text-white">HouseSearcher</span>
+				<FaHouseChimneyMedical
+					size={24}
+					className="bg-transparent text-slate-950 dark:text-white"
+				/>
+				<span className="bg-transparent text-slate-950 dark:text-white">
+					HouseSearcher
+				</span>
 			</Text>
 		</Box>
 	);

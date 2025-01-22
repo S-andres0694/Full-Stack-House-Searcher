@@ -8,13 +8,13 @@ import { AccessPage } from './pages/Access-Page';
 
 function App() {
 	return (
-			<ChakraProvider>
-				<BrowserRouter>
-					<Routes>
-						<Route path="/login" element={<AccessPage />} />
-					</Routes>
-				</BrowserRouter>
-			</ChakraProvider>
+		<ChakraProvider>
+			<BrowserRouter>
+				<Routes>
+					<Route path="/login" element={<AccessPage />} />
+				</Routes>
+			</BrowserRouter>
+		</ChakraProvider>
 	);
 }
 

@@ -75,7 +75,11 @@ export const AccessPage: FunctionComponent = (): JSX.Element => {
 				<div>
 					<ToastContainer className="bg-transparent" newestOnTop={true} />
 				</div>
-				<div className={`${selectedForm === 'Register' ? 'py-4' : ''} flex justify-center items-center min-h-[calc(100vh-64px)]`}>
+				<div
+					className={`${
+						selectedForm === 'Register' ? 'py-4' : ''
+					} flex justify-center items-center min-h-[calc(100vh-64px)]`}
+				>
 					<div
 						className={`max-w-xs md:max-w-sm lg:max-w-md space-y-4 p-8 bg-white dark:bg-slate-800 rounded-lg`}
 					>
@@ -86,7 +90,9 @@ export const AccessPage: FunctionComponent = (): JSX.Element => {
 								size="lg"
 								className="mx-auto rounded-lg"
 								onChange={() =>
-									setSelectedForm(selectedForm === 'Login' ? 'Register' : 'Login')
+									setSelectedForm(
+										selectedForm === 'Login' ? 'Register' : 'Login',
+									)
 								}
 							/>
 							<h1 className="text-4xl font-bold text-center">

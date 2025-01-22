@@ -12,7 +12,7 @@ export const Navbar: FunctionComponent = (): React.ReactNode => {
 		<div className="flex justify-between items-center p-4 bg-gray-100 dark:bg-slate-800 shadow-xl sticky top-0 z-50">
 			<Logo />
 			<div className="flex items-center gap-4">
-				<NavbarLinks /> 
+				<NavbarLinks />
 				<DarkModeToggle />
 			</div>
 		</div>
