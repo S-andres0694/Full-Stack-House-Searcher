@@ -50,7 +50,7 @@ export const LoginWithGoogleButton: React.FunctionComponent<{
 	};
 
 	//Modify the IconButton to use the hover animations
-	const IconButtonWithHoverAnimations = animated(IconButton);
+	const IconButtonWithHoverAnimations: AnimatedComponent<typeof IconButton> = animated(IconButton);
 
 	return (
 		<IconButtonWithHoverAnimations

@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Provider } from './components/ui/provider';
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 import { AccessPage } from './pages/Access-Page';
 
 /**
@@ -9,7 +10,7 @@ import { AccessPage } from './pages/Access-Page';
 
 function App() {
 	return (
-		<Provider>
+		<Provider store={store}>
 			<BrowserRouter>
 				<Routes>
 					<Route path="/login" element={<AccessPage />} />

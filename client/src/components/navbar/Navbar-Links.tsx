@@ -1,10 +1,14 @@
 import { FunctionComponent } from "react";
-import { Link } from "react-router-dom";
+import { Links } from "./Links";
 
 export const NavbarLinks: FunctionComponent = (): React.ReactNode => {
 	return (
-		<div>
-			<Link to="/dashboard">Dashboard</Link>
+		<div className="flex items-center gap-2">
+			<Links label="Dashboard" to="/dashboard" />
+			<Links label="Dashboard" to="/dashboard" />
+			<Links label="Dashboard" to="/dashboard" />
+			<Links label="Dashboard" to="/dashboard" />
+			<Links label="Dashboard" to="/dashboard" />
 		</div>
 	);
 };
