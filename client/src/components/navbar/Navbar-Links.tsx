@@ -81,6 +81,7 @@ export const NavbarLinks: FunctionComponent<NavbarLinksProps> = ({
 										<Links
 											key={link.label + link.to}
 											{...link}
+											onClick={() => setIsOpen(false)}
 										/>
 									))}
 								</animated.div>

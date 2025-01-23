@@ -11,6 +11,7 @@ export interface LinksProps {
 	label: string;
 	to: string;
 	icon?: React.ReactNode;
+	onClick?: () => void;
 }
 /**
  * Links component
@@ -22,6 +23,7 @@ export const Links: FunctionComponent<LinksProps> = ({
 	label,
 	to,
 	icon,
+	onClick,
 }: LinksProps): React.ReactNode => {
 	//This is used to get the current theme
 	const { colorMode }: { colorMode: string } = useColorMode();
@@ -71,6 +73,7 @@ export const Links: FunctionComponent<LinksProps> = ({
 			to={to}
 			onMouseEnter={hoverAnimationsHandler}
 			onMouseLeave={hoverAnimationsLeaveHandler}
+			onClick={onClick}
 		>
 			{' '}
 			{icon} <TypewriterAnimatedHeader text={label} delayPerLetter={15} />
