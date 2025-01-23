@@ -1,5 +1,4 @@
 import { User } from '../types/authentication-types';
-import jwt from 'jsonwebtoken';
 import axiosInstance from '../services/axios-instance';
 import {
 	AxiosResponse,
@@ -7,9 +6,6 @@ import {
 	InternalAxiosRequestConfig,
 	AxiosError,
 } from 'axios';
-import { checkEmailExists } from '../services/authentication-services';
-import { UseFormSetError } from 'react-hook-form';
-import { UseFormClearErrors } from 'react-hook-form';
 
 /**
  * This file contains the utilities for the authentication services.

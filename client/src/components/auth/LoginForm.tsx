@@ -1,5 +1,4 @@
 import { Stack } from '@chakra-ui/react';
-import { Button } from '../../components/ui/button';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { LoginWithJWTRequest } from '../../types/authentication-types';
 import {
@@ -7,19 +6,10 @@ import {
 	checkEmailExists,
 } from '../../services/authentication-services';
 import { NavigateFunction, useNavigate } from 'react-router-dom';
-import {
-	animated,
-	AnimatedComponent,
-	easings,
-	SpringValue,
-	to,
-	useSpring,
-	useSprings,
-} from '@react-spring/web';
 import { InputField } from '../utilities/Text-Input-Field';
 import { PasswordField } from '../utilities/PasswordField';
 import { ButtonWithHoverAnimations } from '../utilities/ButtonWithHoverAnimations';
-import { notify, PopupNotification } from '../utilities/popup-notification';
+import { notify } from '../utilities/popup-notification';
 import { emailRegex } from '../utilities/Regexes';
 
 /**

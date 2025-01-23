@@ -3,10 +3,13 @@ import { Logo } from './Logo';
 import { FunctionComponent } from 'react';
 import { NavbarLinks } from './Navbar-Links';
 import { LinksProps } from './Links';
+import { LoginNavbarButton } from '../auth/LoginNavbarButton';
+import { NavigateFunction } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 //TODO: Change the links to the actual links
-const links: LinksProps[] = [
-	{ label: 'Random', to: '/1' },
+export const links: LinksProps[] = [
+	{ label: 'Home', to: '/' },
 	{ label: 'Random', to: '/2' },
 	{ label: 'Random', to: '/3' },
 	{ label: 'Random', to: '/4' },
@@ -18,11 +21,22 @@ const links: LinksProps[] = [
  * @returns {React.ReactNode} a div with the navbar
  */
 
-export const Navbar: FunctionComponent = (): React.ReactNode => {
+export const Navbar: FunctionComponent<{
+	links: LinksProps[],
+	loginButton: boolean;
+}> = ({ links, loginButton }): React.ReactNode => {
+	const navigate: NavigateFunction = useNavigate();
 	return (
 		<div className="flex justify-between items-center p-4 bg-gray-100 dark:bg-slate-800 shadow-xl sticky top-0 z-50">
 			<Logo />
 			<div className="flex items-center gap-4">
+				{loginButton && (
+					<LoginNavbarButton
+						onClick={() => navigate('/login')}
+						text="Sign In"
+						type="button"
+					/>
+				)}
 				<NavbarLinks links={links} />
 				<DarkModeToggle />
 			</div>

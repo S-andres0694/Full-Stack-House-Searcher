@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 import { Alert } from '../ui/alert';
-import { Slide, toast, Zoom } from 'react-toastify';
+import { Slide, toast } from 'react-toastify';
 
 export interface PopupNotificationProps {
 	errorMessage: string;
@@ -11,10 +11,10 @@ export interface PopupNotificationProps {
 
 /**
  * A popup notification that displays an error message.
- * @param {string} errorTitle - The title of the error message
- * @param {string} errorMessage - The error message to display
- * @param {PopupPosition | PopupPosition[]} position - The position of the popup on the screen
- * @returns {FunctionComponent} - The popup notification
+ * @param errorTitle - The title of the error message
+ * @param errorMessage - The error message to display
+ * @param position - The position of the popup on the screen
+ * @returns - The popup notification
  */
 
 export const PopupNotification: FunctionComponent<PopupNotificationProps> = ({
@@ -22,7 +22,7 @@ export const PopupNotification: FunctionComponent<PopupNotificationProps> = ({
 	errorMessage,
 	type,
 	size = 'lg',
-}) => {
+}: PopupNotificationProps) => {
 	return (
 		<Alert
 			size={size}

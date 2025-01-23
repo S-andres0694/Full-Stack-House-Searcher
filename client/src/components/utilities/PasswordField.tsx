@@ -1,4 +1,4 @@
-import { FieldErrors, FormState, UseFormRegister } from 'react-hook-form';
+import { FormState, UseFormRegister } from 'react-hook-form';
 import { Field } from '../ui/field';
 import { PasswordInput } from '../ui/password-input';
 import { FunctionComponent } from 'react';
