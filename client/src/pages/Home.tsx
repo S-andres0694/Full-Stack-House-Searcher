@@ -1,4 +1,5 @@
 import { FunctionComponent } from "react";
+import { Hero } from "../components/home/Hero";
 
 /**
  * Home Page
@@ -7,8 +8,6 @@ import { FunctionComponent } from "react";
 
 export const Home: FunctionComponent<{}> = () => {
     return (
-        <div>
-            <h1>Home</h1>
-        </div>
+            <Hero />
     );
 };

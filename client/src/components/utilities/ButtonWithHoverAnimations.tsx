@@ -7,7 +7,8 @@ export const ButtonWithHoverAnimations: FunctionComponent<{
 	onClick: () => void;
 	text: string;
 	disabled?: boolean;
-}> = ({ type, onClick, text, disabled }) => {
+	className?: string;
+}> = ({ type, onClick, text, disabled, className }) => {
 	//This is used to animate the sign in button when the user hovers over it
 	const [signInButtonHoverStyles, signInButtonHoverAnimations] = useSpring(
 		() => ({
@@ -44,9 +45,8 @@ export const ButtonWithHoverAnimations: FunctionComponent<{
 			onMouseLeave={hoverAnimationsLeaveHandler}
 			colorPalette="accent"
 			onClick={onClick}
-			className="dark:bg-slate-50 dark:text-black bg-slate-800 text-white px-4 py-2 text-lg mt-5"
+			className={`dark:bg-slate-50 dark:text-black bg-slate-800 text-white px-4 py-2 text-lg mt-5 ${className}`}
 			style={{
-				width: '80%',
 				...signInButtonHoverStyles,
 			}}
 			variant="solid"
