@@ -110,6 +110,7 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 						type="submit"
 						onClick={() => {}}
 						text="Sign In"
+						className="w-[80%]"
 					/>
 				</Stack>
 			</form>

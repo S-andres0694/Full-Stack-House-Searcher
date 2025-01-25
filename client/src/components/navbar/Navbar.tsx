@@ -27,9 +27,9 @@ export const Navbar: FunctionComponent<{
 }> = ({ links, loginButton }): React.ReactNode => {
 	const navigate: NavigateFunction = useNavigate();
 	return (
-		<div className="flex justify-between items-center p-4 pr-6 bg-gray-100 dark:bg-slate-800 shadow-xl sticky top-0 z-50">
+		<div className="flex justify-between items-center p-2 sm:p-4 bg-gray-100 dark:bg-slate-800 shadow-xl sticky top-0 z-50">
 			<Logo />
-			<div className="flex items-center gap-3">
+			<div className="flex items-center gap-1 sm:gap-3">
 				{loginButton && (
 					<LoginNavbarButton
 						onClick={() => navigate('/login')}

@@ -269,18 +269,18 @@ export const RegisterForm: FunctionComponent = () => {
 								});
 							}
 						}}
-						className={`px-4 ${
-							!errors.confirmPassword
+						className={`px-4 ${!errors.confirmPassword
 								? 'focus:border border-black dark:border-white'
 								: 'border border-red-500'
-						} rounded-full`}
+							} rounded-full`}
 					/>
 				</Field>
 				<ButtonWithHoverAnimations
 					type="submit"
 					text="Register"
-					onClick={() => {}}
+					onClick={() => { }}
 					disabled={Object.keys(errors).length > 0}
+					className="w-[80%]"
 				/>
 			</Stack>
 		</form>
