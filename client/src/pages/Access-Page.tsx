@@ -7,13 +7,24 @@ import { RegisterForm } from '../components/auth/RegisterForm';
 import { useState, Dispatch, SetStateAction } from 'react';
 import { FunctionComponent } from 'react';
 import { animated, useSpring } from '@react-spring/web';
-
+import { useDispatch } from 'react-redux';
+import { setAnimatedBackground } from '../store/slices/animatedBackgroundSlice';
+import { AppDispatch } from '../store/store';
 /**
  * Access Page
+ * @param animatedBackground - The animated background state
  * @returns Access Page
  */
 
-export const AccessPage: FunctionComponent = (): JSX.Element => {
+export const AccessPage: FunctionComponent<{
+	animatedBackground: boolean;
+}> = ({ animatedBackground }: { animatedBackground: boolean }): JSX.Element => {
+	//Hook for the dispatch of the animated background state
+	const dispatch: AppDispatch = useDispatch();
+
+	//Sets the animated background state
+	dispatch(setAnimatedBackground(animatedBackground));
+
 	const startForm: string = 'Login';
 	//State of the currently shown form
 	const [selectedForm, setSelectedForm]: [

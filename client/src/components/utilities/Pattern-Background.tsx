@@ -1,5 +1,7 @@
 import { useSpring, animated } from '@react-spring/web';
 import { FunctionComponent } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 /**
  * A component that creates a pattern background for the page
@@ -10,6 +12,12 @@ import { FunctionComponent } from 'react';
 export const PatternBackground: FunctionComponent<{
 	children: React.ReactNode;
 }> = ({ children }: { children: React.ReactNode }) => {
+	//Determines if the animated background is enabled.
+	const animatedBackground: boolean = useSelector(
+		(state: RootState) => state.animatedBackground.animatedBackground,
+	);
+
+	//Creates the animated background.
 	const [springs] = useSpring(() => ({
 		from: { backgroundPosition: '0px 0px' },
 		to: [
@@ -25,7 +33,8 @@ export const PatternBackground: FunctionComponent<{
 	return (
 		<animated.div
 			style={
-				window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+				window.matchMedia('(prefers-reduced-motion: no-preference)').matches &&
+				animatedBackground
 					? springs
 					: {}
 			}

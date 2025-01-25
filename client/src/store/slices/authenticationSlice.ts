@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction, Slice } from '@reduxjs/toolkit';
 
+/**
+ * The state of the authentication.
+ */
+
 interface AuthenticationState {
 	userIsAuthenticated: boolean;
 }
@@ -14,7 +18,7 @@ interface AuthenticationState {
  * @returns the authentication slice of the store.
  */
 
-export const authenticationSlice: Slice = createSlice({
+export const authenticationSlice: Slice<AuthenticationState> = createSlice({
 	name: 'authentication',
 	initialState: {
 		userIsAuthenticated: false,

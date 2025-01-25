@@ -20,8 +20,11 @@ function App() {
 					<BrowserRouter>
 						<Routes>
 							<Route element={<RootLayout />}>
-								<Route path="/" element={<Home />} />
-								<Route path="/login" element={<AccessPage />} />
+								<Route path="/" element={<Home animatedBackground={false} />} />
+								<Route
+									path="/login"
+									element={<AccessPage animatedBackground={true} />}
+								/>
 							</Route>
 						</Routes>
 					</BrowserRouter>
