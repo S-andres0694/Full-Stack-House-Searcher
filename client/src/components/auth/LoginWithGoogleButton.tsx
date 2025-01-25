@@ -4,6 +4,9 @@ import { IconButton } from '@chakra-ui/react';
 import { FcGoogle } from 'react-icons/fc';
 import { AnimatedComponent, useSpring } from '@react-spring/web';
 import { animated } from '@react-spring/web';
+import { authenticationSlice } from '../../store/slices/authenticationSlice';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
 /**
  * This component is used to login the user with Google OAuth2.
  * @returns A button that, when clicked, will login the user with Google OAuth2.
@@ -14,6 +17,9 @@ export const LoginWithGoogleButton: React.FunctionComponent<{
 }> = ({ text = 'Sign in with Google' }) => {
 	//This is used to navigate the user to the login page
 	const navigate: NavigateFunction = useNavigate();
+
+	//This is used to dispatch the authentication state
+	const dispatch: AppDispatch = useDispatch();
 
 	//This is used to animate the sign in button when the user hovers over it
 	const [signInButtonHoverState, hoverAnimations] = useSpring(() => ({
@@ -43,6 +49,7 @@ export const LoginWithGoogleButton: React.FunctionComponent<{
 	const handleLoginWithGoogleOAuth2 = async (): Promise<void> => {
 		try {
 			await loginWithGoogleOAuth2();
+			dispatch(authenticationSlice.actions.setUsersAuthenticationState(true));
 		} catch (error) {
 			console.error(error);
 			navigate('/login');

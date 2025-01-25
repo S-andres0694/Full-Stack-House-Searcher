@@ -63,6 +63,7 @@ export const InputField: FunctionComponent<InputFieldProps<any>> = <
 				variant="subtle"
 				type={type}
 				placeholder={placeholder}
+				autoComplete="on"
 				{...register(name as Path<T>, {
 					required: required ? `${label} is required` : false,
 					pattern: {

@@ -6,6 +6,8 @@ import { LinksProps } from './Links';
 import { LoginNavbarButton } from '../auth/LoginNavbarButton';
 import { NavigateFunction } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 //TODO: Change the links to the actual links
 export const links: LinksProps[] = [
@@ -22,15 +24,21 @@ export const links: LinksProps[] = [
  */
 
 export const Navbar: FunctionComponent<{
-	links: LinksProps[],
-	loginButton: boolean;
-}> = ({ links, loginButton }): React.ReactNode => {
+	links: LinksProps[];
+}> = ({ links }): React.ReactNode => {
+	//Hook for the navigation
 	const navigate: NavigateFunction = useNavigate();
+
+	//Hook for the authentication state
+	const userIsAuthenticated: boolean = useSelector<RootState, boolean>(
+		(state: RootState) => state.authentication.userIsAuthenticated,
+	);
+
 	return (
 		<div className="flex justify-between items-center p-2 sm:p-4 bg-gray-100 dark:bg-slate-800 shadow-xl sticky top-0 z-50">
 			<Logo />
 			<div className="flex items-center gap-1 sm:gap-3">
-				{loginButton && (
+				{!userIsAuthenticated && (
 					<LoginNavbarButton
 						onClick={() => navigate('/login')}
 						text="Sign In"

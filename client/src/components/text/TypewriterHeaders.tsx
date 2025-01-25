@@ -16,7 +16,13 @@ const TypewriterAnimatedHeader: FunctionComponent<{
 	className?: string;
 	colorAnimation?: string[]; // Array of hex colors for animation
 	colorAnimationEndIndex?: number; // New prop to specify where color animation ends
-}> = ({ text, delayPerLetter, className, colorAnimation, colorAnimationEndIndex }) => {
+}> = ({
+	text,
+	delayPerLetter,
+	className,
+	colorAnimation,
+	colorAnimationEndIndex,
+}) => {
 	const textArray: string[] = text.split('');
 	const animatedTextStyles: {
 		opacity: SpringValue<number>;
@@ -28,16 +34,21 @@ const TypewriterAnimatedHeader: FunctionComponent<{
 			from: {
 				opacity: 0,
 				transform: 'translateY(10px)',
-				color: colorAnimation && (colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)
-					? colorAnimation[0]
-					: undefined
+				color:
+					colorAnimation &&
+					(colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)
+						? colorAnimation[0]
+						: undefined,
 			},
 			to: async (next: any) => {
 				await next({ opacity: 1, transform: 'translateY(0px)' });
 
-				if (colorAnimation && (colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)) {
+				if (
+					colorAnimation &&
+					(colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)
+				) {
 					while (true) {
-						await new Promise(resolve => setTimeout(resolve, 750));
+						await new Promise((resolve) => setTimeout(resolve, 750));
 						for (const color of colorAnimation) {
 							await next({ color: color });
 						}
@@ -45,7 +56,7 @@ const TypewriterAnimatedHeader: FunctionComponent<{
 				}
 			},
 			delay: i * delayPerLetter,
-			config: {}
+			config: {},
 		})),
 	);
 	return (

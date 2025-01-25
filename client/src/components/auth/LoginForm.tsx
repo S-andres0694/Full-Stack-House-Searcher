@@ -11,7 +11,9 @@ import { PasswordField } from '../utilities/PasswordField';
 import { ButtonWithHoverAnimations } from '../utilities/ButtonWithHoverAnimations';
 import { notify } from '../utilities/popup-notification';
 import { emailRegex } from '../utilities/Regexes';
-
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store/store';
+import { authenticationSlice } from '../../store/slices/authenticationSlice';
 /**
  * A form for logging in a user through JWT.
  * @returns A form for logging in a user through JWT.
@@ -20,6 +22,9 @@ import { emailRegex } from '../utilities/Regexes';
 export const LoginForm: React.FunctionComponent<{}> = () => {
 	//Hook for the navigation to other pages
 	const navigate: NavigateFunction = useNavigate();
+
+	//Hook for the dispatch of the authentication state
+	const dispatch: AppDispatch = useDispatch();
 
 	//Hook for the form
 	const {
@@ -36,8 +41,10 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 	) => {
 		try {
 			await loginThroughJWT(data);
-			navigate('/dashboard'); //TODO:Redirect to the dashboard
+			dispatch(authenticationSlice.actions.setUsersAuthenticationState(true));
+			navigate('/'); //TODO:Redirect to the dashboard
 		} catch (error: any) {
+			console.log(error);
 			if (error.response?.status === 401) {
 				notify(
 					'Invalid password',
