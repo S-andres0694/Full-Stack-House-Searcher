@@ -45,6 +45,7 @@ export const Hero: FunctionComponent<{}> = (): JSX.Element => {
 								<span className="font-bold">
 									*This service is still on development.
 								</span>
+								<span> </span>
 								We (me the only current dev) are working hard to make it better
 								for you.
 							</p>

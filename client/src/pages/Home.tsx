@@ -50,6 +50,7 @@ export const Home: FunctionComponent<{ animatedBackground: boolean }> = ({
 		<>
 			<Hero />
 			<FunctionalitySection animatedCards={animatedCards} />
+			<div className="h-[100vh] w-full"></div>
 		</>
 	);
 };

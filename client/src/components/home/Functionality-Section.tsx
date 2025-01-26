@@ -43,8 +43,10 @@ export const FunctionalitySection: FunctionComponent<{
 			direction={currentWidth < 1024 ? 'column' : 'row'}
 			gap={12}
 			flexWrap="wrap"
-			alignItems="center"
+			alignItems="start"
 			justifyContent="center"
+			flex={1}
+			minWidth="0"
 		>
 			<AnimatedCards animatedCards={animatedCards} animationDuration={1000} />
 		</Stack>
