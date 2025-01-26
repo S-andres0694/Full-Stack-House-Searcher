@@ -73,21 +73,21 @@ export const FunctionCards = ({
 			/>
 			<CardBody
 				gap="2"
-				className="flex flex-col items-center justify-center dark:bg-gray-800 bg-gray-100"
+				className="flex flex-col items-center justify-center pb-4 dark:bg-gray-800 bg-gray-100"
 			>
 				<TypewriterAnimatedHeader
 					text={title}
 					delayPerLetter={100}
-					className="text-2xl font-bold text-gray-800 dark:text-slate-400"
+					className="text-2xl font-bold text-gray-800 dark:text-gray-200"
 				/>
 				<TypewriterAnimatedHeader
 					text={description as string}
 					delayPerLetter={10}
-					className="text-sm font-medium text-gray-800 dark:text-slate-400"
+					className="text-sm font-medium text-gray-800 dark:text-gray-200"
 					centerText={true}
 				/>
 				{futureFeature && (
-					<hr className="w-[90%] mt-4 border border-slate-700 dark:border-slate-400" />
+					<hr className="w-[90%] mt-2 border border-slate-700 dark:border-slate-400" />
 				)}
 			</CardBody>
 
@@ -97,8 +97,8 @@ export const FunctionCards = ({
 						className="flex items-start justify-center dark:bg-gray-800 bg-gray-100"
 						gap="2"
 					>
-						<FaFlask className="text-gray-800 relative -top-3 dark:text-slate-400 text-5xl" />
-						<p className="text-sm dark:text-slate-400 text-gray-800 font-ibm-plex-sans">
+						<FaFlask className="text-gray-800 relative -top-2 dark:text-gray-300 text-5xl" />
+						<p className="text-sm dark:text-gray-300 text-gray-800 font-ibm-plex-sans">
 							<span className="font-bold">
 								*This feature is still on development.
 							</span>
