@@ -6,7 +6,7 @@ import { SegmentedControl } from '../components/ui/segmented-control';
 import { RegisterForm } from '../components/auth/RegisterForm';
 import { useState, Dispatch, SetStateAction } from 'react';
 import { FunctionComponent } from 'react';
-import { animated, useSpring } from '@react-spring/web';
+import { animated, config, useSpring } from '@react-spring/web';
 import { useDispatch } from 'react-redux';
 import { setAnimatedBackground } from '../store/slices/animatedBackgroundSlice';
 import { AppDispatch } from '../store/store';
@@ -44,8 +44,7 @@ export const AccessPage: FunctionComponent<{
 				transform: 'translateX(0)',
 			},
 			config: {
-				tension: 280,
-				friction: 20,
+				...config.wobbly,
 			},
 			reset: true,
 			immediate: false,

@@ -44,7 +44,7 @@ export const Hero: FunctionComponent<{}> = (): JSX.Element => {
 							<p className="text-xl dark:text-slate-400 text-slate-600 font-ibm-plex-sans">
 								<span className="font-bold">
 									*This service is still on development.
-								</span>{' '}
+								</span>
 								We (me the only current dev) are working hard to make it better
 								for you.
 							</p>

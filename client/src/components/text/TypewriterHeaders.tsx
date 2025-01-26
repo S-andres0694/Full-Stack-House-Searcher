@@ -16,12 +16,14 @@ const TypewriterAnimatedHeader: FunctionComponent<{
 	className?: string;
 	colorAnimation?: string[]; // Array of hex colors for animation
 	colorAnimationEndIndex?: number; // New prop to specify where color animation ends
+	centerText?: boolean;
 }> = ({
 	text,
 	delayPerLetter,
 	className,
 	colorAnimation,
 	colorAnimationEndIndex,
+	centerText,
 }) => {
 	const textArray: string[] = text.split('');
 	const animatedTextStyles: {
@@ -60,7 +62,7 @@ const TypewriterAnimatedHeader: FunctionComponent<{
 		})),
 	);
 	return (
-		<div>
+		<div className={centerText ? 'text-center' : ''}>
 			{textArray.map((letter: string, index: number) => (
 				<animated.span
 					key={`${letter}-${index}`}
