@@ -6,11 +6,14 @@ import tseslint from 'typescript-eslint';
 import react from 'eslint-plugin-react';
 
 export default tseslint.config(
-	{ ignores: ['dist'] },
+	{ ignores: ['dist', 'node_modules'] },
 	{
 		extends: [
 			js.configs.recommended,
 			...tseslint.configs.recommendedTypeChecked,
+			'plugin:react-hooks/recommended',
+			'plugin:react/recommended',
+			'plugin:react/jsx-runtime',
 		],
 		files: ['**/*.{ts,tsx}'],
 		languageOptions: {

@@ -26,7 +26,7 @@ module.exports = function (grunt) {
 			tasks: ['prettify', 'lint'],
 			options: {
 				spawn: false,
-				interval: 2500,
+				interval: 15000,
 			},
 		},
 		//Prettier

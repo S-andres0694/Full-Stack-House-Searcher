@@ -240,9 +240,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getPropertyByIdentifier endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get(
-			'/properties/by-identifier/999',
-		);
+		const response = await request(app).get('/properties/by-identifier/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -292,9 +290,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getMonthlyRent endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get(
-			'/properties/monthly-rent/999',
-		);
+		const response = await request(app).get('/properties/monthly-rent/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -394,9 +390,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getContactPhone endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get(
-			'/properties/contact-phone/999',
-		);
+		const response = await request(app).get('/properties/contact-phone/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -422,9 +416,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getIdentifier endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get(
-			'/properties/identifier/999',
-		);
+		const response = await request(app).get('/properties/identifier/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});
@@ -512,9 +504,7 @@ describe('Properties API Testing', () => {
 	});
 
 	it('tests that the getIdentifier endpoint returns a 404 error if the property is not found', async () => {
-		const response = await request(app).get(
-			'/properties/identifier/999',
-		);
+		const response = await request(app).get('/properties/identifier/999');
 		expect(response.status).toBe(404);
 		expect(response.body.error).toBe('Property not found');
 	});

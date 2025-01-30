@@ -50,7 +50,7 @@ beforeEach(async () => {
 	await initialValues(db);
 });
 
-describe('Tests that when registering as a new user, an invitation token is created', () => {
+describe('Tests the invitation token model and its functionality', () => {
 	it('should create an invitation token', async () => {
 		const invitationToken: string = '1234567890';
 		await invitationTokenModel.createInvitationToken(invitationToken);
@@ -63,15 +63,13 @@ describe('Tests that when registering as a new user, an invitation token is crea
 		expect(invitationTokenRecord[0].token).toBe(invitationToken);
 	});
 
-	it('shows that consuming the token removes marks it as invalid', async () => {
+	it('shows that consuming the token marks it as used', async () => {
 		const invitationToken: string = '1234567890';
 		const invitationTokenRecord: InvitationToken | undefined =
 			await invitationTokenModel.createInvitationToken(invitationToken);
 		expect(invitationTokenRecord).toBeDefined();
 		expect(invitationTokenRecord).not.toBeUndefined();
-		await invitationTokenModel.consumeInvitationToken(
-			invitationTokenRecord as InvitationToken,
-		);
+		await invitationTokenModel.consumeInvitationToken(invitationToken);
 		expect(
 			await invitationTokenModel.isInvitationTokenValid(invitationToken),
 		).toBe(false);

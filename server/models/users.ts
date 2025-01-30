@@ -284,6 +284,15 @@ export class UsersModel {
 		const user: User | undefined = await this.getUserByUsername(username);
 		return user?.id;
 	}
+
+	/**
+	 * Checks if an email exists in the database.
+	 * @param {string} email - The email to check.
+	 * @returns {Promise<boolean>} True if the email exists, false otherwise
+	 */
+	async checkEmailExists(email: string): Promise<boolean> {
+		return await this.emailExists(email);
+	}
 }
 
 /**
