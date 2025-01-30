@@ -10,12 +10,7 @@ import {
 	easings,
 } from '@react-spring/web';
 import { FaFlask } from 'react-icons/fa';
-import {
-	Dispatch,
-	MouseEventHandler,
-	SetStateAction,
-	useState,
-} from 'react';
+import { Dispatch, MouseEventHandler, SetStateAction, useState } from 'react';
 import { useColorMode } from '../ui/color-mode';
 /**
  * Styles for the animated cards.
@@ -43,13 +38,14 @@ export const FunctionCards = ({
 	image,
 	futureFeature,
 }: animatedCards) => {
-
 	// Add state to monitor the theme.
 	const { colorMode } = useColorMode();
 
 	// Keeps state of the message of the typewriter header
-	const [isHovered, setIsHovered]: [boolean, Dispatch<SetStateAction<boolean>>] =
-		useState(false);
+	const [isHovered, setIsHovered]: [
+		boolean,
+		Dispatch<SetStateAction<boolean>>,
+	] = useState(false);
 
 	// Add state to monitor reset trigger
 	const [resetTrigger, setResetTrigger] = useState(false);
@@ -88,7 +84,6 @@ export const FunctionCards = ({
 
 	// Animate the card when it is not hovered over.
 	const handleLeave: MouseEventHandler<HTMLDivElement> = () => {
-		
 		scaleAnimationHandler.start({
 			transform: 'scale(1)',
 			background: 'rgba(0, 0, 0, 0)',
@@ -111,7 +106,7 @@ export const FunctionCards = ({
 
 	return (
 		<AnimatedCardRoot
-			maxW="sm"
+			maxW="md"
 			overflow="hidden"
 			rounded="lg"
 			className="px-3 pt-2 animated-card"
@@ -132,6 +127,7 @@ export const FunctionCards = ({
 				src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
 				alt={title}
 				rounded="lg"
+				className="shadow-md shadow-black dark:shadow-white-900"
 			/>
 			<AnimatedCardBody
 				gap="2"

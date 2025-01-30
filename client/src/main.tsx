@@ -6,7 +6,10 @@ import App from './app';
  * The main entry point for the application.
  */
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+const root: HTMLElement = document.getElementById('root')!;
+root.classList.add('dark:bg-slate-800');
+
+ReactDOM.createRoot(root).render(
 	<React.StrictMode>
 		<App />
 	</React.StrictMode>,

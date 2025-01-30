@@ -5,6 +5,7 @@ import { AppDispatch } from '../store/store';
 import { useDispatch } from 'react-redux';
 import { setAnimatedBackground } from '../store/slices/animatedBackgroundSlice';
 import { animatedCards } from '../components/home/AnimatedCards';
+import { TestimonialSection } from '../components/home/TestimonialSection';
 /**
  * Home Page
  * @returns Home Page
@@ -47,10 +48,10 @@ export const Home: FunctionComponent<{ animatedBackground: boolean }> = ({
 	];
 
 	return (
-		<>
+		<div className="max-w-[100vw] max-h-[100vh] flex flex-col gap-6 bg-white dark:bg-slate-800">
 			<Hero />
 			<FunctionalitySection animatedCards={animatedCards} />
-			<div className="h-[100vh] w-full"></div>
-		</>
+			<TestimonialSection />
+		</div>
 	);
 };

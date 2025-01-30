@@ -1,6 +1,7 @@
 import { FunctionComponent, useEffect, useState } from 'react';
 import { Stack } from '@chakra-ui/react';
 import { AnimatedCards, animatedCards } from './AnimatedCards';
+import TypewriterAnimatedHeader from '../text/TypewriterHeaders';
 
 /**
  * The interface for the animated cards.
@@ -14,12 +15,12 @@ import { AnimatedCards, animatedCards } from './AnimatedCards';
 /**
  * This is the functionality section of the home page.
  * It is a section that shows the functionality of the platform.
- * @returns {JSX.Element}
+ * @returns {React.ReactNode}
  */
 
 export const FunctionalitySection: FunctionComponent<{
 	animatedCards: animatedCards[];
-}> = ({ animatedCards }): JSX.Element => {
+}> = ({ animatedCards }): React.ReactNode => {
 	// Keep track of the current width of the window for responsive design.
 	const [currentWidth, setCurrentWidth] = useState<number>(window.innerWidth);
 
@@ -39,16 +40,27 @@ export const FunctionalitySection: FunctionComponent<{
 
 	// Render the functionality section.
 	return (
-		<Stack
-			direction={currentWidth < 1024 ? 'column' : 'row'}
-			gap={12}
-			flexWrap="wrap"
-			alignItems="start"
-			justifyContent="center"
-			flex={1}
-			minWidth="0"
-		>
-			<AnimatedCards animatedCards={animatedCards} animationDuration={1000} />
-		</Stack>
+		<>
+			<div className="bg-white dark:bg-slate-800 max-w-[100vw]">
+				<TypewriterAnimatedHeader
+					text="Features"
+					delayPerLetter={100}
+					className="text-4xl font-bold dark:text-slate-100 text-slate-800"
+					centerText={true}
+				/>
+			</div>
+			<Stack
+				direction={currentWidth < 1024 ? 'column' : 'row'}
+				gap={5}
+				alignItems={currentWidth < 1024 ? 'center' : 'start'}
+				justifyContent="center"
+				flex={1}
+				flexWrap={currentWidth < 1024 ? 'wrap' : 'nowrap'}
+				minWidth="0"
+				className="dark:bg-slate-800 bg-white max-w-[100vw] border-b-4 border-slate-800 dark:border-gray-300"
+			>
+				<AnimatedCards animatedCards={animatedCards} animationDuration={1000} />
+			</Stack>
+		</>
 	);
 };

@@ -28,87 +28,87 @@ const TypewriterAnimatedHeader: FunctionComponent<{
 	centerText,
 	resetTrigger,
 }) => {
-		// Only create the text array if resetTrigger is undefined or true
-		const textArray: string[] = (resetTrigger === undefined || resetTrigger)
-			? text.split('')
-			: [''];  // Empty array when resetTrigger is false
+	// Only create the text array if resetTrigger is undefined or true
+	const textArray: string[] =
+		resetTrigger === undefined || resetTrigger ? text.split('') : ['']; // Empty array when resetTrigger is false
 
-		/*
-		 * Use springs to animate each character individually. Also applies the color animation if the color is passed.
-		 */
-		const [springs, api] = useSprings(textArray.length, (i: number) => ({
-			from: {
-				opacity: 0,
-				transform: 'translateY(10px)',
-				color:
+	/*
+	 * Use springs to animate each character individually. Also applies the color animation if the color is passed.
+	 */
+	const [springs, api] = useSprings(textArray.length, (i: number) => ({
+		from: {
+			opacity: 0,
+			transform: 'translateY(10px)',
+			color:
+				colorAnimation &&
+				(colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)
+					? colorAnimation[0]
+					: undefined,
+		},
+		to: async (next: any) => {
+			if (resetTrigger === undefined || resetTrigger) {
+				await next({ opacity: 1, transform: 'translateY(0px)' });
+
+				if (
 					colorAnimation &&
-						(colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)
-						? colorAnimation[0]
-						: undefined,
-			},
-			to: async (next: any) => {
-				if (resetTrigger === undefined || resetTrigger) {
-					await next({ opacity: 1, transform: 'translateY(0px)' });
-
-					if (
-						colorAnimation &&
-						(colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)
-					) {
-						while (true) {
-							await new Promise((resolve) => setTimeout(resolve, 750));
-							for (const color of colorAnimation) {
-								await next({ color: color });
-							}
+					(colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)
+				) {
+					while (true) {
+						await new Promise((resolve) => setTimeout(resolve, 750));
+						for (const color of colorAnimation) {
+							await next({ color: color });
 						}
 					}
-				} else {
-					await next({ opacity: 0, transform: 'translateY(10px)' });
 				}
-			},
-			delay: i * delayPerLetter,
-			config: {},
-		}));
+			} else {
+				await next({ opacity: 0, transform: 'translateY(10px)' });
+			}
+		},
+		delay: i * delayPerLetter,
+		config: {},
+	}));
 
-		useEffect(() => {
-			if (resetTrigger !== undefined) {
-				// Reset the springs with new text array length
-				api.start((i) => ({
-					to: async (next: any) => {
-						if (resetTrigger) {
-							await next({ opacity: 1, transform: 'translateY(0px)' });
+	useEffect(() => {
+		if (resetTrigger !== undefined) {
+			// Reset the springs with new text array length
+			api.start((i) => ({
+				to: async (next: any) => {
+					if (resetTrigger) {
+						await next({ opacity: 1, transform: 'translateY(0px)' });
 
-							if (
-								colorAnimation &&
-								(colorAnimationEndIndex === undefined || i <= colorAnimationEndIndex)
-							) {
-								while (true) {
-									await new Promise((resolve) => setTimeout(resolve, 750));
-									for (const color of colorAnimation) {
-										await next({ color: color });
-									}
+						if (
+							colorAnimation &&
+							(colorAnimationEndIndex === undefined ||
+								i <= colorAnimationEndIndex)
+						) {
+							while (true) {
+								await new Promise((resolve) => setTimeout(resolve, 750));
+								for (const color of colorAnimation) {
+									await next({ color: color });
 								}
 							}
-						} else {
-							await next({ opacity: 0, transform: 'translateY(10px)' });
 						}
-					},
-					delay: i * delayPerLetter,
-				}));
-			}
-		}, [resetTrigger]);
+					} else {
+						await next({ opacity: 0, transform: 'translateY(10px)' });
+					}
+				},
+				delay: i * delayPerLetter,
+			}));
+		}
+	}, [resetTrigger]);
 
-		return (
-			<div className={centerText ? 'text-center' : ''}>
-				{textArray.map((letter: string, index: number) => (
-					<animated.span
-						key={`${letter}-${index}`}
-						style={springs[index]}
-						className={className}
-					>
-						{resetTrigger === false ? '' : letter}
-					</animated.span>
-				))}
-			</div>
-		);
-	};
+	return (
+		<div className={centerText ? 'text-center' : ''}>
+			{textArray.map((letter: string, index: number) => (
+				<animated.span
+					key={`${letter}-${index}`}
+					style={springs[index]}
+					className={className}
+				>
+					{resetTrigger === false ? '' : letter}
+				</animated.span>
+			))}
+		</div>
+	);
+};
 export default TypewriterAnimatedHeader;

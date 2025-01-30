@@ -20,7 +20,7 @@ function App() {
 					<BrowserRouter>
 						<Routes>
 							<Route element={<RootLayout />}>
-								<Route path="/" element={<Home animatedBackground={true} />} />
+								<Route path="/" element={<Home animatedBackground={false} />} />
 								<Route
 									path="/login"
 									element={<AccessPage animatedBackground={true} />}

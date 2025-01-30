@@ -45,7 +45,7 @@ export const ButtonWithHoverAnimations: FunctionComponent<{
 			onMouseLeave={hoverAnimationsLeaveHandler}
 			colorPalette="accent"
 			onClick={onClick}
-			className={`dark:bg-slate-50 dark:text-black bg-slate-800 text-white px-4 py-2 text-lg mt-5 ${className}`}
+			className={`dark:bg-slate-50 dark:text-black bg-slate-800 text-white px-4 py-2 text-lg ${className}`}
 			style={{
 				...signInButtonHoverStyles,
 			}}

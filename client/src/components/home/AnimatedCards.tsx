@@ -67,7 +67,7 @@ export const AnimatedCards: FunctionComponent<animatedCardProps> = ({
 				opacity: 1,
 			},
 			config: {
-				...config.gentle,
+				...config.wobbly,
 			},
 			delay: (animationDuration * index) / 2,
 		}),
@@ -79,7 +79,7 @@ export const AnimatedCards: FunctionComponent<animatedCardProps> = ({
 			{animationStyles.map(
 				(animationStyles: animationStyles, index: number) => (
 					<animated.div
-						className="mt-8"
+						className="overflow-visible"
 						key={index}
 						style={{ ...animationStyles }}
 					>

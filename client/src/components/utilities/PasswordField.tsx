@@ -34,6 +34,7 @@ export const PasswordField: FunctionComponent<PasswordFieldProps> = ({
 			required={requiredLabel}
 		>
 			<PasswordInput
+				autoComplete="on"
 				required={required}
 				placeholder="Enter your password"
 				variant="subtle"
