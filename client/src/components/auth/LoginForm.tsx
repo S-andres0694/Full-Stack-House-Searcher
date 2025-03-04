@@ -13,7 +13,7 @@ import { notify } from '../utilities/popup-notification';
 import { emailRegex } from '../utilities/Regexes';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '../../store/store';
-import { authenticationSlice } from '../../store/slices/authenticationSlice';
+import { setUsersAuthenticationState } from '../../store/slices/authenticationSlice';
 /**
  * A form for logging in a user through JWT.
  * @returns A form for logging in a user through JWT.
@@ -41,7 +41,7 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 	) => {
 		try {
 			await loginThroughJWT(data);
-			dispatch(authenticationSlice.actions.setUsersAuthenticationState(true));
+			dispatch(setUsersAuthenticationState(true));
 			navigate('/'); //TODO:Redirect to the home
 		} catch (error: any) {
 			console.log(error);

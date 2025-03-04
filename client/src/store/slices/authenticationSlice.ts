@@ -24,8 +24,10 @@ export const authenticationSlice: Slice<AuthenticationState> = createSlice({
 		userIsAuthenticated: false,
 	} as AuthenticationState,
 	reducers: {
-		setUsersAuthenticationState: (state, action: PayloadAction<boolean>) => {
+		setUsersAuthenticationState: (state: AuthenticationState, action: PayloadAction<boolean>) => {
 			state.userIsAuthenticated = action.payload;
 		},
 	},
 });
+
+export const { setUsersAuthenticationState } = authenticationSlice.actions;

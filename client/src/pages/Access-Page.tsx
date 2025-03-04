@@ -4,7 +4,7 @@ import TypewriterAnimatedHeader from '../components/text/TypewriterHeaders';
 import { Divider } from '../components/utilities/Divider';
 import { SegmentedControl } from '../components/ui/segmented-control';
 import { RegisterForm } from '../components/auth/RegisterForm';
-import { useState, Dispatch, SetStateAction } from 'react';
+import { useState, Dispatch, SetStateAction, useEffect } from 'react';
 import { FunctionComponent } from 'react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { useDispatch } from 'react-redux';
@@ -19,14 +19,16 @@ import { AppDispatch } from '../store/store';
 export const AccessPage: FunctionComponent<{
 	animatedBackground: boolean;
 }> = ({ animatedBackground }: { animatedBackground: boolean }): JSX.Element => {
-	//Hook for the dispatch of the animated background state
+	// Hook for the dispatch of the animated background state
 	const dispatch: AppDispatch = useDispatch();
 
-	//Sets the animated background state
-	dispatch(setAnimatedBackground(animatedBackground));
+	// Use useEffect to dispatch the action when the component mounts or when animatedBackground changes
+	useEffect(() => {
+		dispatch(setAnimatedBackground(animatedBackground));
+	}, [dispatch, animatedBackground]);
 
 	const startForm: string = 'Login';
-	//State of the currently shown form
+	// State of the currently shown form
 	const [selectedForm, setSelectedForm]: [
 		string,
 		Dispatch<SetStateAction<string>>,
@@ -77,9 +79,8 @@ export const AccessPage: FunctionComponent<{
 
 	return (
 		<div
-			className={`${
-				selectedForm === 'Register' ? 'py-4' : ''
-			} flex justify-center items-center min-h-[calc(100vh-64px)]`}
+			className={`${selectedForm === 'Register' ? 'py-4' : ''
+				} flex justify-center items-center min-h-[calc(100vh-64px)]`}
 		>
 			<div
 				className={`max-w-xs md:max-w-sm lg:max-w-md space-y-4 p-8 bg-white dark:bg-slate-800 rounded-lg`}
