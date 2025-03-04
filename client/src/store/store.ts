@@ -24,6 +24,7 @@ const persistConfig: PersistConfig<RootState> = {
 	key: 'root',
 	storage,
 	debug: process.env.NODE_ENV === 'development',
+	blacklist: ['authentication'],
 };
 
 /**
@@ -67,4 +68,3 @@ export const store: Store = configureStore({
 export type RootState = ReturnType<typeof store.getState>;
 export const persistor: Persistor = persistStore(store);
 export type AppDispatch = typeof store.dispatch;
-
