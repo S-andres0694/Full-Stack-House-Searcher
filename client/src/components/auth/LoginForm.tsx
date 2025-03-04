@@ -42,7 +42,7 @@ export const LoginForm: React.FunctionComponent<{}> = () => {
 		try {
 			await loginThroughJWT(data);
 			dispatch(authenticationSlice.actions.setUsersAuthenticationState(true));
-			navigate('/'); //TODO:Redirect to the dashboard
+			navigate('/'); //TODO:Redirect to the home
 		} catch (error: any) {
 			console.log(error);
 			if (error.response?.status === 401) {

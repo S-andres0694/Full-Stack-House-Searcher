@@ -51,7 +51,6 @@ export const Home: FunctionComponent<{ animatedBackground: boolean }> = ({
 		<div className="max-w-[100vw] max-h-[100vh] flex flex-col gap-6 bg-white dark:bg-slate-800">
 			<Hero />
 			<FunctionalitySection animatedCards={animatedCards} />
-			<TestimonialSection />
 		</div>
 	);
 };
