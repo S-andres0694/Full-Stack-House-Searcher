@@ -76,7 +76,7 @@ export const register = async (
 
 export const loginThroughJWT = async (
 	loginRequest: LoginWithJWTRequest,
-): Promise<string> => {
+): Promise<void> => {
 	const response: AxiosResponse = await axiosInstance.post(
 		'/auth/login',
 		loginRequest,
@@ -87,7 +87,59 @@ export const loginThroughJWT = async (
 		//Once the user is logged in, add the interceptors to automatically attach the token and to make requests to refresh the token when necessary.
 		await addAccessTokenInterceptorToInstance(axiosInstance, accessToken);
 		await addRefreshTokenInterceptorToInstance(axiosInstance);
-		return accessToken;
+	} else {
+		throw new Error(response.data.message);
+	}
+};
+
+/**
+ * Checks if an email exists in the database.
+ * @param email - The email to check.
+ * @returns A promise that resolves to a boolean.
+ */
+
+export const checkEmailExists = async (email: string): Promise<boolean> => {
+	const response: AxiosResponse = await axiosInstance.get(
+		`/public/check-email/${email}`,
+	);
+	if (response.status === 200) {
+		return response.data.exists;
+	} else {
+		throw new Error(response.data.error);
+	}
+};
+
+/**
+ * Checks if a username exists in the database.
+ * @param username - The username to check.
+ * @returns A promise that resolves to a boolean.
+ */
+
+export const checkUsernameExists = async (
+	username: string,
+): Promise<boolean> => {
+	const response: AxiosResponse = await axiosInstance.get(
+		`/public/check-username/${username}`,
+	);
+	if (response.status === 200) {
+		return response.data.exists;
+	} else {
+		throw new Error(response.data.error);
+	}
+};
+
+/**
+ * Check if an invitation token is valid.
+ * @param token - The invitation token to check.
+ * @returns A promise that resolves to the status of the invitation token, which might be 'valid', 'used', or 'not found'.
+ */
+
+export const checkInvitationToken = async (token: string): Promise<string> => {
+	const response: AxiosResponse = await axiosInstance.get(
+		`/invitation-tokens/verify/${token}`,
+	);
+	if (response.status === 200) {
+		return response.data.status;
 	} else {
 		throw new Error(response.data.message);
 	}
